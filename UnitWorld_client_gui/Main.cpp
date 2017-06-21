@@ -25,7 +25,8 @@ int main()
 		// Clear screen
 		window.clear();
 		//Game loop
-		if(gameLoop.loop();
+		if (!gameLoop.loop())
+			window.close();
 		// Update the window
 		window.display();
 	}
