@@ -1,2 +1,4 @@
-*.sdf
-*.opendb
+**/*.sdf
+**/*.opendb
+**/*.suo
+**/*.pdb
