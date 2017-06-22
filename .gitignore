@@ -3,3 +3,13 @@
 *.suo
 .suo
 *.pdb
+*.obj
+*.tlog
+*.lastbuildstate
+*.log
+*.idb
+*.db
+*.ipch
+*.ilk
+*.exp
+*.exe
