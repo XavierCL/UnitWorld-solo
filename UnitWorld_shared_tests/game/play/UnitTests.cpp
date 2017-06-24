@@ -14,13 +14,13 @@ namespace UnitWorld_shared_tests
 		{
 			Unit testUnit;
 
-			Assert::AreEqual(Point(0, 0).x(), testUnit.position().x());
-			Assert::AreEqual(Point(0, 0).y(), testUnit.position().y());
+			Assert::AreEqual(Vector2(0, 0).x(), testUnit.position().x());
+			Assert::AreEqual(Vector2(0, 0).y(), testUnit.position().y());
 		}
 
 		TEST_METHOD(oneParameterConstructor_shouldSaveThePositionAsItsOwn)
 		{
-			const Point ARBITRARY_POINT(1, 1);
+			const Vector2 ARBITRARY_POINT(1, 1);
 			Unit testUnit;
 
 			testUnit.position(ARBITRARY_POINT);
@@ -31,8 +31,8 @@ namespace UnitWorld_shared_tests
 
 		TEST_METHOD(oneParameterConstructor_shouldSaveThePositionAsItsOwnOnSecondSet)
 		{
-			const Point ARBITRARY_POINT(1, 1);
-			const Point SECOND_ARBITRARY_POINT(4, 5);
+			const Vector2 ARBITRARY_POINT(1, 1);
+			const Vector2 SECOND_ARBITRARY_POINT(4, 5);
 			Unit testUnit;
 
 			testUnit.position(ARBITRARY_POINT);

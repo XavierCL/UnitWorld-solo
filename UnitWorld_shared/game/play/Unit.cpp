@@ -2,16 +2,16 @@
 
 using namespace uw;
 
-Unit::Unit(const Point& position):
-	_position(position)
+Unit::Unit(const Vector2& initialPosition):
+	_position(initialPosition)
 {}
 
-const Point Unit::position() const
+const Vector2 Unit::position() const
 {
 	return _position;
 }
 
-void Unit::position(const Point& newPosition)
+void Unit::position(const Vector2& newPosition)
 {
 	_position = newPosition;
 }

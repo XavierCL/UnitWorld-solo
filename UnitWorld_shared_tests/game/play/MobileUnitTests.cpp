@@ -18,7 +18,7 @@ namespace UnitWorld_shared_tests
 		TEST_METHOD(setDestination_shouldNotThrowAnyException)
 		{
 			MobileUnit unit;
-			unit.setDestination(Point(2, 4));
+			unit.setDestination(Vector2(2, 4));
 		}
 	};
 }

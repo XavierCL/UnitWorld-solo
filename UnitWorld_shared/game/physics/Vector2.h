@@ -2,10 +2,10 @@
 
 namespace uw
 {
-	class Point
+	class Vector2
 	{
 	public:
-		Point(const int& x = 0, const int& y = 0);
+		Vector2(const int& x = 0, const int& y = 0);
 
 		const int x() const;
 		void x(const int& newX);

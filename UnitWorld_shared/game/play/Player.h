@@ -11,11 +11,12 @@ namespace uw
 	class Player
 	{
 	public:
-		void setMobileUnitsDestinationInArea(const Rectangle& area, const Point& destination);
+		void selectMobileUnitsInArea(const Rectangle& area);
+		void setSelectedMobileUnitsDestination(const Vector2& destination);
 
 	private:
-		static void setMobileUnitsDestination(Set<MobileUnit*>& movedUnits, const Point& destination);
 		
 		Set<MobileUnit*> _mobileUnits;
+		Set<MobileUnit*> _selectedMobileUnits;
 	};
 }

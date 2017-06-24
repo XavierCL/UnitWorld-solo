@@ -123,7 +123,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="game\GameManager.h" />
-    <ClInclude Include="game\geometry\Point.h" />
+    <ClInclude Include="game\physics\Vector2.h" />
     <ClInclude Include="game\geometry\Rectangle.h" />
     <ClInclude Include="game\play\MobileUnit.h" />
     <ClInclude Include="game\play\Player.h" />
@@ -137,7 +137,7 @@
     <ClInclude Include="utils\Set.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="game\geometry\Point.cpp" />
+    <ClCompile Include="game\physics\Vector2.cpp" />
     <ClCompile Include="game\geometry\Rectangle.cpp" />
     <ClCompile Include="game\play\MobileUnit.cpp" />
     <ClCompile Include="game\play\Player.cpp" />

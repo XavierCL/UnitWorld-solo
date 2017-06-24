@@ -11,8 +11,8 @@ MobileUnit::~MobileUnit()
 	delete _destination;
 }
 
-void MobileUnit::setDestination(const Point& destination)
+void MobileUnit::setDestination(const Vector2& destination)
 {
 	delete _destination;
-	_destination = new Point(destination);
+	_destination = new Vector2(destination);
 }

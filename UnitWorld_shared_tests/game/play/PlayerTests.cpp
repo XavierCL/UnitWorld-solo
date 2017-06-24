@@ -15,10 +15,16 @@ namespace UnitWorld_shared_tests
 			Player testPlayer;
 		}
 
-		TEST_METHOD(setMobileUnitsDestinationInArea_shouldNotThrowAnyException)
+		TEST_METHOD(selectMobileUnitsInArea_shouldNotThrowAnyException)
 		{
 			Player testPlayer;
-			testPlayer.setMobileUnitsDestinationInArea(Rectangle(), Point());
+			testPlayer.selectMobileUnitsInArea(Rectangle(Vector2(), Vector2()));
+		}
+
+		TEST_METHOD(setSelectedMobileUnitsDestination_shouldNotThrowAnyException)
+		{
+			Player testPlayer;
+			testPlayer.setSelectedMobileUnitsDestination(Vector2());
 		}
 	};
 }

@@ -1,21 +1,19 @@
 #pragma once
 
-#include "Point.h"
+#include "../physics/Vector2.h"
 
 namespace uw
 {
 	class Rectangle
 	{
 	public:
-		Rectangle(const Point& upperLeftCorner = Point(0, 0),
-			const unsigned int& width = 0,
-			const unsigned int& height = 0);
+		Rectangle(const Vector2& corner1,
+			const Vector2& corner2);
 
-		const bool contains(const Point& point) const;
+		const bool contains(const Vector2& point) const;
 
 	private:
-		Point _upperLeftCorner;
-		unsigned int _width;
-		unsigned int _height;
+		Vector2 _upperLeftCorner;
+		Vector2 _lowerRightCorner;
 	};
 }

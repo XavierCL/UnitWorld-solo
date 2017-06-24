@@ -2,22 +2,20 @@
 
 using namespace uw;
 
-void Player::setMobileUnitsDestinationInArea(const Rectangle& area, const Point& destination)
+void Player::selectMobileUnitsInArea(const Rectangle& area)
 {
-	Set<MobileUnit*> movedUnits;
 	for(auto* const mobileUnit: _mobileUnits)
 	{
 		if (area.contains(mobileUnit->position()))
 		{
-			movedUnits.insert(mobileUnit);
+			_selectedMobileUnits.insert(mobileUnit);
 		}
 	}
-	setMobileUnitsDestination(movedUnits, destination);
 }
 
-void Player::setMobileUnitsDestination(Set<MobileUnit*>& mobileUnits, const Point& destination)
+void Player::setSelectedMobileUnitsDestination(const Vector2& destination)
 {
-	for (MobileUnit* mobileUnit : mobileUnits)
+	for (MobileUnit* mobileUnit : _selectedMobileUnits)
 	{
 		mobileUnit->setDestination(destination);
 	}

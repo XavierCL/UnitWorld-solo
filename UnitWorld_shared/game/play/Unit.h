@@ -1,17 +1,17 @@
 #pragma once
 
-#include "../geometry/Point.h"
+#include "../physics/Vector2.h"
 
 namespace uw
 {
 	class Unit
 	{
 	public:
-		Unit(const Point& position = Point(0, 0));
+		Unit(const Vector2& initialPosition);
 
-		const Point position() const;
-		void position(const Point& newPosition);
+		const Vector2 position() const;
+		void position(const Vector2& newPosition);
 	private:
-		Point _position;
+		Vector2 _position;
 	};
 }

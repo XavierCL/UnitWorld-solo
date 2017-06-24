@@ -1,18 +1,18 @@
 #include "CppUnitTest.h"
-#include "game/geometry/Point.h"
+#include "game/physics/Vector2.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace uw;
 
 namespace UnitWorld_shared_tests
 {		
-	TEST_CLASS(PointTests)
+	TEST_CLASS(Vector2Tests)
 	{
 	public:
 		
 		TEST_METHOD(constructor_shouldInitializeAttributesTo0)
 		{
-			Point testPoint;
+			Vector2 testPoint;
 
 			Assert::AreEqual(0, testPoint.x());
 			Assert::AreEqual(0, testPoint.y());
@@ -23,7 +23,7 @@ namespace UnitWorld_shared_tests
 			const int ARBITRARY_X = 23;
 			const int ARBITRARY_Y = 42;
 
-			Point testPoint(ARBITRARY_X, ARBITRARY_Y);
+			Vector2 testPoint(ARBITRARY_X, ARBITRARY_Y);
 
 			Assert::AreEqual(ARBITRARY_X, testPoint.x());
 			Assert::AreEqual(ARBITRARY_Y, testPoint.y());
@@ -33,7 +33,7 @@ namespace UnitWorld_shared_tests
 		{
 			const int ARBITRARY_X = 23;
 
-			Point testPoint(ARBITRARY_X);
+			Vector2 testPoint(ARBITRARY_X);
 
 			Assert::AreEqual(ARBITRARY_X, testPoint.x());
 			Assert::AreEqual(0, testPoint.y());
@@ -43,7 +43,7 @@ namespace UnitWorld_shared_tests
 		{
 			const int ARBITRARY_VALUE = 56;
 
-			Point testPoint;
+			Vector2 testPoint;
 			testPoint.x(ARBITRARY_VALUE);
 
 			Assert::AreEqual(ARBITRARY_VALUE, testPoint.x());
@@ -53,7 +53,7 @@ namespace UnitWorld_shared_tests
 		{
 			const int ARBITRARY_VALUE = 56;
 
-			Point testPoint;
+			Vector2 testPoint;
 			testPoint.y(ARBITRARY_VALUE);
 
 			Assert::AreEqual(ARBITRARY_VALUE, testPoint.y());
@@ -64,7 +64,7 @@ namespace UnitWorld_shared_tests
 			const int ARBITRARY_VALUE = 56;
 			const int SECOND_ARBITRARY_VALUE = 5241;
 
-			Point testPoint;
+			Vector2 testPoint;
 			testPoint.x(ARBITRARY_VALUE);
 			testPoint.x(SECOND_ARBITRARY_VALUE);
 
@@ -76,7 +76,7 @@ namespace UnitWorld_shared_tests
 			const int ARBITRARY_VALUE = 56;
 			const int SECOND_ARBITRARY_VALUE = 5241;
 
-			Point testPoint;
+			Vector2 testPoint;
 			testPoint.y(ARBITRARY_VALUE);
 			testPoint.y(SECOND_ARBITRARY_VALUE);
 

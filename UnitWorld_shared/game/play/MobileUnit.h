@@ -10,8 +10,8 @@ namespace uw
 		MobileUnit();
 		~MobileUnit();
 
-		void setDestination(const Point& destination);
+		void setDestination(const Vector2& destination);
 	private:
-		Point* _destination;
+		Vector2* _destination;
 	};
 }
