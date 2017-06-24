@@ -59,5 +59,20 @@
     <ClCompile Include="timing\IntervalManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\geometry\Rectangle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\play\Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\geometry\Point.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\play\Unit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\play\MobileUnit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

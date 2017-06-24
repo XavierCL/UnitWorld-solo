@@ -1,8 +1,9 @@
 #pragma once
 
+#include "Unit.h"
+
 namespace uw
 {
-	class UnitGenerator
-	{
-	};
+	class UnitGenerator: public Unit
+	{};
 }

@@ -7,6 +7,9 @@ namespace uw
 	class Unit
 	{
 	public:
-		Point position;
+		const Point position() const;
+		void position(const Point& newPosition);
+	private:
+		Point _position;
 	};
 }

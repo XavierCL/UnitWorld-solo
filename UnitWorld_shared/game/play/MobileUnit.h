@@ -7,9 +7,11 @@ namespace uw
 	class MobileUnit: public Unit
 	{
 	public:
-		void move(const Point& destination);
+		MobileUnit();
+		~MobileUnit();
+
+		void setDestination(const Point& destination);
 	private:
-		int _xSpeed;
-		int _ySpeed;
+		Point* _destination;
 	};
 }

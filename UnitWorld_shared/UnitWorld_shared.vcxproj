@@ -137,6 +137,11 @@
     <ClInclude Include="utils\Set.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="game\geometry\Point.cpp" />
+    <ClCompile Include="game\geometry\Rectangle.cpp" />
+    <ClCompile Include="game\play\MobileUnit.cpp" />
+    <ClCompile Include="game\play\Player.cpp" />
+    <ClCompile Include="game\play\Unit.cpp" />
     <ClCompile Include="timing\IntervalManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
