@@ -13,3 +13,5 @@
 *.ilk
 *.exp
 *.exe
+*.cache
+*.enc

@@ -1,17 +1,32 @@
-#include <SFML/Audio.hpp>
+#include "game/GameLoop.h"
+#include "graphics/canvas/SFMLCanvas.h"
+#include "graphics/shared/SharedSFMLDisplayDrawer.h"
+
 #include <SFML/Graphics.hpp>
 
-#include "GameLoop.h"
+#include <thread>
 
-int main()
+int WinMain()
 {
 	unsigned int screenWidth = 800;
 	unsigned int screenHeight = 600;
-	// Create the main window
+
 	sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "Unit World");
-	//Create the game instance
-	uw::GameLoop gameLoop(window);
-	// Start the game loop
+
+	uw::SFMLCanvas canvas(window);
+	uw::SharedSFMLDislayDrawer sharedHandler(canvas);
+	uw::GameLoop game((uw::SharedDrawer&)sharedHandler);
+
+	window.setActive(false);
+
+	std::thread gameThread([&window, &game](){
+		while(window.isOpen())
+		{
+			game.loop();
+			std::this_thread::sleep_for(std::chrono::milliseconds(30));
+		}
+	});
+
 	while (window.isOpen())
 	{
 		// Process events
@@ -22,13 +37,10 @@ int main()
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
-		// Clear screen
-		window.clear();
-		//Game loop
-		if (!gameLoop.loop())
-			window.close();
-		// Update the window
-		window.display();
+
+		sharedHandler.tryClose();
 	}
+
+	gameThread.join();
 	return EXIT_SUCCESS;
 }

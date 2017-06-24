@@ -23,22 +23,31 @@
     <ClInclude Include="config\ConfigReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameLoop.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="input\InputManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="state\StateParser.h">
+    <ClInclude Include="game\GameLoop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="state\StateReceiver.h">
+    <ClInclude Include="graphics\canvas\DrawingCanvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="state\StateUpdater.h">
+    <ClInclude Include="graphics\canvas\SFMLCanvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\SharedDrawer.h">
+    <ClInclude Include="graphics\shared\SharedDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\shared\SharedDrawer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\canvas\DisplayCanvas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\canvas\DisplayDrawerCanvas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\shared\SharedSFMLDisplayDrawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
