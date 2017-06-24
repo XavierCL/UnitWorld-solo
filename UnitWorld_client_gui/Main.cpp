@@ -22,8 +22,12 @@ int WinMain()
 	std::thread gameThread([&window, &game](){
 		while(window.isOpen())
 		{
+			auto counter1 = std::chrono::steady_clock::now();
 			game.loop();
-			std::this_thread::sleep_for(std::chrono::milliseconds(30));
+			auto counter2 = std::chrono::steady_clock::now();
+			int remainingSleepTime = 30 - (int)std::chrono::duration <double, std::milli>(counter2 - counter1).count();
+			if(remainingSleepTime >= 1)
+				std::this_thread::sleep_for(std::chrono::milliseconds(remainingSleepTime));
 		}
 	});
 

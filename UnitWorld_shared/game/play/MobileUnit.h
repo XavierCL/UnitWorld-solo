@@ -7,7 +7,6 @@ namespace uw
 	class MobileUnit: public Unit
 	{
 	public:
-		MobileUnit();
 		~MobileUnit();
 
 		void setDestination(const Vector2& destination);

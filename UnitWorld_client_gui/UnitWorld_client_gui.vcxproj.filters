@@ -50,5 +50,8 @@
     <ClInclude Include="graphics\shared\SharedSFMLDisplayDrawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\graphics\GraphicalSinguity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

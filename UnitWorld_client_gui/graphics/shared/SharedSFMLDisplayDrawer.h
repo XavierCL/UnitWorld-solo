@@ -17,8 +17,11 @@ namespace uw
 
 		void tryDrawingTransaction(const std::function<void(DrawingCanvas&)>& drawingFunction)
 		{
-			drawingFunction(_canvas);
-			_canvas.display();
+			if(!_shouldCloseCanvas)
+			{
+				drawingFunction(_canvas);
+				_canvas.display();
+			}
 		}
 
 		void requestClosure()
