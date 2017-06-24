@@ -2,10 +2,6 @@
 
 using namespace uw;
 
-MobileUnit::MobileUnit() :
-	_destination(nullptr)
-{}
-
 MobileUnit::~MobileUnit()
 {
 	delete _destination;

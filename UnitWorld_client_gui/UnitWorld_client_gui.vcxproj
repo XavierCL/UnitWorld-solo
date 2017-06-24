@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClInclude Include="config\ConfigReader.h" />
     <ClInclude Include="game\GameLoop.h" />
+    <ClInclude Include="game\graphics\GraphicalSinguity.h" />
     <ClInclude Include="graphics\canvas\DisplayCanvas.h" />
     <ClInclude Include="graphics\canvas\DisplayDrawerCanvas.h" />
     <ClInclude Include="graphics\canvas\DrawingCanvas.h" />

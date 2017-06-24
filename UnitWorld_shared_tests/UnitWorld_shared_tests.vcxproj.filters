@@ -18,9 +18,6 @@
     <ClCompile Include="game\geometry\RectangleTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\play\MobileUnitTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game\play\PlayerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
