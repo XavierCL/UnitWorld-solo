@@ -5,11 +5,11 @@ using namespace uw;
 void Player::setMobileUnitsDestinationInArea(const Rectangle& area, const Point& destination)
 {
 	Set<MobileUnit*> movedUnits;
-	for(const auto* mobileUnit: _mobileUnits)
+	for(auto* const mobileUnit: _mobileUnits)
 	{
 		if (area.contains(mobileUnit->position()))
 		{
-			movedUnits.emplace(mobileUnit);
+			movedUnits.insert(mobileUnit);
 		}
 	}
 	setMobileUnitsDestination(movedUnits, destination);

@@ -2,6 +2,11 @@
 
 using namespace uw;
 
+Point::Point(const int& x, const int& y) :
+	_x(x),
+	_y(y)
+{}
+
 const int Point::x() const
 {
 	return _x;

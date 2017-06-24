@@ -69,7 +69,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Users\Xavier\Projects\C++\Qt\UnitWorld\dependencies\SFML\2.4.2\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\dependencies\SFML\2.4.2\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>..\dependencies\SFML\2.4.2\lib;$(LibraryPath)</LibraryPath>
