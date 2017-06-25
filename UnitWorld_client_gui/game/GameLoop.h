@@ -1,5 +1,10 @@
 #pragma once
 
+#include "game/play/Player.h"
+#include "game/play/Singuity.h"
+
+#include "graphics/GraphicalSinguity.h"
+
 #include "../graphics/shared/SharedDrawer.h"
 #include "../graphics/canvas/DrawingCanvas.h"
 
@@ -12,13 +17,24 @@ namespace uw
 	public:
 
 		GameLoop(SharedDrawer& drawer) :
-			_drawer(drawer),
-			temp1(300)
-		{}
+			_drawer(drawer)
+		{
+			_currentPlayer = new Player();
+			_currentPlayer->addSinguity(new Singuity(Vector2(150, 150)));
+			_currentPlayer->addSinguity(new Singuity(Vector2(200, 150)));
+			_currentPlayer->selectMobileUnitsInArea(Rectangle(Vector2(0, 0), Vector2(200, 200)));
+			_currentPlayer->setSelectedMobileUnitsDestination(Vector2(400, 400));
+		}
+
+		~GameLoop()
+		{
+			delete _currentPlayer;
+		}
+
 		void loop()
 		{
-			auto gameState = handlePhysics();
-			handleGraphics(gameState);
+			auto gameIsDone = handlePhysics();
+			handleGraphics(gameIsDone);
 		}
 	private:
 		static const bool GAME_STATE_ENDED = true;
@@ -26,13 +42,13 @@ namespace uw
 
 		bool handlePhysics()
 		{
-			++temp1;
-			return temp1 >= 600;
+			_currentPlayer->actualize();
+			return false;
 		}
 
-		void handleGraphics(const bool& gameState)
+		void handleGraphics(const bool& gameIsDone)
 		{
-			if (gameState)
+			if (gameIsDone)
 			{
 				_drawer.requestClosure();
 			}
@@ -40,15 +56,15 @@ namespace uw
 			{
 				_drawer.tryDrawingTransaction([this](DrawingCanvas& canvas)
 				{
-					auto r = sf::RectangleShape(sf::Vector2f(1000, 1000));
-					r.setFillColor(sf::Color(sf::Uint8(128), sf::Uint8(128), sf::Uint8(200)));
-					r.setPosition(temp1, temp1);
-					canvas.draw(r);
+					for(auto singuity: _currentPlayer->singuities())
+					{
+						canvas.draw((GraphicalSinguity(*singuity).drawable()));
+					}
 				});
 			}
 		}
 
-		int temp1;
 		SharedDrawer& _drawer;
+		Player* _currentPlayer;
 	};
 }

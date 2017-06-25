@@ -7,10 +7,13 @@ namespace uw
 	class Unit
 	{
 	public:
+		virtual void actualize() = 0;
+		Vector2& position();
+		void position(const Vector2& newPosition);
+
+	protected:
 		Unit(const Vector2& initialPosition);
 
-		const Vector2 position() const;
-		void position(const Vector2& newPosition);
 	private:
 		Vector2 _position;
 	};

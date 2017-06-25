@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MobileUnit.h"
+#include "Singuity.h"
 
 #include "../geometry/Rectangle.h"
 
@@ -11,11 +11,16 @@ namespace uw
 	class Player
 	{
 	public:
+		~Player();
+
+		void actualize();
+		void addSinguity(Singuity* newSinguity);
 		void selectMobileUnitsInArea(const Rectangle& area);
 		void setSelectedMobileUnitsDestination(const Vector2& destination);
+		Set<Singuity*> singuities() const;
 
 	private:
-		
+		Set<Singuity*> _singuities;
 		Set<MobileUnit*> _mobileUnits;
 		Set<MobileUnit*> _selectedMobileUnits;
 	};
