@@ -53,5 +53,8 @@
     <ClInclude Include="game\graphics\GraphicalSinguity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\graphics\GraphicalUnit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

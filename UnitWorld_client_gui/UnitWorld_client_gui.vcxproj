@@ -79,7 +79,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\dependencies\SFML\2.4.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\UnitWorld_shared;..\dependencies\SFML\2.4.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -90,7 +90,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\dependencies\SFML\2.4.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\UnitWorld_shared;..\dependencies\SFML\2.4.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfml-audio-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -104,7 +104,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\dependencies\SFML\2.4.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\UnitWorld_shared;..\dependencies\SFML\2.4.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -119,7 +119,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\dependencies\SFML\2.4.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\UnitWorld_shared;..\dependencies\SFML\2.4.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -135,6 +135,7 @@
     <ClInclude Include="config\ConfigReader.h" />
     <ClInclude Include="game\GameLoop.h" />
     <ClInclude Include="game\graphics\GraphicalSinguity.h" />
+    <ClInclude Include="game\graphics\GraphicalUnit.h" />
     <ClInclude Include="graphics\canvas\DisplayCanvas.h" />
     <ClInclude Include="graphics\canvas\DisplayDrawerCanvas.h" />
     <ClInclude Include="graphics\canvas\DrawingCanvas.h" />
@@ -143,6 +144,11 @@
     <ClInclude Include="graphics\shared\SharedDrawer.h" />
     <ClInclude Include="graphics\shared\SharedSFMLDisplayDrawer.h" />
     <ClInclude Include="input\InputManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UnitWorld_shared\UnitWorld_shared.vcxproj">
+      <Project>{d774e74d-eff1-430f-bccd-7e998f29ba60}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

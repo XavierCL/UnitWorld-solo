@@ -3,7 +3,9 @@
 *.suo
 .suo
 *.pdb
+*.ipdb
 *.obj
+*.iobj
 *.tlog
 *.lastbuildstate
 *.log
