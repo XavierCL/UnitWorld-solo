@@ -16,7 +16,7 @@ namespace uw
 		void actualize();
 		void addSinguity(Singuity* newSinguity);
 		void selectMobileUnitsInArea(const Rectangle& area);
-		void setSelectedMobileUnitsDestination(const Vector2& destination);
+		void setSelectedMobileUnitsDestination(const Vector2D& destination);
 		Set<Singuity*> singuities() const;
 
 	private:

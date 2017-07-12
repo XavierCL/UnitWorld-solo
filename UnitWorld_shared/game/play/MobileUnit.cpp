@@ -11,35 +11,27 @@ MobileUnit::~MobileUnit()
 
 void MobileUnit::actualize()
 {
-	if(_destination)
+	if(_destination && position().distanceSq(*_destination) > stopDistanceFromTargetSq())
 	{
-		if((position().x() - _destination->x()) * (position().x() - _destination->x()) +
-			(position().y() - _destination->y()) * (position().y() - _destination->y()) >=
-			16)
-		{
-			_speed.x(abs(position().x() - _destination->x()) > abs(position().y() - _destination->y()));
-			if (position().x() - _destination->x() > 0)
-				_speed.x(-_speed.x());
-			_speed.y(abs(position().x() - _destination->x()) <= abs(position().y() - _destination->y()));
-			if (position().y() - _destination->y() > 0)
-				_speed.y(-_speed.y());
-		}
-		else
-		{
-			_speed.x(0);
-			_speed.y(0);
-			delete _destination;
-			_destination = nullptr;
-		}
+		setMaximalAcceleration(*_destination);
 	}
-	position().x(position().x() + _speed.x());
-	position().y(position().y() + _speed.y());
+	else
+	{
+		if(_destination)
+		{
+			deleteDestination();
+		}
+		_acceleration = getBreakingAcceleration();
+	}
+	_speed += _acceleration;
+	_speed.maxAt(maximumSpeed());
+	position() += _speed;
 }
 
-void MobileUnit::setDestination(const Vector2& destination)
+void MobileUnit::setDestination(const Vector2D& destination)
 {
 	delete _destination;
-	_destination = new Vector2(destination);
+	_destination = new Vector2D(destination);
 }
 
 uw::MobileUnit::MobileUnit(const MobileUnit & copy):
@@ -47,7 +39,7 @@ uw::MobileUnit::MobileUnit(const MobileUnit & copy):
 {
 	if(copy._destination)
 	{
-		_destination = new Vector2(*copy._destination);
+		_destination = new Vector2D(*copy._destination);
 	}
 	else
 	{
@@ -56,7 +48,24 @@ uw::MobileUnit::MobileUnit(const MobileUnit & copy):
 	_speed = copy._speed;
 }
 
-MobileUnit::MobileUnit(const Vector2& initialPosition) :
+MobileUnit::MobileUnit(const Vector2D& initialPosition) :
 	Unit(initialPosition),
 	_destination(nullptr)
 {}
+
+void uw::MobileUnit::setMaximalAcceleration(const Vector2D & destination)
+{
+	_acceleration = Vector2D(destination.x() - position().x(), destination.y() - position().y())
+		.maxAt(maximumAcceleration());
+}
+
+Vector2D uw::MobileUnit::getBreakingAcceleration() const
+{
+	return Vector2D(-_speed.x(), -_speed.y()).maxAt(maximumAcceleration());
+}
+
+void MobileUnit::deleteDestination()
+{
+	delete _destination;
+	_destination = nullptr;
+}
