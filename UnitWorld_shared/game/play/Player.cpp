@@ -35,7 +35,7 @@ void Player::selectMobileUnitsInArea(const Rectangle& area)
 	}
 }
 
-void Player::setSelectedMobileUnitsDestination(const Vector2& destination)
+void Player::setSelectedMobileUnitsDestination(const Vector2D& destination)
 {
 	for (auto mobileUnit : _selectedMobileUnits)
 	{

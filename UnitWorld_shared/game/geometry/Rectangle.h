@@ -1,19 +1,19 @@
 #pragma once
 
-#include "../physics/Vector2.h"
+#include "../physics/Vector2D.h"
 
 namespace uw
 {
 	class Rectangle
 	{
 	public:
-		Rectangle(const Vector2& corner1,
-			const Vector2& corner2);
+		Rectangle(const Vector2D& corner1,
+			const Vector2D& corner2);
 
-		const bool contains(const Vector2& point) const;
+		const bool contains(const Vector2D& point) const;
 
 	private:
-		Vector2 _upperLeftCorner;
-		Vector2 _lowerRightCorner;
+		Vector2D _upperLeftCorner;
+		Vector2D _lowerRightCorner;
 	};
 }

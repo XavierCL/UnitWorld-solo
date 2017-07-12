@@ -18,13 +18,13 @@ namespace UnitWorld_shared_tests
 		TEST_METHOD(selectMobileUnitsInArea_shouldNotThrowAnyException)
 		{
 			Player testPlayer;
-			testPlayer.selectMobileUnitsInArea(Rectangle(Vector2(), Vector2()));
+			testPlayer.selectMobileUnitsInArea(Rectangle(Vector2D(), Vector2D()));
 		}
 
 		TEST_METHOD(setSelectedMobileUnitsDestination_shouldNotThrowAnyException)
 		{
 			Player testPlayer;
-			testPlayer.setSelectedMobileUnitsDestination(Vector2());
+			testPlayer.setSelectedMobileUnitsDestination(Vector2D());
 		}
 	};
 }

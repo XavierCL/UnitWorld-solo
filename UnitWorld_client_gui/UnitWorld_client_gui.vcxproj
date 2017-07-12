@@ -132,10 +132,9 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config\ConfigReader.h" />
     <ClInclude Include="game\GameLoop.h" />
-    <ClInclude Include="game\graphics\GraphicalSinguity.h" />
-    <ClInclude Include="game\graphics\GraphicalUnit.h" />
+    <ClInclude Include="graphics\units\GraphicalSinguity.h" />
+    <ClInclude Include="graphics\units\GraphicalUnit.h" />
     <ClInclude Include="graphics\canvas\DisplayCanvas.h" />
     <ClInclude Include="graphics\canvas\DisplayDrawerCanvas.h" />
     <ClInclude Include="graphics\canvas\DrawingCanvas.h" />
@@ -143,7 +142,7 @@
     <ClInclude Include="graphics\shared\SharedDisplay.h" />
     <ClInclude Include="graphics\shared\SharedDrawer.h" />
     <ClInclude Include="graphics\shared\SharedSFMLDisplayDrawer.h" />
-    <ClInclude Include="input\InputManager.h" />
+    <ClInclude Include="inputs\SharedInputManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UnitWorld_shared\UnitWorld_shared.vcxproj">

@@ -125,6 +125,7 @@
     <ClInclude Include="game\GameManager.h" />
     <ClInclude Include="game\physics\Vector2.h" />
     <ClInclude Include="game\geometry\Rectangle.h" />
+    <ClInclude Include="game\physics\Vector2D.h" />
     <ClInclude Include="game\play\MobileUnit.h" />
     <ClInclude Include="game\play\Player.h" />
     <ClInclude Include="game\play\Singuity.h" />
@@ -134,11 +135,13 @@
     <ClInclude Include="timing\IntervalManager.h" />
     <ClInclude Include="utils\Hash.hpp" />
     <ClInclude Include="utils\Map.hpp" />
+    <ClInclude Include="utils\Option.hpp" />
     <ClInclude Include="utils\Set.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game\physics\Vector2.cpp" />
     <ClCompile Include="game\geometry\Rectangle.cpp" />
+    <ClCompile Include="game\physics\Vector2D.cpp" />
     <ClCompile Include="game\play\MobileUnit.cpp" />
     <ClCompile Include="game\play\Player.cpp" />
     <ClCompile Include="game\play\Unit.cpp" />

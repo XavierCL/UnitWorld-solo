@@ -3,7 +3,7 @@
 #include "game/play/Player.h"
 #include "game/play/Singuity.h"
 
-#include "graphics/GraphicalSinguity.h"
+#include "../graphics/units/GraphicalSinguity.h"
 
 #include "../graphics/shared/SharedDrawer.h"
 #include "../graphics/canvas/DrawingCanvas.h"
@@ -20,10 +20,10 @@ namespace uw
 			_drawer(drawer)
 		{
 			_currentPlayer = new Player();
-			_currentPlayer->addSinguity(new Singuity(Vector2(150, 150)));
-			_currentPlayer->addSinguity(new Singuity(Vector2(200, 150)));
-			_currentPlayer->selectMobileUnitsInArea(Rectangle(Vector2(0, 0), Vector2(200, 200)));
-			_currentPlayer->setSelectedMobileUnitsDestination(Vector2(400, 400));
+			_currentPlayer->addSinguity(new Singuity(Vector2D(150, 150)));
+			_currentPlayer->addSinguity(new Singuity(Vector2D(200, 150)));
+			_currentPlayer->selectMobileUnitsInArea(Rectangle(Vector2D(0, 0), Vector2D(200, 200)));
+			_currentPlayer->setSelectedMobileUnitsDestination(Vector2D(400, 400));
 		}
 
 		~GameLoop()
