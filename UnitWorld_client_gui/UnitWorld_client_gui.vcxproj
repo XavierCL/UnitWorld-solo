@@ -142,6 +142,8 @@
     <ClInclude Include="graphics\shared\SharedDisplay.h" />
     <ClInclude Include="graphics\shared\SharedDrawer.h" />
     <ClInclude Include="graphics\shared\SharedSFMLDisplayDrawer.h" />
+    <ClInclude Include="inputs\GameInputContext.h" />
+    <ClInclude Include="inputs\windowEvents\MouseEvent.h" />
     <ClInclude Include="inputs\SharedInputManager.h" />
   </ItemGroup>
   <ItemGroup>
