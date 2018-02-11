@@ -1,8 +1,10 @@
 #pragma once
 
 #include "game/physics/Vector2.h"
-#include "game/physics/Vector2D.h"
 
+#include "utils/Option.hpp"
+
+#include <queue>
 #include <mutex>
 
 namespace uw
@@ -10,35 +12,44 @@ namespace uw
 	class SharedInputManager
 	{
 	public:
-		const bool hasClicked()
+		const Option<Vector2> clickedAt()
 		{
 			if(_clickedMutex.try_lock())
 			{
-				const bool hasClicked = _hasClicked;
-				_clickedMutex.unlock();
-				return hasClicked;
+				if(!_clicks.empty())
+				{
+					Vector2 click = _clicks.back();
+					_clicks.pop();
+					return Option<Vector2>(click);
+				}
 			}
 			else
 			{
-				return false;
+				return Option<Vector2>::none;
 			}
 		}
-		const Vector2D clickedAt()
+
+		void clickedAt(const Vector2& position)
 		{
-			if(_clickedMutex.try_lock())
-			{
-			}
-			else
+			std::lock_guard<std::mutex> lock(_clickedMutex);
+			_clicks.push(position);
 		}
-		void clickedAt(const Vector2& position);
-		const bool hasReleasedMouse();
+
+		const bool hasReleasedMouse()
+		{
+
+		}
+
 		const bool isMouseDown();
-		const Vector2D mouseFrom();
-		const Vector2D mouseTo();
+		const Vector2 mouseFrom();
+		const Vector2 mouseTo();
 		void mouseFrom(const Vector2& position);
 		void mouseTo(const Vector2& position);
 	private:
-		bool _hasClicked;
+		Option<Vector2> _mouseCurrentTo;
+		Option<Vector2> _mouseFrom;
+		std::queue<Vector2> _clicks;
+
 		std::mutex _clickedMutex;
 	};
 }
