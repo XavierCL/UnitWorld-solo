@@ -2,24 +2,30 @@
 #include "graphics/canvas/SFMLCanvas.h"
 #include "graphics/shared/SharedSFMLDisplayDrawer.h"
 
+#include "../UnitWorld_client_shared/communication/ClientConnector.h"
+
 #include <SFML/Graphics.hpp>
 
 #include <thread>
 
-int WinMain()
+int main()
 {
+	ClientConnector(ConnectionInfo("127.0.0.1", "52124"), [](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
+		OutputDebugStringA("Server connected!");
+	});
+
 	unsigned int screenWidth = 800;
 	unsigned int screenHeight = 600;
 
 	sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "Unit World");
 
 	uw::SFMLCanvas canvas(window);
-	uw::SharedSFMLDislayDrawer sharedHandler(canvas);
-	uw::GameLoop game((uw::SharedDrawer&)sharedHandler);
+	auto sharedHandler(std::make_shared<uw::SharedSFMLDislayDrawer>(canvas));
+	uw::GameLoop game(sharedHandler);
 
 	window.setActive(false);
 
-	std::thread gameThread([&window, &game](){
+	std::thread gameThread([&window, &game]{
 		while(window.isOpen())
 		{
 			auto counter1 = std::chrono::steady_clock::now();
@@ -42,7 +48,7 @@ int WinMain()
 				window.close();
 		}
 
-		sharedHandler.tryClose();
+		sharedHandler->tryClose();
 	}
 
 	gameThread.join();

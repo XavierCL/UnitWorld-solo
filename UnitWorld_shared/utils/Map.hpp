@@ -1,9 +1,9 @@
 #pragma once
 
-#include <unordered_map>
-
 #include "Hash.hpp"
 
-template <typename _keyType, typename _valueType>
-class Map: public unordered_map<_keyType, _valueType, Hash<_keyType>>
+#include <unordered_map>
+
+template <typename _KeyType, typename _ValueType>
+class Map: public std::unordered_map<_KeyType, _ValueType, Hash<_KeyType>>
 {};

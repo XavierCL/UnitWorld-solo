@@ -1,18 +1,31 @@
 #pragma once
 
-#include <string>
 #include <functional>
+#include <cstdint>
+#include <memory>
 
 template <typename _Type>
 class Hash
 {
 public:
-	size_t operator()(const _Type const & element) const
+
+	const size_t operator()(const _Type &hashed) const
 	{
-		return _innerHash(std::string((char*)&element, sizeof(_Type)));
+		return reinterpret_cast<uintptr_t>(hashed) % static_cast<uintptr_t>(sizeof(size_t));
 	}
-private:
-	static const std::hash<std::string> _innerHash;
 };
 
-template <typename _Type> const std::hash<std::string> Hash<_Type>::_innerHash;
+template <typename _Type>
+class Hash<std::shared_ptr<_Type>>
+{
+public:
+	size_t operator()(const std::shared_ptr<_Type>& hashed) const
+	{
+		return _underlyingHash(hashed);
+	}
+
+	static const std::hash<std::shared_ptr<_Type>> _underlyingHash;
+};
+
+template <typename _Type>
+const std::hash<std::shared_ptr<_Type>> Hash<std::shared_ptr<_Type>>::_underlyingHash;

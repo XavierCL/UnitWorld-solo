@@ -11,5 +11,7 @@ namespace uw
 
 		virtual void draw(const sf::Vertex* vertices, std::size_t vertexCount,
 			sf::PrimitiveType type, const sf::RenderStates& states = sf::RenderStates::Default) = 0;
+
+		virtual void draw(const std::string& text) = 0;
 	};
 }

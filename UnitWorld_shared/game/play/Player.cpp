@@ -2,14 +2,6 @@
 
 using namespace uw;
 
-uw::Player::~Player()
-{
-	for(auto unit: _mobileUnits)
-	{
-		delete unit;
-	}
-}
-
 void Player::actualize()
 {
 	for(auto mobileUnit: _mobileUnits)
@@ -18,7 +10,7 @@ void Player::actualize()
 	}
 }
 
-void uw::Player::addSinguity(Singuity * newSinguity)
+void uw::Player::addSinguity(std::shared_ptr<Singuity> newSinguity)
 {
 	_singuities.insert(newSinguity);
 	_mobileUnits.insert(newSinguity);
@@ -43,7 +35,7 @@ void Player::setSelectedMobileUnitsDestination(const Vector2D& destination)
 	}
 }
 
-Set<Singuity*> uw::Player::singuities() const
+Set<std::shared_ptr<Singuity>> uw::Player::singuities() const
 {
 	return _singuities;
 }
