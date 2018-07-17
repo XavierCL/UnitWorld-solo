@@ -16,19 +16,14 @@ namespace uw
 	{
 	public:
 
-		GameLoop(SharedDrawer& drawer) :
+		GameLoop(std::shared_ptr<SharedDrawer> drawer):
 			_drawer(drawer)
 		{
-			_currentPlayer = new Player();
-			_currentPlayer->addSinguity(new Singuity(Vector2D(150, 150)));
-			_currentPlayer->addSinguity(new Singuity(Vector2D(200, 150)));
+			_currentPlayer = std::make_shared<Player>();
+			_currentPlayer->addSinguity(std::make_shared<Singuity>(Vector2D(150, 150)));
+			_currentPlayer->addSinguity(std::make_shared<Singuity>(Vector2D(200, 150)));
 			_currentPlayer->selectMobileUnitsInArea(Rectangle(Vector2D(0, 0), Vector2D(200, 200)));
 			_currentPlayer->setSelectedMobileUnitsDestination(Vector2D(400, 400));
-		}
-
-		~GameLoop()
-		{
-			delete _currentPlayer;
 		}
 
 		void loop()
@@ -50,12 +45,13 @@ namespace uw
 		{
 			if (gameIsDone)
 			{
-				_drawer.requestClosure();
+				_drawer->requestClosure();
 			}
 			else
 			{
-				_drawer.tryDrawingTransaction([this](DrawingCanvas& canvas)
+				_drawer->tryDrawingTransaction([this](DrawingCanvas& canvas)
 				{
+					canvas.draw("Client connected!");
 					for(auto singuity: _currentPlayer->singuities())
 					{
 						canvas.draw((GraphicalSinguity(*singuity).drawable()));
@@ -64,7 +60,7 @@ namespace uw
 			}
 		}
 
-		SharedDrawer& _drawer;
-		Player* _currentPlayer;
+		std::shared_ptr<SharedDrawer> _drawer;
+		std::shared_ptr<Player> _currentPlayer;
 	};
 }

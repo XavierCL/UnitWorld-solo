@@ -26,6 +26,14 @@ namespace uw
 			_windowCanvas.draw(vertices, vertexCount, type, states);
 		}
 
+		void draw(const std::string& text)
+		{
+			sf::Text graphic_text;
+			graphic_text.setString(text);
+			graphic_text.setFillColor(sf::Color::Green);
+			_windowCanvas.draw(graphic_text);
+		}
+
 		void display()
 		{
 			_windowCanvas.display();

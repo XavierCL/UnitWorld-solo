@@ -25,7 +25,7 @@ namespace uw
 			}
 			else
 			{
-				return Option<Vector2>::none;
+				return Option<Vector2>::None;
 			}
 		}
 

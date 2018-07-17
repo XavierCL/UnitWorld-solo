@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Hash.hpp"
+
 #include <unordered_set>
 
 template <typename _Type>

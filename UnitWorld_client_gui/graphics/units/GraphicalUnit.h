@@ -10,6 +10,7 @@ namespace uw
 		GraphicalUnit() :
 			_drawable(nullptr)
 		{}
+
 		~GraphicalUnit()
 		{
 			delete _drawable;
