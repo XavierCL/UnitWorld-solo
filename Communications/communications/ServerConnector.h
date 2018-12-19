@@ -14,18 +14,9 @@ public:
 	ServerConnector(const ConnectionInfo& connectionInfo, const std::function<void(std::shared_ptr<CommunicationHandler>)>& clientConnectedCallback) :
 		_acceptor(_ioService, endpoint(_ioService, connectionInfo)),
 		_clientConnectedCallback(clientConnectedCallback)
-	{
-		accept_async();
-	}
+	{}
 
-	~ServerConnector()
-	{
-		_acceptor.close();
-	}
-
-private:
-
-	void accept_async()
+	void accept()
 	{
 		auto newClientSocket(std::make_shared<asio::ip::tcp::socket>(_ioService));
 		asio::ip::tcp::endpoint newClientEndpoint;
@@ -34,10 +25,18 @@ private:
 			{
 				_clientConnectedCallback(std::make_shared<CommunicationHandler>(newClientSocket, newClientEndpoint));
 
-				accept_async();
+				accept();
 			}
 		});
+		_ioService.run();
 	}
+
+	~ServerConnector()
+	{
+		_acceptor.close();
+	}
+
+private:
 
 	static asio::ip::tcp::endpoint endpoint(asio::io_service& ioService, const ConnectionInfo& connectionInfo)
 	{

@@ -17,9 +17,5 @@ int main()
 	});
 	Logger::info("Waiting for connections...\n");
 	ServerConnector serverConnector(ConnectionInfo("127.0.0.1", "52124"), clientCallback);
-	
-	while (true)
-	{
-		std::this_thread::sleep_for(std::chrono::seconds(1));
-	}
+	serverConnector.accept();
 }
