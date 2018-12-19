@@ -2,7 +2,7 @@
 #include "graphics/canvas/SFMLCanvas.h"
 #include "graphics/shared/SharedSFMLDisplayDrawer.h"
 
-#include "../UnitWorld_client_shared/communication/ClientConnector.h"
+#include "communications/ClientConnector.h"
 
 #include <SFML/Graphics.hpp>
 

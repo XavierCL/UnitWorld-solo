@@ -74,7 +74,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -85,7 +85,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -98,7 +98,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Xavier\Projects\C++\Projects\UnitWorld\dependencies;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -113,7 +113,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Xavier\Projects\C++\Projects\UnitWorld\dependencies;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -132,19 +132,6 @@
     <ClInclude Include="game\play\SinguityGenerator.h" />
     <ClInclude Include="game\play\Unit.h" />
     <ClInclude Include="game\play\UnitGenerator.h" />
-    <ClInclude Include="communication\commands\Command.h" />
-    <ClInclude Include="communication\CommunicationHandler.h" />
-    <ClInclude Include="communication\CommunicationObserver.h" />
-    <ClInclude Include="communication\CommunicationSender.h" />
-    <ClInclude Include="communication\ConnectionInfo.h" />
-    <ClInclude Include="utils\FastMath.h" />
-    <ClInclude Include="utils\FixedUnorderedMap.hpp" />
-    <ClInclude Include="utils\Hash.hpp" />
-    <ClInclude Include="utils\Logger.h" />
-    <ClInclude Include="utils\Map.hpp" />
-    <ClInclude Include="utils\Option.hpp" />
-    <ClInclude Include="utils\RandomEngineGenerator.h" />
-    <ClInclude Include="utils\Set.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game\physics\Vector2.cpp" />
@@ -153,8 +140,6 @@
     <ClCompile Include="game\play\MobileUnit.cpp" />
     <ClCompile Include="game\play\Player.cpp" />
     <ClCompile Include="game\play\Unit.cpp" />
-    <ClCompile Include="utils\FastMath.cpp" />
-    <ClCompile Include="utils\Logger.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
