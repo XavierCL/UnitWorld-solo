@@ -4,9 +4,9 @@
 
 #include "../geometry/Rectangle.h"
 
-#include "../../utils/Set.hpp"
+#include "commons/Hash.hpp"
 
-#include <memory>
+#include <unordered_set>
 
 namespace uw
 {
@@ -17,11 +17,11 @@ namespace uw
 		void addSinguity(std::shared_ptr<Singuity> newSinguity);
 		void selectMobileUnitsInArea(const Rectangle& area);
 		void setSelectedMobileUnitsDestination(const Vector2D& destination);
-		Set<std::shared_ptr<Singuity>> singuities() const;
+		std::unordered_set<std::shared_ptr<Singuity>, SharedPointerHash<Singuity>> singuities() const;
 
 	private:
-		Set<std::shared_ptr<Singuity>> _singuities;
-		Set<std::shared_ptr<MobileUnit>> _mobileUnits;
-		Set<std::shared_ptr<MobileUnit>> _selectedMobileUnits;
+		std::unordered_set<std::shared_ptr<Singuity>, SharedPointerHash<Singuity>> _singuities;
+		std::unordered_set<std::shared_ptr<MobileUnit>, SharedPointerHash<MobileUnit>> _mobileUnits;
+		std::unordered_set<std::shared_ptr<MobileUnit>, SharedPointerHash<MobileUnit>> _selectedMobileUnits;
 	};
 }

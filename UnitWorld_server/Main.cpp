@@ -1,16 +1,25 @@
-#include "communication/ServerConnector.h"
+#include "communications/ServerConnector.h"
 
-#include "../UnitWorld_shared/utils/Logger.h"
+#include "commons/Logger.hpp"
+
+#include <thread>
+#include <iostream>
 
 void clientCallback(std::shared_ptr<CommunicationHandler> communicationHandler)
 {
-	Logger::info("Client" + communicationHandler->prettyName());
+	Logger::info("Client " + communicationHandler->prettyName() + " connected");
 }
 
 int main()
 {
 	Logger::registerInfo([](const std::string& message) {
-		OutputDebugStringA(message.data());
+		std::cout << message;
 	});
+	Logger::info("Waiting for connections...\n");
 	ServerConnector serverConnector(ConnectionInfo("127.0.0.1", "52124"), clientCallback);
+	
+	while (true)
+	{
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
 }

@@ -4,7 +4,7 @@ using namespace uw;
 
 void Player::actualize()
 {
-	for(auto mobileUnit: _mobileUnits)
+	for (auto mobileUnit : _mobileUnits)
 	{
 		mobileUnit->actualize();
 	}
@@ -18,7 +18,7 @@ void uw::Player::addSinguity(std::shared_ptr<Singuity> newSinguity)
 
 void Player::selectMobileUnitsInArea(const Rectangle& area)
 {
-	for(auto const mobileUnit: _mobileUnits)
+	for (auto const mobileUnit : _mobileUnits)
 	{
 		if (area.contains(mobileUnit->position()))
 		{
@@ -35,7 +35,7 @@ void Player::setSelectedMobileUnitsDestination(const Vector2D& destination)
 	}
 }
 
-Set<std::shared_ptr<Singuity>> uw::Player::singuities() const
+std::unordered_set<std::shared_ptr<Singuity>, SharedPointerHash<Singuity>> uw::Player::singuities() const
 {
 	return _singuities;
 }
