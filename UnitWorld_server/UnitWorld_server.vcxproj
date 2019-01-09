@@ -125,6 +125,10 @@
       <Project>{630786e3-766e-43d1-b56b-f699983026ee}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lobby\ClientQueue.h" />
+    <ClInclude Include="lobby\ClientRoom.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
