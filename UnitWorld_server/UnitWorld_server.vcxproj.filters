@@ -23,8 +23,5 @@
     <ClInclude Include="lobby\ClientRoom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lobby\ClientQueue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

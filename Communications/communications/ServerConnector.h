@@ -16,7 +16,7 @@ public:
 		_clientConnectedCallback(clientConnectedCallback)
 	{}
 
-	void accept()
+	void acceptBlocking()
 	{
 		auto newClientSocket(std::make_shared<asio::ip::tcp::socket>(_ioService));
 		asio::ip::tcp::endpoint newClientEndpoint;
@@ -25,7 +25,7 @@ public:
 			{
 				_clientConnectedCallback(std::make_shared<CommunicationHandler>(newClientSocket, newClientEndpoint));
 
-				accept();
+				acceptBlocking();
 			}
 		});
 		_ioService.run();
