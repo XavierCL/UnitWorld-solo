@@ -1,4 +1,4 @@
-#include "lobby\ClientRoom.h"
+#include "lobby/ClientRoom.h"
 
 #include "communications/ServerConnector.h"
 
@@ -20,5 +20,5 @@ int main()
 			clientRoom.addClient(communicationHandler);
 		}
 	);
-	serverConnector.accept();
+	serverConnector.acceptBlocking();
 }

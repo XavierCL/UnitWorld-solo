@@ -27,7 +27,7 @@ public:
 		}
 		else
 		{
-
+			// Starts the game with the connected clients
 		}
 	}
 

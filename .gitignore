@@ -1,4 +1,6 @@
 .vs
+*.lib
+*.dll
 *.sdf
 *.opendb
 *.suo
