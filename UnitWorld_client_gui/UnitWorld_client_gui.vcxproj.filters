@@ -18,6 +18,21 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\GameLoop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\canvas\CanvasTransactionGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\canvas\SFMLCanvas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\units\GraphicalSinguity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\units\GraphicalUnit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game\GameLoop.h">
@@ -33,15 +48,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphics\units\GraphicalUnit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inputs\SharedInputManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inputs\windowEvents\MouseEvent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inputs\GameInputContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphics\canvas\CanvasTransactionGenerator.h">

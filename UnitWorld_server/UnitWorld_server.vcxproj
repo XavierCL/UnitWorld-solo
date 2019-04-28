@@ -75,7 +75,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\Communications;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);ASIO_STANDALONE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_HAS_VARIADIC_TEMPLATES;ASIO_HAS_STD_FUNCTION;ASIO_HAS_STD_CHRONO;BOOST_ALL_NO_LIB;_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_HAS_GETADDRINFO</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -84,7 +84,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\Communications;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);ASIO_STANDALONE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_HAS_VARIADIC_TEMPLATES;ASIO_HAS_STD_FUNCTION;ASIO_HAS_STD_CHRONO;BOOST_ALL_NO_LIB;_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_HAS_GETADDRINFO</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -95,7 +95,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\Communications;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);ASIO_STANDALONE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_HAS_VARIADIC_TEMPLATES;ASIO_HAS_STD_FUNCTION;ASIO_HAS_STD_CHRONO;BOOST_ALL_NO_LIB;_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_HAS_GETADDRINFO</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -110,7 +110,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\Communications;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);ASIO_STANDALONE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_HAS_VARIADIC_TEMPLATES;ASIO_HAS_STD_FUNCTION;ASIO_HAS_STD_CHRONO;BOOST_ALL_NO_LIB;_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_HAS_GETADDRINFO</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -118,11 +118,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="lobby\ClientRoom.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Commons\Commons.vcxproj">
       <Project>{630786e3-766e-43d1-b56b-f699983026ee}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Communications\Communications.vcxproj">
+      <Project>{144afafb-5c8c-41f4-a89b-9b4c83606bff}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

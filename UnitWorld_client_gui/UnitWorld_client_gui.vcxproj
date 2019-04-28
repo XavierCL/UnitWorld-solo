@@ -80,7 +80,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\UnitWorld_shared;..\dependencies\SFML\2.4.2\include;..\Communications;..\Commons;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);ASIO_STANDALONE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_HAS_VARIADIC_TEMPLATES;ASIO_HAS_STD_FUNCTION;ASIO_HAS_STD_CHRONO;BOOST_ALL_NO_LIB;_WIN32_WINNT=0x0501;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_WIN32_WINNT=0x0501</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -93,7 +93,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\UnitWorld_shared;..\dependencies\SFML\2.4.2\include;..\Communications;..\Commons;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);ASIO_STANDALONE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_HAS_VARIADIC_TEMPLATES;ASIO_HAS_STD_FUNCTION;ASIO_HAS_STD_CHRONO;BOOST_ALL_NO_LIB;_WIN32_WINNT=0x0501;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_WIN32_WINNT=0x0501</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfml-audio-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -109,7 +109,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\UnitWorld_shared;..\dependencies\SFML\2.4.2\include;..\Communications;..\Commons;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);ASIO_STANDALONE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_HAS_VARIADIC_TEMPLATES;ASIO_HAS_STD_FUNCTION;ASIO_HAS_STD_CHRONO;BOOST_ALL_NO_LIB;_WIN32_WINNT=0x0501;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_WIN32_WINNT=0x0501</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -126,7 +126,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\UnitWorld_shared;..\dependencies\SFML\2.4.2\include;..\Communications;..\Commons;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);ASIO_STANDALONE;ASIO_HAS_STD_ADDRESSOF;ASIO_HAS_STD_ARRAY;ASIO_HAS_CSTDINT;ASIO_HAS_STD_SHARED_PTR;ASIO_HAS_STD_TYPE_TRAITS;ASIO_HAS_VARIADIC_TEMPLATES;ASIO_HAS_STD_FUNCTION;ASIO_HAS_STD_CHRONO;BOOST_ALL_NO_LIB;_WIN32_WINNT=0x0501;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_WIN32_WINNT=0x0501</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -137,6 +137,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="game\GameLoop.cpp" />
+    <ClCompile Include="graphics\canvas\CanvasTransactionGenerator.cpp" />
+    <ClCompile Include="graphics\canvas\SFMLCanvas.cpp" />
+    <ClCompile Include="graphics\units\GraphicalSinguity.cpp" />
+    <ClCompile Include="graphics\units\GraphicalUnit.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -147,11 +152,11 @@
     <ClInclude Include="graphics\canvas\SFMLDrawingCanvas.h" />
     <ClInclude Include="graphics\canvas\SFMLCanvas.h" />
     <ClInclude Include="graphics\canvas\CanvasTransactionGenerator.h" />
-    <ClInclude Include="inputs\GameInputContext.h" />
-    <ClInclude Include="inputs\windowEvents\MouseEvent.h" />
-    <ClInclude Include="inputs\SharedInputManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Communications\Communications.vcxproj">
+      <Project>{144afafb-5c8c-41f4-a89b-9b4c83606bff}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\UnitWorld_shared\UnitWorld_shared.vcxproj">
       <Project>{d774e74d-eff1-430f-bccd-7e998f29ba60}</Project>
     </ProjectReference>

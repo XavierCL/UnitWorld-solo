@@ -8,13 +8,12 @@ SFMLCanvas::SFMLCanvas(sf::RenderWindow& canvas) :
     _windowCanvas.setActive();
 }
 
-void SFMLCanvas::draw(const sf::Drawable& drawable, const sf::RenderStates& states = sf::RenderStates::Default)
+void SFMLCanvas::draw(const sf::Drawable& drawable, const sf::RenderStates& states)
 {
     _windowCanvas.draw(drawable, states);
 }
 
-void SFMLCanvas::draw(const sf::Vertex* vertices, std::size_t vertexCount,
-    sf::PrimitiveType type, const sf::RenderStates& states = sf::RenderStates::Default)
+void SFMLCanvas::draw(const sf::Vertex* vertices, std::size_t vertexCount, sf::PrimitiveType type, const sf::RenderStates& states)
 {
     _windowCanvas.draw(vertices, vertexCount, type, states);
 }
