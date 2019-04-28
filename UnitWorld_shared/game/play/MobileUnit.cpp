@@ -4,25 +4,17 @@
 
 using namespace uw;
 
-MobileUnit::~MobileUnit()
-{
-    delete _destination;
-}
-
 void MobileUnit::actualize()
 {
-    if (_destination && position().distanceSq(*_destination) > stopDistanceFromTargetSq())
-    {
-        setMaximalAcceleration(*_destination);
-    }
-    else
-    {
-        if (_destination)
-        {
-            deleteDestination();
-        }
+    _destination.filter([this](const Vector2D& destination) {
+        return position().distanceSq(destination) > stopDistanceFromTargetSq();
+    }).foreach([this](const Vector2D& destination) {
+        setMaximalAcceleration(destination);
+    }).orElse([this]() {
+        _destination = Option<Vector2D>();
         _acceleration = getBreakingAcceleration();
-    }
+    });
+
     _speed += _acceleration;
     _speed.maxAt(maximumSpeed());
     position() += _speed;
@@ -30,21 +22,13 @@ void MobileUnit::actualize()
 
 void MobileUnit::setDestination(const Vector2D& destination)
 {
-    delete _destination;
-    _destination = new Vector2D(destination);
+    _destination = Option<Vector2D>(destination);
 }
 
 MobileUnit::MobileUnit(const MobileUnit & copy) :
     Unit(copy)
 {
-    if (copy._destination)
-    {
-        _destination = new Vector2D(*copy._destination);
-    }
-    else
-    {
-        _destination = nullptr;
-    }
+    _destination = copy._destination;
     _speed = copy._speed;
 }
 
@@ -55,8 +39,7 @@ MobileUnit::MobileUnit(const Vector2D& initialPosition) :
 
 void MobileUnit::setMaximalAcceleration(const Vector2D & destination)
 {
-    _acceleration = Vector2D(destination.x() - position().x(), destination.y() - position().y())
-        .maxAt(maximumAcceleration());
+    _acceleration = Vector2D(destination.x() - position().x(), destination.y() - position().y()).maxAt(maximumAcceleration());
 }
 
 const double MobileUnit::stopDistanceFromTarget() const
@@ -85,10 +68,4 @@ const double MobileUnit::stopDistanceFromTargetSq() const
 Vector2D MobileUnit::getBreakingAcceleration() const
 {
     return Vector2D(-_speed.x(), -_speed.y()).maxAt(maximumAcceleration());
-}
-
-void MobileUnit::deleteDestination()
-{
-    delete _destination;
-    _destination = nullptr;
 }

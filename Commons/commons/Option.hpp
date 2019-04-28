@@ -72,6 +72,15 @@ public:
         }
     }
 
+    template <typename _FunctionType>
+    void orElse(const _FunctionType& elseAction) const
+    {
+        if (isEmpty())
+        {
+            elseAction();
+        }
+    }
+
     template <typename _ReturnType, typename _FunctionType>
     const Option<_ReturnType> map(const _FunctionType& mappingFunction) const
     {
@@ -99,12 +108,13 @@ public:
     }
 
     template <typename _FunctionType>
-    void foreach(const _FunctionType& foreachFunction) const
+    const Option<_Type>& foreach(const _FunctionType& foreachFunction) const
     {
         if (isDefined())
         {
             foreachFunction(*_inner);
         }
+        return *this;
     }
 
     template <typename _PredicateType>
