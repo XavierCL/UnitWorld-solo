@@ -22,8 +22,8 @@ GameLoop::GameLoop(std::shared_ptr<CanvasTransactionGenerator> canvasTransaction
 
 void GameLoop::loop()
 {
-    auto gameIsDone = handlePhysics();
-    handleGraphics(gameIsDone);
+    handlePhysics();
+    handleGraphics();
 }
 
 bool GameLoop::handlePhysics()
@@ -32,17 +32,14 @@ bool GameLoop::handlePhysics()
     return false;
 }
 
-void GameLoop::handleGraphics(const bool& gameIsDone)
+void GameLoop::handleGraphics()
 {
-    if (!gameIsDone)
+    _canvasTransactionGenerator->tryDrawingTransaction([this](std::shared_ptr<SFMLDrawingCanvas> canvas)
     {
-        _canvasTransactionGenerator->tryDrawingTransaction([this](std::shared_ptr<SFMLDrawingCanvas> canvas)
+        canvas->draw("Client connected!");
+        for (auto singuity : _currentPlayer->singuities())
         {
-            canvas->draw("Client connected!");
-            for (auto singuity : _currentPlayer->singuities())
-            {
-                canvas->draw(*(GraphicalSinguity(*singuity).drawable()));
-            }
-        });
-    }
+            canvas->draw(*(GraphicalSinguity(*singuity).drawable()));
+        }
+    });
 }
