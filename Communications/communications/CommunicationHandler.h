@@ -2,31 +2,21 @@
 
 #include <asio.hpp>
 
-class CommunicationHandler
+namespace uw
 {
-public:
-    CommunicationHandler(const std::shared_ptr<asio::ip::tcp::socket>& socket, const asio::ip::tcp::endpoint& endpoint) :
-        _socket(socket),
-        _endpoint(endpoint)
+    class CommunicationHandler
     {
-    }
+    public:
+        CommunicationHandler(const std::shared_ptr<asio::ip::tcp::socket>& socket, const asio::ip::tcp::endpoint& endpoint);
 
-    void send()
-    {
-        throw std::exception("Not implemented");
-    }
+        void send();
 
-    void receive()
-    {
-        throw std::exception("Not implemented");
-    }
+        void receive();
 
-    std::string prettyName() const
-    {
-        return _endpoint.address().to_string() + ":" + std::to_string(_endpoint.port());
-    }
+        std::string prettyName() const;
 
-private:
-    std::shared_ptr<const asio::ip::tcp::socket> _socket;
-    const asio::ip::tcp::endpoint _endpoint;
-};
+    private:
+        std::shared_ptr<const asio::ip::tcp::socket> _socket;
+        const asio::ip::tcp::endpoint _endpoint;
+    };
+}

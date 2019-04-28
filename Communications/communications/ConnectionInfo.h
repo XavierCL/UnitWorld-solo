@@ -2,25 +2,19 @@
 
 #include <string>
 
-class ConnectionInfo
+namespace uw
 {
-public:
-    ConnectionInfo(const std::string& host, const std::string& port) :
-        _host(host),
-        _port(port)
-    {}
-
-    std::string host() const
+    class ConnectionInfo
     {
-        return _host;
-    }
+    public:
+        ConnectionInfo(const std::string& host, const std::string& port);
 
-    std::string port() const
-    {
-        return _port;
-    }
+        std::string host() const;
 
-private:
-    const std::string _host;
-    const std::string _port;
-};
+        std::string port() const;
+
+    private:
+        const std::string _host;
+        const std::string _port;
+    };
+}
