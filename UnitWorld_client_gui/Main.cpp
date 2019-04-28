@@ -9,6 +9,8 @@
 
 #include <thread>
 
+using namespace uw;
+
 int main()
 {
     ClientConnector(ConnectionInfo("127.0.0.1", "52124"), [](const std::shared_ptr<CommunicationHandler>& connectionHandler) {

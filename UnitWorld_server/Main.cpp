@@ -7,6 +7,8 @@
 #include <thread>
 #include <iostream>
 
+using namespace uw;
+
 int main()
 {
     Logger::registerInfo([](const std::string& message) {

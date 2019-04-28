@@ -2,7 +2,6 @@
 
 #include "../canvas/SFMLCanvas.h"
 
-#include <atomic>
 #include <functional>
 
 namespace uw
@@ -10,20 +9,11 @@ namespace uw
     class CanvasTransactionGenerator
     {
     public:
-        CanvasTransactionGenerator(std::shared_ptr<SFMLCanvas> canvas) :
-            _canvas(canvas)
-        {}
+        CanvasTransactionGenerator(std::shared_ptr<SFMLCanvas> canvas);
 
-        void tryDrawingTransaction(const std::function<void(std::shared_ptr<SFMLDrawingCanvas>)>& drawingFunction)
-        {
-            drawingFunction(_canvas);
-            _canvas->display();
-        }
+        void tryDrawingTransaction(const std::function<void(std::shared_ptr<SFMLDrawingCanvas>)>& drawingFunction);
 
-        ~CanvasTransactionGenerator()
-        {
-            _canvas->close();
-        }
+        ~CanvasTransactionGenerator();
 
     private:
         std::shared_ptr<SFMLCanvas> _canvas;
