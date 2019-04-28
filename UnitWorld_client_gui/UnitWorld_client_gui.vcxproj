@@ -144,12 +144,9 @@
     <ClInclude Include="graphics\units\GraphicalSinguity.h" />
     <ClInclude Include="graphics\units\GraphicalUnit.h" />
     <ClInclude Include="graphics\canvas\DisplayCanvas.h" />
-    <ClInclude Include="graphics\canvas\DisplayDrawerCanvas.h" />
-    <ClInclude Include="graphics\canvas\DrawingCanvas.h" />
+    <ClInclude Include="graphics\canvas\SFMLDrawingCanvas.h" />
     <ClInclude Include="graphics\canvas\SFMLCanvas.h" />
-    <ClInclude Include="graphics\shared\SharedDisplay.h" />
-    <ClInclude Include="graphics\shared\SharedDrawer.h" />
-    <ClInclude Include="graphics\shared\SharedSFMLDisplayDrawer.h" />
+    <ClInclude Include="graphics\canvas\CanvasTransactionGenerator.h" />
     <ClInclude Include="inputs\GameInputContext.h" />
     <ClInclude Include="inputs\windowEvents\MouseEvent.h" />
     <ClInclude Include="inputs\SharedInputManager.h" />

@@ -1,12 +1,13 @@
 #pragma once
 
-#include "DisplayDrawerCanvas.h"
+#include "DisplayCanvas.h"
+#include "SFMLDrawingCanvas.h"
 
 #include <SFML/Graphics.hpp>
 
 namespace uw
 {
-    class SFMLCanvas : public DisplayDrawerCanvas
+    class SFMLCanvas : public DisplayCanvas, public SFMLDrawingCanvas
     {
     public:
         SFMLCanvas(sf::RenderWindow& canvas) :

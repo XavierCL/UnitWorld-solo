@@ -4,7 +4,7 @@
 
 namespace uw
 {
-    class DrawingCanvas
+    class SFMLDrawingCanvas
     {
     public:
         virtual void draw(const sf::Drawable& drawable, const sf::RenderStates& states = sf::RenderStates::Default) = 0;

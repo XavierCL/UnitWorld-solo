@@ -1,6 +1,7 @@
 #include "game/GameLoop.h"
+
 #include "graphics/canvas/SFMLCanvas.h"
-#include "graphics/shared/SharedSFMLDisplayDrawer.h"
+#include "graphics/canvas/CanvasTransactionGenerator.h"
 
 #include "communications/ClientConnector.h"
 
@@ -19,8 +20,7 @@ int main()
 
     sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "Unit World");
 
-    uw::SFMLCanvas canvas(window);
-    auto sharedHandler(std::make_shared<uw::SharedSFMLDislayDrawer>(canvas));
+    auto sharedHandler(std::make_shared<uw::CanvasTransactionGenerator>(std::make_shared<uw::SFMLCanvas>(window)));
     uw::GameLoop game(sharedHandler);
 
     window.setActive(false);
@@ -47,8 +47,6 @@ int main()
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-
-        sharedHandler->tryClose();
     }
 
     gameThread.join();

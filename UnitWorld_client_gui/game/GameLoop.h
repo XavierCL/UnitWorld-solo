@@ -5,8 +5,8 @@
 
 #include "../graphics/units/GraphicalSinguity.h"
 
-#include "../graphics/shared/SharedDrawer.h"
-#include "../graphics/canvas/DrawingCanvas.h"
+#include "../graphics/canvas/CanvasTransactionGenerator.h"
+#include "../graphics/canvas/SFMLDrawingCanvas.h"
 
 #include "SFML/Graphics.hpp"
 
@@ -16,8 +16,8 @@ namespace uw
     {
     public:
 
-        GameLoop(std::shared_ptr<SharedDrawer> drawer) :
-            _drawer(drawer)
+        GameLoop(std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator) :
+            _canvasTransactionGenerator(canvasTransactionGenerator)
         {
             _currentPlayer = std::make_shared<Player>();
             _currentPlayer->addSinguity(std::make_shared<Singuity>(Vector2D(150, 150)));
@@ -43,24 +43,20 @@ namespace uw
 
         void handleGraphics(const bool& gameIsDone)
         {
-            if (gameIsDone)
+            if (!gameIsDone)
             {
-                _drawer->requestClosure();
-            }
-            else
-            {
-                _drawer->tryDrawingTransaction([this](DrawingCanvas& canvas)
+                _canvasTransactionGenerator->tryDrawingTransaction([this](std::shared_ptr<SFMLDrawingCanvas> canvas)
                 {
-                    canvas.draw("Client connected!");
+                    canvas->draw("Client connected!");
                     for (auto singuity : _currentPlayer->singuities())
                     {
-                        canvas.draw((GraphicalSinguity(*singuity).drawable()));
+                        canvas->draw(*(GraphicalSinguity(*singuity).drawable()));
                     }
                 });
             }
         }
 
-        std::shared_ptr<SharedDrawer> _drawer;
+        std::shared_ptr<CanvasTransactionGenerator> _canvasTransactionGenerator;
         std::shared_ptr<Player> _currentPlayer;
     };
 }
