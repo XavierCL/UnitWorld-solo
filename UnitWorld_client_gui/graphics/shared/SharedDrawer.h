@@ -6,11 +6,11 @@
 
 namespace uw
 {
-	class SharedDrawer
-	{
-	public:
-		virtual void tryDrawingTransaction(const std::function<void(DrawingCanvas&)>& drawingFunction) = 0;
+    class SharedDrawer
+    {
+    public:
+        virtual void tryDrawingTransaction(const std::function<void(DrawingCanvas&)>& drawingFunction) = 0;
 
-		virtual void requestClosure() = 0;
-	};
+        virtual void requestClosure() = 0;
+    };
 }

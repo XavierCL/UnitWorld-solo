@@ -5,8 +5,8 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace uw;
 
 namespace UnitWorld_shared_tests
-{		
-	TEST_CLASS(UnitTests)
-	{
-	};
+{
+    TEST_CLASS(UnitTests)
+    {
+    };
 }

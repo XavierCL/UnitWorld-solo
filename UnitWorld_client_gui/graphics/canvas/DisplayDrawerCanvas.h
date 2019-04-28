@@ -5,6 +5,6 @@
 
 namespace uw
 {
-	class DisplayDrawerCanvas : public DisplayCanvas, public DrawingCanvas
-	{};
+    class DisplayDrawerCanvas : public DisplayCanvas, public DrawingCanvas
+    {};
 }

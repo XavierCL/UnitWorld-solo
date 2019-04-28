@@ -5,7 +5,7 @@
 class MouseEvent
 {
 public:
-	virtual void execute(const WindowContext &context) = 0;
+    virtual void execute(const WindowContext &context) = 0;
 
 
 };
