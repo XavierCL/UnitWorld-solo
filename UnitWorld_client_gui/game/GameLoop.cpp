@@ -26,10 +26,9 @@ void GameLoop::loop()
     handleGraphics();
 }
 
-bool GameLoop::handlePhysics()
+void GameLoop::handlePhysics()
 {
     _currentPlayer->actualize();
-    return false;
 }
 
 void GameLoop::handleGraphics()
