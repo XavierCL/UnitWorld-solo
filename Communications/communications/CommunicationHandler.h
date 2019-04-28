@@ -13,11 +13,12 @@ public:
 
     void send()
     {
-
+        throw std::exception("Not implemented");
     }
 
     void receive()
     {
+        throw std::exception("Not implemented");
     }
 
     std::string prettyName() const
