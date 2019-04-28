@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.al": "awla",
+        "cmath": "cpp"
+    }
+}
