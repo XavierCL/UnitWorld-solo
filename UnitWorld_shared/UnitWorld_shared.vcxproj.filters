@@ -15,18 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="utils\Hash.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\Map.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\Set.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="timing\IntervalManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\play\MobileUnit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -36,17 +24,37 @@
     <ClInclude Include="game\play\Singuity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\play\SinguityGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\play\Unit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\play\UnitGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\GameManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\geometry\Rectangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\physics\Vector2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="game\geometry\Rectangle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\play\Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\play\Unit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\play\MobileUnit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\physics\Vector2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\play\Singuity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

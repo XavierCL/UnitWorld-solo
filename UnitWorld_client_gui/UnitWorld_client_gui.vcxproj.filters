@@ -18,27 +18,42 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\GameLoop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\canvas\CanvasTransactionGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\canvas\SFMLCanvas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\units\GraphicalSinguity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\units\GraphicalUnit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config\ConfigReader.h">
+    <ClInclude Include="game\GameLoop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameLoop.h">
+    <ClInclude Include="graphics\canvas\SFMLCanvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="input\InputManager.h">
+    <ClInclude Include="graphics\canvas\DisplayCanvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="state\StateParser.h">
+    <ClInclude Include="graphics\units\GraphicalSinguity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="state\StateReceiver.h">
+    <ClInclude Include="graphics\units\GraphicalUnit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="state\StateUpdater.h">
+    <ClInclude Include="graphics\canvas\CanvasTransactionGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\SharedDrawer.h">
+    <ClInclude Include="graphics\canvas\SFMLDrawingCanvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
