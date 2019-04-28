@@ -7,21 +7,15 @@ namespace uw
     class GraphicalUnit
     {
     public:
-        GraphicalUnit() :
-            _drawable(nullptr)
+        GraphicalUnit()
         {}
 
-        ~GraphicalUnit()
+        std::shared_ptr<sf::Drawable> drawable() const
         {
-            delete _drawable;
-        }
-
-        sf::Drawable& drawable() const
-        {
-            return *_drawable;
+            return _drawable;
         }
 
     protected:
-        sf::Drawable* _drawable;
+        std::shared_ptr<sf::Drawable> _drawable;
     };
 }

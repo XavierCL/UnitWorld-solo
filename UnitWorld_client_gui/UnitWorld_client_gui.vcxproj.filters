@@ -23,25 +23,10 @@
     <ClInclude Include="game\GameLoop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\canvas\DrawingCanvas.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="graphics\canvas\SFMLCanvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\shared\SharedDisplay.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="graphics\shared\SharedDrawer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="graphics\canvas\DisplayCanvas.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="graphics\canvas\DisplayDrawerCanvas.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="graphics\shared\SharedSFMLDisplayDrawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphics\units\GraphicalSinguity.h">
@@ -57,6 +42,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inputs\GameInputContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\canvas\CanvasTransactionGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\canvas\SFMLDrawingCanvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
