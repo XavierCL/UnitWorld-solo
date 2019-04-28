@@ -15,7 +15,7 @@ namespace uw
         void loop();
 
     private:
-        bool handlePhysics();
+        void handlePhysics();
         void handleGraphics();
 
         const std::shared_ptr<CanvasTransactionGenerator> _canvasTransactionGenerator;
