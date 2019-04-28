@@ -1,4 +1,5 @@
 .vs
+.vscode
 *.lib
 *.dll
 *.sdf
