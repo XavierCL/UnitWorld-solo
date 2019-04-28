@@ -4,17 +4,17 @@
 
 namespace uw
 {
-	class Unit
-	{
-	public:
-		virtual void actualize() = 0;
-		Vector2D& position();
-		void position(const Vector2D& newPosition);
+    class Unit
+    {
+    public:
+        virtual void actualize() = 0;
+        Vector2D& position();
+        void position(const Vector2D& newPosition);
 
-	protected:
-		Unit(const Vector2D& initialPosition);
+    protected:
+        Unit(const Vector2D& initialPosition);
 
-	private:
-		Vector2D _position;
-	};
+    private:
+        Vector2D _position;
+    };
 }

@@ -4,6 +4,6 @@
 
 namespace uw
 {
-	class UnitGenerator: public Unit
-	{};
+    class UnitGenerator : public Unit
+    {};
 }
