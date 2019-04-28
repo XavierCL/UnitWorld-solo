@@ -61,7 +61,7 @@ void MobileUnit::setMaximalAcceleration(const Vector2D & destination)
 
 const double MobileUnit::stopDistanceFromTarget() const
 {
-    sqrt(stopDistanceFromTargetSq());
+    return sqrt(stopDistanceFromTargetSq());
 }
 
 const double MobileUnit::stopDistanceFromTargetSq() const

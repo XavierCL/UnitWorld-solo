@@ -24,13 +24,7 @@
     <ClInclude Include="game\play\Singuity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\play\SinguityGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game\play\Unit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\play\UnitGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="game\GameManager.h">
@@ -57,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\physics\Vector2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\play\Singuity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
