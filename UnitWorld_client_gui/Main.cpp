@@ -1,34 +1,56 @@
-#include <SFML/Audio.hpp>
+#include "game/GameLoop.h"
+
+#include "graphics/canvas/SFMLCanvas.h"
+#include "graphics/canvas/CanvasTransactionGenerator.h"
+
+#include "communications/ClientConnector.h"
+
 #include <SFML/Graphics.hpp>
 
-#include "GameLoop.h"
+#include <thread>
+
+using namespace uw;
 
 int main()
 {
-	unsigned int screenWidth = 800;
-	unsigned int screenHeight = 600;
-	// Create the main window
-	sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "Unit World");
-	//Create the game instance
-	uw::GameLoop gameLoop(window);
-	// Start the game loop
-	while (window.isOpen())
-	{
-		// Process events
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			// Close window: exit
-			if (event.type == sf::Event::Closed)
-				window.close();
-		}
-		// Clear screen
-		window.clear();
-		//Game loop
-		if (!gameLoop.loop())
-			window.close();
-		// Update the window
-		window.display();
-	}
-	return EXIT_SUCCESS;
+    ClientConnector(ConnectionInfo("127.0.0.1", "52124"), [](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
+        OutputDebugStringA("Server connected!");
+    });
+
+    unsigned int screenWidth = 800;
+    unsigned int screenHeight = 600;
+
+    sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "Unit World");
+
+    auto sharedHandler(std::make_shared<uw::CanvasTransactionGenerator>(std::make_shared<uw::SFMLCanvas>(window)));
+    uw::GameLoop game(sharedHandler);
+
+    window.setActive(false);
+
+    std::thread gameThread([&window, &game] {
+        while (window.isOpen())
+        {
+            auto counter1 = std::chrono::steady_clock::now();
+            game.loop();
+            auto counter2 = std::chrono::steady_clock::now();
+            int remainingSleepTime = 30 - (int)std::chrono::duration <double, std::milli>(counter2 - counter1).count();
+            if (remainingSleepTime >= 1)
+                std::this_thread::sleep_for(std::chrono::milliseconds(remainingSleepTime));
+        }
+    });
+
+    while (window.isOpen())
+    {
+        // Process events
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            // Close window: exit
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+    }
+
+    gameThread.join();
+    return EXIT_SUCCESS;
 }

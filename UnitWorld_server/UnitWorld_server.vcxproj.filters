@@ -15,31 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="command\CommandCortex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="command\CommandParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="command\CommandReceiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="command\CommandValidator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="state\StateSender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="state\StateSerializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="state\StateUpdater.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lobby\ClientRoom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lobby\ClientRoom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
