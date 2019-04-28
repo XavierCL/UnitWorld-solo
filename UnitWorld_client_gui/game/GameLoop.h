@@ -17,9 +17,9 @@ namespace uw
     public:
 
         GameLoop(std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator) :
-            _canvasTransactionGenerator(canvasTransactionGenerator)
+            _canvasTransactionGenerator(canvasTransactionGenerator),
+            _currentPlayer(std::make_shared<Player>())
         {
-            _currentPlayer = std::make_shared<Player>();
             _currentPlayer->addSinguity(std::make_shared<Singuity>(Vector2D(150, 150)));
             _currentPlayer->addSinguity(std::make_shared<Singuity>(Vector2D(200, 150)));
             _currentPlayer->selectMobileUnitsInArea(Rectangle(Vector2D(0, 0), Vector2D(200, 200)));
@@ -56,7 +56,7 @@ namespace uw
             }
         }
 
-        std::shared_ptr<CanvasTransactionGenerator> _canvasTransactionGenerator;
-        std::shared_ptr<Player> _currentPlayer;
+        const std::shared_ptr<CanvasTransactionGenerator> _canvasTransactionGenerator;
+        const std::shared_ptr<Player> _currentPlayer;
     };
 }

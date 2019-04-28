@@ -7,44 +7,24 @@
 
 #include <functional>
 
-class ServerConnector
+namespace uw
 {
-public:
-
-    ServerConnector(const ConnectionInfo& connectionInfo, const std::function<void(std::shared_ptr<CommunicationHandler>)>& clientConnectedCallback) :
-        _acceptor(_ioService, endpoint(_ioService, connectionInfo)),
-        _clientConnectedCallback(clientConnectedCallback)
-    {}
-
-    void acceptBlocking()
+    class ServerConnector
     {
-        auto newClientSocket(std::make_shared<asio::ip::tcp::socket>(_ioService));
-        asio::ip::tcp::endpoint newClientEndpoint;
-        _acceptor.async_accept(*newClientSocket, newClientEndpoint, [this, &newClientSocket, &newClientEndpoint](const asio::error_code& error) {
-            if (!error)
-            {
-                _clientConnectedCallback(std::make_shared<CommunicationHandler>(newClientSocket, newClientEndpoint));
+    public:
 
-                acceptBlocking();
-            }
-        });
-        _ioService.run();
-    }
+        ServerConnector(const ConnectionInfo& connectionInfo, const std::function<void(std::shared_ptr<CommunicationHandler>)>& clientConnectedCallback);
 
-    ~ServerConnector()
-    {
-        _acceptor.close();
-    }
+        void acceptBlocking();
 
-private:
+        ~ServerConnector();
 
-    static asio::ip::tcp::endpoint endpoint(asio::io_service& ioService, const ConnectionInfo& connectionInfo)
-    {
-        asio::ip::tcp::resolver resolver(ioService);
-        return *resolver.resolve(asio::ip::tcp::resolver::query(connectionInfo.host(), connectionInfo.port()));
-    }
+    private:
 
-    asio::io_service _ioService;
-    asio::ip::tcp::acceptor _acceptor;
-    std::function<void(std::shared_ptr<CommunicationHandler>)> _clientConnectedCallback;
-};
+        static asio::ip::tcp::endpoint endpoint(asio::io_service& ioService, const ConnectionInfo& connectionInfo);
+
+        asio::io_service _ioService;
+        asio::ip::tcp::acceptor _acceptor;
+        std::function<void(std::shared_ptr<CommunicationHandler>)> _clientConnectedCallback;
+    };
+}
