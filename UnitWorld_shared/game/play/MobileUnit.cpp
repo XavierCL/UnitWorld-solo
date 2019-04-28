@@ -34,7 +34,7 @@ void MobileUnit::setDestination(const Vector2D& destination)
     _destination = new Vector2D(destination);
 }
 
-uw::MobileUnit::MobileUnit(const MobileUnit & copy) :
+MobileUnit::MobileUnit(const MobileUnit & copy) :
     Unit(copy)
 {
     if (copy._destination)
@@ -53,13 +53,36 @@ MobileUnit::MobileUnit(const Vector2D& initialPosition) :
     _destination(nullptr)
 {}
 
-void uw::MobileUnit::setMaximalAcceleration(const Vector2D & destination)
+void MobileUnit::setMaximalAcceleration(const Vector2D & destination)
 {
     _acceleration = Vector2D(destination.x() - position().x(), destination.y() - position().y())
         .maxAt(maximumAcceleration());
 }
 
-Vector2D uw::MobileUnit::getBreakingAcceleration() const
+const double MobileUnit::stopDistanceFromTarget() const
+{
+    sqrt(stopDistanceFromTargetSq());
+}
+
+const double MobileUnit::stopDistanceFromTargetSq() const
+{
+    const auto speedModule = _speed.module();
+    if (speedModule == 0)
+    {
+        return 0;
+    }
+    const auto relativeX = std::abs(_speed.x()) / speedModule;
+    const auto relativeY = std::abs(_speed.y()) / speedModule;
+    const auto accX = maximumAcceleration() * relativeX;
+    const auto accY = maximumAcceleration() * relativeY;
+
+    const auto numberOfMeterX = (_speed.x() / accX) * (_speed.x() / 2);
+    const auto numberOfMeterY = (_speed.y() / accY) * (_speed.y() / 2);
+
+    return Vector2D(numberOfMeterX, numberOfMeterY).moduleSq() + 1;
+}
+
+Vector2D MobileUnit::getBreakingAcceleration() const
 {
     return Vector2D(-_speed.x(), -_speed.y()).maxAt(maximumAcceleration());
 }

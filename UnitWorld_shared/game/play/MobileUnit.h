@@ -2,8 +2,6 @@
 
 #include "Unit.h"
 
-#include <cmath>
-
 namespace uw
 {
     class MobileUnit : public Unit
@@ -19,27 +17,8 @@ namespace uw
 
     private:
         void setMaximalAcceleration(const Vector2D& destination);
-        const double stopDistanceFromTarget() const
-        {
-            sqrt(stopDistanceFromTargetSq());
-        }
-        const double stopDistanceFromTargetSq() const
-        {
-            const auto speedModule = _speed.module();
-            if (speedModule == 0)
-            {
-                return 0;
-            }
-            const auto relativeX = abs(_speed.x()) / speedModule;
-            const auto relativeY = abs(_speed.y()) / speedModule;
-            const auto accX = maximumAcceleration() * relativeX;
-            const auto accY = maximumAcceleration() * relativeY;
-
-            const auto numberOfMeterX = (_speed.x() / accX) * (_speed.x() / 2);
-            const auto numberOfMeterY = (_speed.y() / accY) * (_speed.y() / 2);
-
-            return Vector2D(numberOfMeterX, numberOfMeterY).moduleSq() + 1;
-        }
+        const double stopDistanceFromTarget() const;
+        const double stopDistanceFromTargetSq() const;
         Vector2D getBreakingAcceleration() const;
         void deleteDestination();
         virtual const double maximumSpeed() const = 0;
