@@ -53,12 +53,13 @@ namespace uw
 
         immer::vector<std::shared_ptr<const Player>> threadSafePlayers()
         {
-
+            return _playersView;
         }
 
     private:
         const unsigned int _msPerFrame;
         immer::vector<std::shared_ptr<Player>> _players;
+        immer::vector<std::shared_ptr<const Player>> _playersView;
         bool _isRunning;
     };
 }

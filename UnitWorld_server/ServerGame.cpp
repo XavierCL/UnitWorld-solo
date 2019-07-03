@@ -27,11 +27,14 @@ ServerGame::~ServerGame()
 {
     _gameManager.stop();
     _gameManagerThread->join();
+    // missing some joins
 }
 
 void ServerGame::addClient(std::shared_ptr<CommunicationHandler> communicationHandler)
 {
     _communicationHandlers = _communicationHandlers.push_back(communicationHandler);
+    _gameManager.addPlayer();
+    _clientWaiters.emplace_back([this, communicationHandler] { waitClientReceive(communicationHandler); });
 }
 
 void ServerGame::sendCompleteState()
@@ -44,9 +47,11 @@ void ServerGame::sendCompleteState()
         auto localClientCommunicationHandlers = _communicationHandlers;
 
         const auto players = _gameManager.threadSafePlayers();
+
         std::vector<CommunicatedPlayer> communicatedPlayers;
         communicatedPlayers.resize(players.size());
         std::transform(players.begin(), players.end(), communicatedPlayers.begin(), [this](const auto player) { return physicsCommunicationAssembler.physicsPlayerToCommunicated(player);  });
+
         const auto message = MessageWrapper(std::make_shared<CompleteGameStateMessage>()).json();
         for (auto processingClientCommunicationHandler : localClientCommunicationHandlers)
         {
@@ -64,8 +69,18 @@ void ServerGame::sendCompleteState()
     }
 }
 
-void ServerGame::waitClientReceive()
-{}
+void ServerGame::waitClientReceive(std::shared_ptr<CommunicationHandler> communicationHandler)
+{
+    while (_isNetworkRunning)
+    {
+        const auto receivedCommunication = communicationHandler->receive();
 
-void ServerGame::handleClientReceive(std::shared_ptr<CommunicationHandler> callingClient)
-{}
+        handleClientReceive(receivedCommunication);
+    }
+}
+
+void ServerGame::handleClientReceive(const std::string& receivedCommunication)
+{
+    MessageWrapper messageWrapper(receivedCommunication);
+    _gameManager.command(messageWrapper.innerMessage); // or rather a conversion of this particular message
+}
