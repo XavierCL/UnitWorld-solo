@@ -36,6 +36,33 @@
     <ClInclude Include="game\physics\Vector2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="communication\Message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="communication\MessageType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="communication\MessageWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="communication\InvalidMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="communication\CompleteGameStateMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="communication\game\CommunicatedPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="communication\game\CommunicatedSinguity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="communication\game\CommunicatedVector2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="transfers\PhysicsCommunicationAssembler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game\geometry\Rectangle.cpp">
@@ -54,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\play\Singuity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="communication\MessageWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

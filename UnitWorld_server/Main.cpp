@@ -1,4 +1,4 @@
-#include "lobby/ClientRoom.h"
+#include "ServerGame.h"
 
 #include "communications/ServerConnector.h"
 
@@ -14,13 +14,12 @@ int main()
     Logger::registerInfo([](const std::string& message) {
         std::cout << message;
     });
-    ClientRoom clientRoom(2);
+    ServerGame serverGame;
     Logger::info("Waiting for connections...\n");
-    ServerConnector serverConnector(
-        ConnectionInfo("127.0.0.1", "52124"),
-        [&clientRoom](std::shared_ptr<CommunicationHandler> communicationHandler) {
-        clientRoom.addClient(communicationHandler);
-    }
+    ServerConnector serverConnector(ConnectionInfo("127.0.0.1", "52124"),
+        [&serverGame](std::shared_ptr<CommunicationHandler> communicationHandler) {
+            serverGame.addClient(communicationHandler);
+        }
     );
     serverConnector.acceptBlocking();
 }
