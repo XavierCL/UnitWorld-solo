@@ -9,7 +9,7 @@ namespace uw
     public:
         CommunicationHandler(const std::shared_ptr<asio::ip::tcp::socket>& socket, const asio::ip::tcp::endpoint& endpoint);
 
-        void send();
+        void send(const std::string& message);
 
         void receive();
 

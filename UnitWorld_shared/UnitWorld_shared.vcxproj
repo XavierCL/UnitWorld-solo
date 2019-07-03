@@ -74,7 +74,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\dependencies\nlohmann-json\3.6.1\include;..\dependencies\immer\0.6.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -85,7 +85,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\dependencies\nlohmann-json\3.6.1\include;..\dependencies\immer\0.6.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -98,7 +98,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\dependencies\nlohmann-json\3.6.1\include;..\dependencies\immer\0.6.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -113,7 +113,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\dependencies\nlohmann-json\3.6.1\include;..\dependencies\immer\0.6.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -122,6 +122,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="communication\CompleteGameStateMessage.h" />
+    <ClInclude Include="communication\game\CommunicatedPlayer.h" />
+    <ClInclude Include="communication\game\CommunicatedSinguity.h" />
+    <ClInclude Include="communication\game\CommunicatedVector2D.h" />
+    <ClInclude Include="communication\InvalidMessage.h" />
+    <ClInclude Include="communication\Message.h" />
+    <ClInclude Include="communication\MessageType.h" />
+    <ClInclude Include="communication\MessageWrapper.h" />
     <ClInclude Include="game\GameManager.h" />
     <ClInclude Include="game\geometry\Rectangle.h" />
     <ClInclude Include="game\physics\Vector2D.h" />
@@ -129,8 +137,10 @@
     <ClInclude Include="game\play\Player.h" />
     <ClInclude Include="game\play\Singuity.h" />
     <ClInclude Include="game\play\Unit.h" />
+    <ClInclude Include="transfers\PhysicsCommunicationAssembler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="communication\MessageWrapper.cpp" />
     <ClCompile Include="game\geometry\Rectangle.cpp" />
     <ClCompile Include="game\physics\Vector2D.cpp" />
     <ClCompile Include="game\play\MobileUnit.cpp" />

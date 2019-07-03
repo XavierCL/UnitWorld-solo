@@ -8,7 +8,7 @@ CommunicationHandler::CommunicationHandler(const std::shared_ptr<asio::ip::tcp::
 {
 }
 
-void CommunicationHandler::send()
+void CommunicationHandler::send(const std::string& message)
 {
     throw std::exception("Not implemented");
 }
