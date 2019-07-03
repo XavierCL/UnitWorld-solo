@@ -13,7 +13,7 @@ void CommunicationHandler::send(const std::string& message)
     throw std::exception("Not implemented");
 }
 
-void CommunicationHandler::receive()
+std::string CommunicationHandler::receive()
 {
     throw std::exception("Not implemented");
 }
