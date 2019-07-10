@@ -144,6 +144,10 @@
     <ClInclude Include="transfers\PhysicsCommunicationAssembler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="communication\game\CommunicatedPlayer.cpp" />
+    <ClCompile Include="communication\game\CommunicatedSinguity.cpp" />
+    <ClCompile Include="communication\game\CommunicatedVector2D.cpp" />
+    <ClCompile Include="communication\CompleteGameStateMessage.cpp" />
     <ClCompile Include="communication\MessageWrapper.cpp" />
     <ClCompile Include="game\geometry\Rectangle.cpp" />
     <ClCompile Include="game\physics\Vector2D.cpp" />

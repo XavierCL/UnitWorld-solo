@@ -8,8 +8,6 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#define _SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING
-
 #ifndef ASIO_ASSOCIATED_ALLOCATOR_HPP
 #define ASIO_ASSOCIATED_ALLOCATOR_HPP
 

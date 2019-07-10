@@ -10,43 +10,13 @@ namespace uw
     class CompleteGameStateMessage : public Message
     {
     public:
-        CompleteGameStateMessage(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities):
-            _players(players),
-            _singuities(singuities)
-        {}
+        CompleteGameStateMessage(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities);
 
-        // TODO: parse the json data
-        CompleteGameStateMessage(const std::string jsonData) :
-            _players(),
-            _singuities()
-        {}
+        CompleteGameStateMessage(const std::string jsonData);
 
-        virtual MessageType messageType() const
-        {
-            return MessageType::CompleteGameStateMessageType;
-        }
+        virtual MessageType messageType() const;
 
-        virtual std::string toJsonData() const
-        {
-            std::vector<std::string> playerJsons;
-            for (const auto& communicatedPlayer : _players)
-            {
-                playerJsons.emplace_back(communicatedPlayer.toJson());
-            }
-
-            std::vector<std::string> singuityJsons;
-            for (const auto& communicatedSinguity : _singuities)
-            {
-                singuityJsons.emplace_back(communicatedSinguity.toJson());
-            }
-
-            nlohmann::json jsonData = {
-                {"players", playerJsons},
-                {"singuities", singuityJsons}
-            };
-
-            return jsonData;
-        }
+        virtual std::string toJsonData() const;
 
     private:
 

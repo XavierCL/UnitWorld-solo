@@ -9,13 +9,13 @@
 
 #include "commons/Logger.hpp"
 
-#include <ctime>
+#include <chrono>
 
 using namespace uw;
 
 ServerGame::ServerGame(const unsigned int& physicsFPS, const unsigned int& networkFPS) :
     _gameManager(physicsFPS),
-    _networkFPS(networkFPS)
+    _networkMsPerFrame(1000.0 / networkFPS)
 {
     _gameManagerThread = std::make_unique<std::thread>([this] { _gameManager.startSync(); });
 
@@ -47,7 +47,7 @@ void ServerGame::addClient(std::shared_ptr<CommunicationHandler> communicationHa
     _communicationHandlers = _communicationHandlers.push_back(communicationHandler);
 
     const auto singuityInitialXPosition = (double)_communicationHandlers.size();
-    auto newPlayer(std::make_shared<Player>(std::vector<std::shared_ptr<Singuity>> {std::make_shared<Singuity>(singuityInitialXPosition, 0)}));
+    auto newPlayer(std::make_shared<Player>(std::vector<std::shared_ptr<Singuity>> {std::make_shared<Singuity>(Vector2D(singuityInitialXPosition, 0))}));
 
     _gameManager.addPlayer(newPlayer);
     _clientWaiters.emplace_back([this, newPlayer, communicationHandler] { waitClientReceive(newPlayer->id(), communicationHandler); });
@@ -58,9 +58,9 @@ void ServerGame::loopSendCompleteState()
     PhysicsCommunicationAssembler physicsCommunicationAssembler;
 
     while (_isNetworkRunning) {
-        const auto startFrameTime = clock();
+        const auto startFrameTime = std::chrono::steady_clock::now();
 
-        auto localClientCommunicationHandlers = _communicationHandlers;
+        auto localClientCommunicationHandlers(_communicationHandlers);
 
         const auto players = _gameManager.threadSafePlayers();
 
@@ -69,8 +69,9 @@ void ServerGame::loopSendCompleteState()
         for( const auto player : players)
         {
             communicatedPlayers.emplace_back(physicsCommunicationAssembler.physicsPlayerToCommunicated(player));
-            const auto assembledPlayerSinguities = physicsCommunicationAssembler.physicsPlayerToCommunicatedSinguities(player);
-            communicatedSinguities.insert(communicatedSinguities.cend(), assembledPlayerSinguities.begin(), assembledPlayerSinguities.end());
+            const auto assembledPlayerSinguities(physicsCommunicationAssembler.physicsPlayerToCommunicatedSinguities(player));
+
+            std::copy(assembledPlayerSinguities.begin(), assembledPlayerSinguities.end(), std::back_inserter(communicatedSinguities));
         }
 
         const auto message = MessageWrapper(std::make_shared<CompleteGameStateMessage>(communicatedPlayers, communicatedSinguities)).json();
@@ -79,13 +80,13 @@ void ServerGame::loopSendCompleteState()
             processingClientCommunicationHandler->send(message);
         }
 
-        const auto endFrameTime = clock();
+        const auto endFrameTime = std::chrono::steady_clock::now();
 
-        const auto frameTimeInMs = (endFrameTime - startFrameTime) / (CLOCK_PER_SEC / 1000);
+        const auto frameTimeInMs = (endFrameTime - startFrameTime).count() * 1000000;
 
-        if (frameTimeInMs < _networkFPS)
+        if (frameTimeInMs < _networkMsPerFrame)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(_networkFPS - frameTimeInMs));
+            std::this_thread::sleep_for(std::chrono::milliseconds(_networkMsPerFrame - frameTimeInMs));
         }
     }
 }
