@@ -13,31 +13,47 @@
 
 using namespace uw;
 
-ServerGame::ServerGame(const unsigned int& physicsFPS, const unsigned int& networkFPS):
+ServerGame::ServerGame(const unsigned int& physicsFPS, const unsigned int& networkFPS) :
     _gameManager(physicsFPS),
     _networkFPS(networkFPS)
 {
     _gameManagerThread = std::make_unique<std::thread>([this] { _gameManager.startSync(); });
 
     _isNetworkRunning = true;
-    _stateSenderThread = std::make_unique<std::thread>([this] { sendCompleteState(); });
+    _stateSenderThread = std::make_unique<std::thread>([this] { loopSendCompleteState(); });
 }
 
 ServerGame::~ServerGame()
 {
     _gameManager.stop();
+    _isNetworkRunning = false;
+
     _gameManagerThread->join();
-    // missing some joins
+    _stateSenderThread->join();
+
+    for (auto& clientHandler : _communicationHandlers)
+    {
+        clientHandler->close();
+    }
+
+    for (auto& clientWaiter : _clientWaiters)
+    {
+        clientWaiter.join();
+    }
 }
 
 void ServerGame::addClient(std::shared_ptr<CommunicationHandler> communicationHandler)
 {
     _communicationHandlers = _communicationHandlers.push_back(communicationHandler);
-    _gameManager.addPlayer();
-    _clientWaiters.emplace_back([this, communicationHandler] { waitClientReceive(communicationHandler); });
+
+    const auto singuityInitialXPosition = (double)_communicationHandlers.size();
+    auto newPlayer(std::make_shared<Player>(std::vector<std::shared_ptr<Singuity>> {std::make_shared<Singuity>(singuityInitialXPosition, 0)}));
+
+    _gameManager.addPlayer(newPlayer);
+    _clientWaiters.emplace_back([this, newPlayer, communicationHandler] { waitClientReceive(newPlayer->id(), communicationHandler); });
 }
 
-void ServerGame::sendCompleteState()
+void ServerGame::loopSendCompleteState()
 {
     PhysicsCommunicationAssembler physicsCommunicationAssembler;
 
@@ -49,10 +65,15 @@ void ServerGame::sendCompleteState()
         const auto players = _gameManager.threadSafePlayers();
 
         std::vector<CommunicatedPlayer> communicatedPlayers;
-        communicatedPlayers.resize(players.size());
-        std::transform(players.begin(), players.end(), communicatedPlayers.begin(), [this](const auto player) { return physicsCommunicationAssembler.physicsPlayerToCommunicated(player);  });
+        std::vector<CommunicatedSinguity> communicatedSinguities;
+        for( const auto player : players)
+        {
+            communicatedPlayers.emplace_back(physicsCommunicationAssembler.physicsPlayerToCommunicated(player));
+            const auto assembledPlayerSinguities = physicsCommunicationAssembler.physicsPlayerToCommunicatedSinguities(player);
+            communicatedSinguities.insert(communicatedSinguities.cend(), assembledPlayerSinguities.begin(), assembledPlayerSinguities.end());
+        }
 
-        const auto message = MessageWrapper(std::make_shared<CompleteGameStateMessage>()).json();
+        const auto message = MessageWrapper(std::make_shared<CompleteGameStateMessage>(communicatedPlayers, communicatedSinguities)).json();
         for (auto processingClientCommunicationHandler : localClientCommunicationHandlers)
         {
             processingClientCommunicationHandler->send(message);
@@ -69,18 +90,18 @@ void ServerGame::sendCompleteState()
     }
 }
 
-void ServerGame::waitClientReceive(std::shared_ptr<CommunicationHandler> communicationHandler)
+void ServerGame::waitClientReceive(const xg::Guid& playerGuid, std::shared_ptr<CommunicationHandler> communicationHandler)
 {
     while (_isNetworkRunning)
     {
         const auto receivedCommunication = communicationHandler->receive();
 
-        handleClientReceive(receivedCommunication);
+        handleClientReceive(playerGuid, receivedCommunication);
     }
 }
 
-void ServerGame::handleClientReceive(const std::string& receivedCommunication)
+void ServerGame::handleClientReceive(const xg::Guid& playerGuid, const std::string& receivedCommunication)
 {
     MessageWrapper messageWrapper(receivedCommunication);
-    _gameManager.command(messageWrapper.innerMessage); // or rather a conversion of this particular message
+    // _gameManager.command(messageWrapper.innerMessage); // or rather a conversion of this particular message
 }

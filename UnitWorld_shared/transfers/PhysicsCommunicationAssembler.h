@@ -11,14 +11,34 @@ namespace uw
 {
     class PhysicsCommunicationAssembler
     {
+    public:
         CommunicatedPlayer physicsPlayerToCommunicated(std::shared_ptr<const Player> player)
         {
-
+            return CommunicatedPlayer(player->id());
         }
 
-        immer::vector<CommunicatedSinguity> physicsPlayersToCommunicatedSinguities(immer::vector<std::shared_ptr<const Player>> players)
+        immer::vector<CommunicatedSinguity> physicsPlayerToCommunicatedSinguities(std::shared_ptr<const Player> player)
         {
+            std::vector<CommunicatedSinguity> communicatedSinguities;
+            for (const auto& singuity : player->singuities())
+            {
+                communicatedSinguities.emplace_back(
+                    singuity->id(),
+                    player->id(),
+                    physicsVector2DToCommunicated(singuity->position()),
+                    physicsVector2DToCommunicated(singuity->speed()),
+                    physicsVector2DToCommunicated(singuity->destination())
+                );
+            }
 
+            return immer::vector<CommunicatedSinguity>(communicatedSinguities.begin(), communicatedSinguities.end());
+        }
+
+    private:
+
+        CommunicatedVector2D physicsVector2DToCommunicated(const Vector2D& vector2D)
+        {
+            return CommunicatedVector2D(vector2D.x(), vector2D.y());
         }
     };
 }

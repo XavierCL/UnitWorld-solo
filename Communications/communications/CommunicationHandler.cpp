@@ -10,12 +10,20 @@ CommunicationHandler::CommunicationHandler(const std::shared_ptr<asio::ip::tcp::
 
 void CommunicationHandler::send(const std::string& message)
 {
-    throw std::exception("Not implemented");
+    _socket->send(asio::buffer(message));
 }
 
 std::string CommunicationHandler::receive()
 {
-    throw std::exception("Not implemented");
+    std::string receivedData;
+    receivedData.reserve(10000);
+    _socket->receive(asio::buffer(receivedData));
+    return receivedData;
+}
+
+void CommunicationHandler::close()
+{
+    _socket->close();
 }
 
 std::string CommunicationHandler::prettyName() const
