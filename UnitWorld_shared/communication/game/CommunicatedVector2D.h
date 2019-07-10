@@ -1,26 +1,15 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
+#include <string>
 
 namespace uw
 {
     class CommunicatedVector2D
     {
     public:
-        CommunicatedVector2D(const double& xPosition, const double& yPosition):
-            _x(xPosition),
-            _y(yPosition)
-        {}
+        CommunicatedVector2D(const double& xPosition, const double& yPosition);
 
-        std::string toJson() const
-        {
-            nlohmann::json jsonData = {
-                {"x", _x},
-                {"y", _y}
-            };
-
-            return jsonData;
-        }
+        std::string toJson() const;
 
     private:
 

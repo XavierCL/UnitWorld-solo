@@ -27,7 +27,7 @@ namespace uw
                     player->id(),
                     physicsVector2DToCommunicated(singuity->position()),
                     physicsVector2DToCommunicated(singuity->speed()),
-                    physicsVector2DToCommunicated(singuity->destination())
+                    singuity->destination().map<CommunicatedVector2D>([this](const Vector2D& destination) { return physicsVector2DToCommunicated(destination); })
                 );
             }
 

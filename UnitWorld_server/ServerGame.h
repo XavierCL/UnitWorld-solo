@@ -31,7 +31,7 @@ namespace uw
         immer::vector<std::shared_ptr<CommunicationHandler>> _communicationHandlers;
 
         GameManager _gameManager;
-        const unsigned int _networkFPS;
+        const unsigned int _networkMsPerFrame;
         bool _isNetworkRunning;
 
         std::unique_ptr<std::thread> _gameManagerThread;
