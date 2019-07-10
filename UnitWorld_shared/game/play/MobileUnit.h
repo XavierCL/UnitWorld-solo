@@ -11,7 +11,12 @@ namespace uw
     public:
 
         virtual void actualize();
+
         void setDestination(const Vector2D& destination);
+        Option<Vector2D> destination() const;
+
+        Vector2D speed() const;
+
     protected:
         MobileUnit(const MobileUnit& copy);
         MobileUnit(const Vector2D& initialPosition);

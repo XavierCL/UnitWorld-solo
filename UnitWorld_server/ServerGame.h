@@ -4,6 +4,8 @@
 
 #include "game/GameManager.h"
 
+#include "commons/Guid.hpp"
+
 #include <immer/vector.hpp>
 
 namespace uw
@@ -19,12 +21,13 @@ namespace uw
 
     private:
 
-        void sendCompleteState();
+        void loopSendCompleteState();
 
-        void waitClientReceive();
+        void waitClientReceive(const xg::Guid& playerGuid, std::shared_ptr<CommunicationHandler> clientToReceive);
 
-        void handleClientReceive(std::shared_ptr<CommunicationHandler> callingClient);
+        void handleClientReceive(const xg::Guid& playerGuid, const std::string& receivedCommunication);
 
+        std::vector<std::thread> _clientWaiters;
         immer::vector<std::shared_ptr<CommunicationHandler>> _communicationHandlers;
 
         GameManager _gameManager;

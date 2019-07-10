@@ -5,6 +5,7 @@
 #include "../geometry/Rectangle.h"
 
 #include "commons/Hash.hpp"
+#include "commons/Guid.hpp"
 
 #include <unordered_set>
 
@@ -13,14 +14,19 @@ namespace uw
     class Player
     {
     public:
+        Player(const std::vector<std::shared_ptr<Singuity>>& singuities);
+
+        xg::Guid id() const;
         void actualize();
         void addSinguity(std::shared_ptr<Singuity> newSinguity);
         void selectMobileUnitsInArea(const Rectangle& area);
         void setSelectedMobileUnitsDestination(const Vector2D& destination);
-        std::unordered_set<std::shared_ptr<Singuity>, SharedPointerHash<Singuity>> singuities() const;
+        std::unordered_set<std::shared_ptr<const Singuity>, SharedPointerHash<const Singuity>> singuities() const;
 
     private:
-        std::unordered_set<std::shared_ptr<Singuity>, SharedPointerHash<Singuity>> _singuities;
+        const xg::Guid _id;
+
+        std::unordered_set<std::shared_ptr<const Singuity>, SharedPointerHash<const Singuity>> _singuities;
         std::unordered_set<std::shared_ptr<MobileUnit>, SharedPointerHash<MobileUnit>> _mobileUnits;
         std::unordered_set<std::shared_ptr<MobileUnit>, SharedPointerHash<MobileUnit>> _selectedMobileUnits;
     };

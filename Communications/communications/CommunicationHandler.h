@@ -11,12 +11,14 @@ namespace uw
 
         void send(const std::string& message);
 
-        void receive();
+        std::string receive();
+
+        void close();
 
         std::string prettyName() const;
 
     private:
-        std::shared_ptr<const asio::ip::tcp::socket> _socket;
+        std::shared_ptr<asio::ip::tcp::socket> _socket;
         const asio::ip::tcp::endpoint _endpoint;
     };
 }

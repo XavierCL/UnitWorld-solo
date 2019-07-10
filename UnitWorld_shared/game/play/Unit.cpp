@@ -2,7 +2,12 @@
 
 using namespace uw;
 
-Vector2D& Unit::position()
+xg::Guid Unit::id() const
+{
+    return _id;
+}
+
+Vector2D Unit::position() const
 {
     return _position;
 }
@@ -13,5 +18,6 @@ void Unit::position(const Vector2D& newPosition)
 }
 
 Unit::Unit(const Vector2D& initialPosition) :
+    _id(xg::newGuid()),
     _position(initialPosition)
 {}

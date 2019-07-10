@@ -21,6 +21,9 @@
     <ClCompile Include="commons\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="commons\Guid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commons\FastMath.hpp">
@@ -39,6 +42,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="commons\RandomEngineGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="commons\Guid.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

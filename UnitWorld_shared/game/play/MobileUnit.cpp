@@ -25,6 +25,16 @@ void MobileUnit::setDestination(const Vector2D& destination)
     _destination = Option<Vector2D>(destination);
 }
 
+Option<Vector2D> MobileUnit::destination() const
+{
+    return _destination;
+}
+
+Vector2D MobileUnit::speed() const
+{
+    return _speed;
+}
+
 MobileUnit::MobileUnit(const MobileUnit & copy) :
     Unit(copy)
 {

@@ -2,6 +2,17 @@
 
 using namespace uw;
 
+Player::Player(const std::vector<std::shared_ptr<Singuity>>& singuities):
+    _id(xg::newGuid()),
+    _singuities(singuities.begin(), singuities.end()),
+    _mobileUnits(singuities.begin(), singuities.end())
+{}
+
+xg::Guid Player::id() const
+{
+    return _id;
+}
+
 void Player::actualize()
 {
     for (auto mobileUnit : _mobileUnits)
@@ -35,7 +46,7 @@ void Player::setSelectedMobileUnitsDestination(const Vector2D& destination)
     }
 }
 
-std::unordered_set<std::shared_ptr<Singuity>, SharedPointerHash<Singuity>> uw::Player::singuities() const
+std::unordered_set<std::shared_ptr<const Singuity>, SharedPointerHash<const Singuity>> uw::Player::singuities() const
 {
     return _singuities;
 }
