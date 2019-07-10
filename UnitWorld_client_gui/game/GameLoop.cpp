@@ -12,7 +12,7 @@ using namespace uw;
 
 GameLoop::GameLoop(std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator) :
     _canvasTransactionGenerator(canvasTransactionGenerator),
-    _currentPlayer(std::make_shared<Player>())
+    _currentPlayer(std::make_shared<Player>(std::vector<std::shared_ptr<Singuity>>()))
 {
     _currentPlayer->addSinguity(std::make_shared<Singuity>(Vector2D(150, 150)));
     _currentPlayer->addSinguity(std::make_shared<Singuity>(Vector2D(200, 150)));
