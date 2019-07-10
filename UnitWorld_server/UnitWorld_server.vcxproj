@@ -76,6 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\Communications;..\dependencies\asio\1.12.2\include;..\dependencies\immer\0.6.2\include;..\UnitWorld_shared</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -85,6 +86,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\Communications;..\dependencies\asio\1.12.2\include;..\dependencies\immer\0.6.2\include;..\UnitWorld_shared</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -96,6 +98,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\Communications;..\dependencies\asio\1.12.2\include;..\dependencies\immer\0.6.2\include;..\UnitWorld_shared</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -111,6 +114,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\Communications;..\dependencies\asio\1.12.2\include;..\dependencies\immer\0.6.2\include;..\UnitWorld_shared</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

@@ -81,6 +81,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\UnitWorld_shared;..\dependencies\SFML\2.4.2\include;..\Communications;..\Commons;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -94,6 +95,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\UnitWorld_shared;..\dependencies\SFML\2.4.2\include;..\Communications;..\Commons;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfml-audio-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -110,6 +112,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\UnitWorld_shared;..\dependencies\SFML\2.4.2\include;..\Communications;..\Commons;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -127,6 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\UnitWorld_shared;..\dependencies\SFML\2.4.2\include;..\Communications;..\Commons;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_WIN32_WINNT=_WIN32_WINNT_WINXP;ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

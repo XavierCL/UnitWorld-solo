@@ -4,7 +4,7 @@
 
 using namespace uw;
 
-GraphicalSinguity::GraphicalSinguity(Singuity& self) :
+GraphicalSinguity::GraphicalSinguity(const Singuity& self) :
     Singuity(self)
 {
     auto circleShape = std::make_shared<sf::CircleShape>(4);

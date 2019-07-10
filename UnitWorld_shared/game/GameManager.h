@@ -32,7 +32,7 @@ namespace uw
 
                 const auto endFrameTime = clock();
 
-                const auto frameTimeInMs = (endFrameTime - startFrameTime) / (CLOCK_PER_SEC / 1000);
+                const auto frameTimeInMs = (endFrameTime - startFrameTime) / (CLOCKS_PER_SEC / 1000);
 
                 if (frameTimeInMs < _msPerFrame)
                 {

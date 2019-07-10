@@ -15,6 +15,12 @@ namespace uw
             _singuities(singuities)
         {}
 
+        // TODO: parse the json data
+        CompleteGameStateMessage(const std::string jsonData) :
+            _players(),
+            _singuities()
+        {}
+
         virtual MessageType messageType() const
         {
             return MessageType::CompleteGameStateMessageType;
