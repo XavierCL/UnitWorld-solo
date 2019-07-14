@@ -16,3 +16,10 @@ std::string CommunicatedPlayer::toJson() const
 
     return jsonData;
 }
+
+CommunicatedPlayer CommunicatedPlayer::fromJson(std::string jsonData)
+{
+    nlohmann::json parsedJson = nlohmann::json::parse(jsonData);
+    
+    return CommunicatedPlayer(xg::Guid(parsedJson.at("id").get<std::string>()));
+}

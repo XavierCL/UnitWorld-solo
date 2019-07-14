@@ -4,15 +4,17 @@
 
 #include "../graphics/canvas/CanvasTransactionGenerator.h"
 
+#include "communications/CommunicationHandler.h"
+
 namespace uw
 {
     class GameLoop
     {
     public:
 
-        GameLoop(std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator);
+        GameLoop(const int& graphicsFramePerSecond, const int& physicsFramePerSecond, std::shared_ptr<CommunicationHandler> serverHandler, std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator);
 
-        void loop();
+        void start();
 
     private:
         void handlePhysics();

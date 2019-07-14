@@ -2,7 +2,7 @@
 
 #include "communications/CommunicationHandler.h"
 
-#include "game/GameManager.h"
+#include "shared/game/GameManager.h"
 
 #include "commons/Guid.hpp"
 
@@ -28,7 +28,7 @@ namespace uw
         void handleClientReceive(const xg::Guid& playerGuid, const std::string& receivedCommunication);
 
         std::vector<std::thread> _clientWaiters;
-        immer::vector<std::shared_ptr<CommunicationHandler>> _communicationHandlers;
+        immer::vector<std::pair<xg::Guid, std::shared_ptr<CommunicationHandler>>> _communicationHandlers;
 
         GameManager _gameManager;
         const unsigned int _networkMsPerFrame;

@@ -24,3 +24,16 @@ std::string CommunicatedSinguity::toJson() const
 
     return jsonData;
 }
+
+CommunicatedSinguity CommunicatedSinguity::fromJson(const std::string& jsonData)
+{
+    nlohmann::json parsedJson = nlohmann::json::parse(jsonData);
+
+    return CommunicatedSinguity(
+        xg::Guid(parsedJson.at("id").get<std::string>()),
+        xg::Guid(parsedJson.at("playerId").get<std::string>()),
+        CommunicatedVector2D::fromJson(parsedJson.at("position")),
+        CommunicatedVector2D::fromJson(parsedJson.at("speed")),
+        CommunicatedVector2D::fromJson(parsedJson.at("destination"))
+    );
+}
