@@ -18,3 +18,10 @@ std::string CommunicatedVector2D::toJson() const
 
     return jsonData;
 }
+
+CommunicatedVector2D CommunicatedVector2D::fromJson(const std::string& jsonData)
+{
+    nlohmann::json parsedJson = nlohmann::json::parse(jsonData);
+
+    return CommunicatedVector2D(parsedJson.at("x").get<double>(), parsedJson.at("y").get<double>());
+}

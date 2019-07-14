@@ -126,35 +126,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="communication\CompleteGameStateMessage.h" />
-    <ClInclude Include="communication\game\CommunicatedPlayer.h" />
-    <ClInclude Include="communication\game\CommunicatedSinguity.h" />
-    <ClInclude Include="communication\game\CommunicatedVector2D.h" />
-    <ClInclude Include="communication\InvalidMessage.h" />
-    <ClInclude Include="communication\Message.h" />
-    <ClInclude Include="communication\MessageType.h" />
-    <ClInclude Include="communication\MessageWrapper.h" />
-    <ClInclude Include="game\GameManager.h" />
-    <ClInclude Include="game\geometry\Rectangle.h" />
-    <ClInclude Include="game\physics\Vector2D.h" />
-    <ClInclude Include="game\play\MobileUnit.h" />
-    <ClInclude Include="game\play\Player.h" />
-    <ClInclude Include="game\play\Singuity.h" />
-    <ClInclude Include="game\play\Unit.h" />
-    <ClInclude Include="transfers\PhysicsCommunicationAssembler.h" />
+    <ClInclude Include="shared\communication\CompleteGameStateMessage.h" />
+    <ClInclude Include="shared\communication\game\CommunicatedPlayer.h" />
+    <ClInclude Include="shared\communication\game\CommunicatedSinguity.h" />
+    <ClInclude Include="shared\communication\game\CommunicatedVector2D.h" />
+    <ClInclude Include="shared\communication\InvalidMessage.h" />
+    <ClInclude Include="shared\communication\Message.h" />
+    <ClInclude Include="shared\communication\MessageType.h" />
+    <ClInclude Include="shared\communication\MessageWrapper.h" />
+    <ClInclude Include="shared\game\GameManager.h" />
+    <ClInclude Include="shared\game\geometry\Rectangle.h" />
+    <ClInclude Include="shared\game\physics\Vector2D.h" />
+    <ClInclude Include="shared\game\play\MobileUnit.h" />
+    <ClInclude Include="shared\game\play\Player.h" />
+    <ClInclude Include="shared\game\play\Singuity.h" />
+    <ClInclude Include="shared\game\play\Unit.h" />
+    <ClInclude Include="shared\transfers\PhysicsCommunicationAssembler.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="communication\game\CommunicatedPlayer.cpp" />
-    <ClCompile Include="communication\game\CommunicatedSinguity.cpp" />
-    <ClCompile Include="communication\game\CommunicatedVector2D.cpp" />
-    <ClCompile Include="communication\CompleteGameStateMessage.cpp" />
-    <ClCompile Include="communication\MessageWrapper.cpp" />
-    <ClCompile Include="game\geometry\Rectangle.cpp" />
-    <ClCompile Include="game\physics\Vector2D.cpp" />
-    <ClCompile Include="game\play\MobileUnit.cpp" />
-    <ClCompile Include="game\play\Player.cpp" />
-    <ClCompile Include="game\play\Singuity.cpp" />
-    <ClCompile Include="game\play\Unit.cpp" />
+    <ClCompile Include="shared\communication\game\CommunicatedPlayer.cpp" />
+    <ClCompile Include="shared\communication\game\CommunicatedSinguity.cpp" />
+    <ClCompile Include="shared\communication\game\CommunicatedVector2D.cpp" />
+    <ClCompile Include="shared\communication\CompleteGameStateMessage.cpp" />
+    <ClCompile Include="shared\communication\MessageWrapper.cpp" />
+    <ClCompile Include="shared\game\geometry\Rectangle.cpp" />
+    <ClCompile Include="shared\game\physics\Vector2D.cpp" />
+    <ClCompile Include="shared\game\play\MobileUnit.cpp" />
+    <ClCompile Include="shared\game\play\Player.cpp" />
+    <ClCompile Include="shared\game\play\Singuity.cpp" />
+    <ClCompile Include="shared\game\play\Unit.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

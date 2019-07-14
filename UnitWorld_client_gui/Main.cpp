@@ -13,30 +13,13 @@ using namespace uw;
 
 int main()
 {
-    ClientConnector(ConnectionInfo("127.0.0.1", "52124"), [](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
-        OutputDebugStringA("Server connected!");
-    });
-
-    unsigned int screenWidth = 800;
-    unsigned int screenHeight = 600;
-
-    sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "Unit World");
-
-    auto sharedHandler(std::make_shared<uw::CanvasTransactionGenerator>(std::make_shared<uw::SFMLCanvas>(window)));
-    uw::GameLoop game(sharedHandler);
+    sf::RenderWindow window(sf::VideoMode::getFullscreenModes().front(), "Unit World client GUI");
 
     window.setActive(false);
+    auto sharedHandler(std::make_shared<uw::CanvasTransactionGenerator>(std::make_shared<uw::SFMLCanvas>(window)));
 
-    std::thread gameThread([&window, &game] {
-        while (window.isOpen())
-        {
-            auto counter1 = std::chrono::steady_clock::now();
-            game.loop();
-            auto counter2 = std::chrono::steady_clock::now();
-            int remainingSleepTime = 30 - (int)std::chrono::duration <double, std::milli>(counter2 - counter1).count();
-            if (remainingSleepTime >= 1)
-                std::this_thread::sleep_for(std::chrono::milliseconds(remainingSleepTime));
-        }
+    ClientConnector(ConnectionInfo("127.0.0.1", "52124"), [](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
+        
     });
 
     while (window.isOpen())
@@ -51,6 +34,5 @@ int main()
         }
     }
 
-    gameThread.join();
     return EXIT_SUCCESS;
 }

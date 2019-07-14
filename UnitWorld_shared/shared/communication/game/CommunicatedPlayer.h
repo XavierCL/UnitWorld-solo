@@ -11,6 +11,8 @@ namespace uw
 
         std::string toJson() const;
 
+        static CommunicatedPlayer fromJson(std::string jsonData);
+
     private:
         const xg::Guid _playerId;
     };

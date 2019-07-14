@@ -14,6 +14,8 @@ namespace uw
 
         std::string toJson() const;
 
+        static CommunicatedSinguity fromJson(const std::string& jsonData);
+
     private:
         const xg::Guid _singuityId;
         const xg::Guid _playerId;

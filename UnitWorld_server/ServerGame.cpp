@@ -1,11 +1,11 @@
 #include "ServerGame.h"
 
-#include "communication/CompleteGameStateMessage.h"
-#include "communication/MessageWrapper.h"
+#include "shared/communication/CompleteGameStateMessage.h"
+#include "shared/communication/MessageWrapper.h"
 
-#include "communication/game/CommunicatedPlayer.h"
+#include "shared/communication/game/CommunicatedPlayer.h"
 
-#include "transfers/PhysicsCommunicationAssembler.h"
+#include "shared/transfers/PhysicsCommunicationAssembler.h"
 
 #include "commons/Logger.hpp"
 
@@ -33,7 +33,7 @@ ServerGame::~ServerGame()
 
     for (auto& clientHandler : _communicationHandlers)
     {
-        clientHandler->close();
+        clientHandler.second->close();
     }
 
     for (auto& clientWaiter : _clientWaiters)
@@ -44,10 +44,10 @@ ServerGame::~ServerGame()
 
 void ServerGame::addClient(std::shared_ptr<CommunicationHandler> communicationHandler)
 {
-    _communicationHandlers = _communicationHandlers.push_back(communicationHandler);
-
     const auto singuityInitialXPosition = (double)_communicationHandlers.size();
     auto newPlayer(std::make_shared<Player>(std::vector<std::shared_ptr<Singuity>> {std::make_shared<Singuity>(Vector2D(singuityInitialXPosition, 0))}));
+
+    _communicationHandlers = _communicationHandlers.push_back(std::pair(newPlayer->id(), communicationHandler));
 
     _gameManager.addPlayer(newPlayer);
     _clientWaiters.emplace_back([this, newPlayer, communicationHandler] { waitClientReceive(newPlayer->id(), communicationHandler); });
@@ -74,15 +74,15 @@ void ServerGame::loopSendCompleteState()
             std::copy(assembledPlayerSinguities.begin(), assembledPlayerSinguities.end(), std::back_inserter(communicatedSinguities));
         }
 
-        const auto message = MessageWrapper(std::make_shared<CompleteGameStateMessage>(communicatedPlayers, communicatedSinguities)).json();
-        for (auto processingClientCommunicationHandler : localClientCommunicationHandlers)
+        for (auto clientPlayerIdAndCommunicationHandler : localClientCommunicationHandlers)
         {
-            processingClientCommunicationHandler->send(message);
+            const auto message = MessageWrapper(std::make_shared<CompleteGameStateMessage>(communicatedPlayers, communicatedSinguities, clientPlayerIdAndCommunicationHandler.first)).json();
+            clientPlayerIdAndCommunicationHandler.second->send(message);
         }
 
         const auto endFrameTime = std::chrono::steady_clock::now();
 
-        const auto frameTimeInMs = (endFrameTime - startFrameTime).count() * 1000000;
+        const auto frameTimeInMs = (unsigned int)std::chrono::duration<double, std::milli>(endFrameTime - startFrameTime).count();
 
         if (frameTimeInMs < _networkMsPerFrame)
         {
