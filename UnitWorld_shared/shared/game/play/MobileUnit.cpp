@@ -42,9 +42,10 @@ MobileUnit::MobileUnit(const MobileUnit & copy) :
     _speed = copy._speed;
 }
 
-MobileUnit::MobileUnit(const Vector2D& initialPosition) :
-    Unit(initialPosition),
-    _destination(nullptr)
+MobileUnit::MobileUnit(const Vector2D& position, const Vector2D& speed, const Option<Vector2D>& destination):
+    Unit(position),
+    _speed(speed),
+    _destination(destination)
 {}
 
 void MobileUnit::setMaximalAcceleration(const Vector2D & destination)

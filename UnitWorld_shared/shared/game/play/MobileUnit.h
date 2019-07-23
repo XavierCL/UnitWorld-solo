@@ -19,7 +19,7 @@ namespace uw
 
     protected:
         MobileUnit(const MobileUnit& copy);
-        MobileUnit(const Vector2D& initialPosition);
+        MobileUnit(const Vector2D& position, const Vector2D& speed, const Option<Vector2D>& destination);
 
     private:
         void setMaximalAcceleration(const Vector2D& destination);

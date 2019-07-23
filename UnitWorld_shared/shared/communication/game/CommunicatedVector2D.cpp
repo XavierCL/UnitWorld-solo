@@ -25,3 +25,13 @@ CommunicatedVector2D CommunicatedVector2D::fromJson(const std::string& jsonData)
 
     return CommunicatedVector2D(parsedJson.at("x").get<double>(), parsedJson.at("y").get<double>());
 }
+
+double CommunicatedVector2D::x() const
+{
+    return _x;
+}
+
+double CommunicatedVector2D::y() const
+{
+    return _y;
+}

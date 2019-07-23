@@ -26,6 +26,11 @@ void CommunicationHandler::close()
     _socket->close();
 }
 
+bool CommunicationHandler::isOpen() const
+{
+    return _socket->is_open();
+}
+
 std::string CommunicationHandler::prettyName() const
 {
     return _endpoint.address().to_string() + ":" + std::to_string(_endpoint.port());

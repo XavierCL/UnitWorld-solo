@@ -23,3 +23,8 @@ CommunicatedPlayer CommunicatedPlayer::fromJson(std::string jsonData)
     
     return CommunicatedPlayer(xg::Guid(parsedJson.at("id").get<std::string>()));
 }
+
+xg::Guid CommunicatedPlayer::playerId() const
+{
+    return _playerId;
+}

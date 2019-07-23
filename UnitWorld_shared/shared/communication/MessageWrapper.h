@@ -11,7 +11,7 @@ namespace uw
 
         MessageWrapper(const std::shared_ptr<const Message> message);
 
-        std::shared_ptr<const Message> innerMessage() const;
+        std::shared_ptr<Message const> innerMessage() const;
 
         std::string json() const;
 

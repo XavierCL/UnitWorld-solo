@@ -13,6 +13,9 @@ namespace uw
 
         static CommunicatedVector2D fromJson(const std::string& jsonData);
 
+        double x() const;
+        double y() const;
+
     private:
 
         const double _x;

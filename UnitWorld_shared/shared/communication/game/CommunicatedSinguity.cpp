@@ -37,3 +37,23 @@ CommunicatedSinguity CommunicatedSinguity::fromJson(const std::string& jsonData)
         CommunicatedVector2D::fromJson(parsedJson.at("destination"))
     );
 }
+
+xg::Guid CommunicatedSinguity::playerId() const
+{
+    return _playerId;
+}
+
+CommunicatedVector2D CommunicatedSinguity::position() const
+{
+    return _position;
+}
+
+CommunicatedVector2D CommunicatedSinguity::speed() const
+{
+    return _speed;
+}
+
+Option<CommunicatedVector2D> CommunicatedSinguity::destination() const
+{
+    return _destination;
+}
