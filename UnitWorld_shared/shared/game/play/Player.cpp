@@ -2,10 +2,9 @@
 
 using namespace uw;
 
-Player::Player(const std::vector<std::shared_ptr<Singuity>>& singuities):
-    _id(xg::newGuid()),
-    _singuities(singuities.begin(), singuities.end()),
-    _mobileUnits(singuities.begin(), singuities.end())
+Player::Player(const xg::Guid& id, const std::vector<std::shared_ptr<Singuity>>& singuities):
+    _id(id),
+    _singuities(singuities.begin(), singuities.end())
 {}
 
 xg::Guid Player::id() const

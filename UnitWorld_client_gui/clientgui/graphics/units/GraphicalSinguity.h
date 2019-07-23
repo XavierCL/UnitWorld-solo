@@ -2,7 +2,7 @@
 
 #include "GraphicalUnit.h"
 
-#include "game/play/Singuity.h"
+#include "shared/game/play/Singuity.h"
 
 namespace uw
 {

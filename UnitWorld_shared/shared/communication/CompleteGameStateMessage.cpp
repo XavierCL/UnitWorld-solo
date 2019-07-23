@@ -13,7 +13,7 @@ CompleteGameStateMessage::CompleteGameStateMessage(const std::vector<Communicate
 CompleteGameStateMessage::CompleteGameStateMessage(const std::string jsonData) :
     _players(jsonDataToPlayers(jsonData)),
     _singuities(jsonDataToSinguities(jsonData)),
-    _currentPlayerId(jsonDataToCurrentPlayerId(jsonData)
+    _currentPlayerId(jsonDataToCurrentPlayerId(jsonData))
 {}
 
 MessageType CompleteGameStateMessage::messageType() const

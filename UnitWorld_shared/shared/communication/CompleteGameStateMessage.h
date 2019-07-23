@@ -2,8 +2,8 @@
 
 #include "Message.h"
 
-#include "shared/game/CommunicatedPlayer.h"
-#include "shared/game/CommunicatedSinguity.h"
+#include "game/CommunicatedPlayer.h"
+#include "game/CommunicatedSinguity.h"
 
 #include "commons/Guid.hpp"
 

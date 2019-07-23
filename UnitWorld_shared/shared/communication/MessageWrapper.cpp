@@ -30,7 +30,7 @@ MessageWrapper::MessageWrapper(const std::shared_ptr<const Message> message) :
     _innerMessage(message)
 {}
 
-std::shared_ptr<const Message> MessageWrapper::innerMessage() const
+std::shared_ptr<Message const> MessageWrapper::innerMessage() const
 {
     return _innerMessage;
 }

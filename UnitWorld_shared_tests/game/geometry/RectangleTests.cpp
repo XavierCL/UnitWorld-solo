@@ -1,5 +1,5 @@
 #include "CppUnitTest.h"
-#include "game/geometry/Rectangle.h"
+#include "shared/game/geometry/Rectangle.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace uw;

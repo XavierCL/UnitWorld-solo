@@ -45,11 +45,11 @@ ServerGame::~ServerGame()
 void ServerGame::addClient(std::shared_ptr<CommunicationHandler> communicationHandler)
 {
     const auto singuityInitialXPosition = (double)_communicationHandlers.size();
-    auto newPlayer(std::make_shared<Player>(std::vector<std::shared_ptr<Singuity>> {std::make_shared<Singuity>(Vector2D(singuityInitialXPosition, 0))}));
+    auto newPlayer(std::make_shared<Player>(xg::newGuid(), std::vector<std::shared_ptr<Singuity>> {std::make_shared<Singuity>(Vector2D(singuityInitialXPosition, 0), Vector2D(), Option<Vector2D>())}));
 
     _communicationHandlers = _communicationHandlers.push_back(std::pair(newPlayer->id(), communicationHandler));
 
-    _gameManager.addPlayer(newPlayer);
+    _gameManager.setNextPlayer(newPlayer);
     _clientWaiters.emplace_back([this, newPlayer, communicationHandler] { waitClientReceive(newPlayer->id(), communicationHandler); });
 }
 
@@ -62,7 +62,7 @@ void ServerGame::loopSendCompleteState()
 
         auto localClientCommunicationHandlers(_communicationHandlers);
 
-        const auto players = _gameManager.threadSafePlayers();
+        const auto players = _gameManager.players();
 
         std::vector<CommunicatedPlayer> communicatedPlayers;
         std::vector<CommunicatedSinguity> communicatedSinguities;

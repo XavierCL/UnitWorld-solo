@@ -15,6 +15,8 @@ namespace uw
 
         void close();
 
+        bool isOpen() const;
+
         std::string prettyName() const;
 
     private:

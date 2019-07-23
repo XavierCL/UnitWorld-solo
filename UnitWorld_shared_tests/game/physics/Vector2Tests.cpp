@@ -1,5 +1,5 @@
 #include "CppUnitTest.h"
-#include "game/physics/Vector2D.h"
+#include "shared/game/physics/Vector2D.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace uw;
