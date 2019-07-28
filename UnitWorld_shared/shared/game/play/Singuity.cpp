@@ -6,6 +6,10 @@ Singuity::Singuity(const Vector2D& position, const Vector2D& speed, const Option
     MobileUnit(position, speed, destination)
 {}
 
+Singuity::Singuity(const Singuity& other) :
+    MobileUnit(other)
+{}
+
 const double Singuity::maximumSpeed() const
 {
     return 1.5;

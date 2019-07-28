@@ -36,6 +36,7 @@ void ClientGame::startSync()
     gameManagerThread.join();
 }
 
+// This should be hold in a separate class
 void ClientGame::receiveServerStates()
 {
     _serverReceiver = std::make_unique<std::thread>([this] {

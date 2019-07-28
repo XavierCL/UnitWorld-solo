@@ -15,6 +15,7 @@ namespace uw
     {
     public:
         Player(const xg::Guid& id, const std::vector<std::shared_ptr<Singuity>>& singuities);
+        Player(const Player& other);
 
         xg::Guid id() const;
         void actualize();

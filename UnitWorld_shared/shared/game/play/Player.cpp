@@ -3,9 +3,22 @@
 using namespace uw;
 
 Player::Player(const xg::Guid& id, const std::vector<std::shared_ptr<Singuity>>& singuities):
-    _id(id),
-    _singuities(singuities.begin(), singuities.end())
-{}
+    _id(id)
+{
+    for (auto singuity : singuities)
+    {
+        addSinguity(std::make_shared<Singuity>(*singuity));
+    }
+}
+
+Player::Player(const Player& other):
+    _id(other._id)
+{
+    for (auto singuity : other._singuities)
+    {
+        addSinguity(std::make_shared<Singuity>(*singuity));
+    }
+}
 
 xg::Guid Player::id() const
 {

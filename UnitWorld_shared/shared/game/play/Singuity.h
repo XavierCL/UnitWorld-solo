@@ -8,6 +8,7 @@ namespace uw
     {
     public:
         Singuity(const Vector2D& position, const Vector2D& speed, const Option<Vector2D>& destination);
+        Singuity(const Singuity& other);
 
     private:
         const double maximumSpeed() const;

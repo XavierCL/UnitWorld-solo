@@ -88,11 +88,19 @@ namespace uw
             }
 
             auto localPlayers = _players;
+            std::vector<std::shared_ptr<Player>> workingPlayers(localPlayers.begin(), localPlayers.end());
 
-            for (auto processingPlayer : localPlayers)
+            for(unsigned int workingPlayerIndex = 0; workingPlayerIndex < workingPlayers.size(); ++workingPlayerIndex)
             {
-                processingPlayer->actualize();
+                workingPlayers[workingPlayerIndex] = std::make_shared<Player>(*workingPlayers[workingPlayerIndex]);
             }
+
+            for (auto workingPlayer : workingPlayers)
+            {
+                workingPlayer->actualize();
+            }
+
+            _players = immer::vector<std::shared_ptr<Player>>(workingPlayers.begin(), workingPlayers.end());
         }
 
         const unsigned int _msPerFrame;
