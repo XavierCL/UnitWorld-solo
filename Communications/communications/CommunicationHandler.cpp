@@ -6,19 +6,19 @@ CommunicationHandler::CommunicationHandler(const std::shared_ptr<asio::ip::tcp::
     _socket(socket),
     _endpoint(endpoint)
 {
+    // Max TCP receive size
+    _receiveBuffer.resize(65535);
 }
 
 void CommunicationHandler::send(const std::string& message)
 {
-    _socket->send(asio::buffer(message));
+    asio::write(*_socket, asio::buffer(message));
 }
 
 std::string CommunicationHandler::receive()
 {
-    std::string receivedData;
-    receivedData.reserve(10000);
-    _socket->receive(asio::buffer(receivedData));
-    return receivedData;
+    _socket->read_some(asio::buffer(_receiveBuffer));
+    return _receiveBuffer;
 }
 
 void CommunicationHandler::close()

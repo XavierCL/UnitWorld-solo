@@ -15,7 +15,9 @@ namespace uw
     public:
         GameManager(const unsigned int& framePerSecond):
             _msPerFrame(1000 / framePerSecond),
-            _isRunning(true)
+            _isRunning(true),
+            _nextPlayers(nullptr),
+            _nextAddPlayer(nullptr)
         {}
 
         void startSync()

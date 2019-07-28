@@ -44,16 +44,16 @@ std::string MessageWrapper::wrapMessageToJson(const std::shared_ptr<const Messag
 {
     nlohmann::json jsonMessage = {
         {MESSAGE_TYPE_JSON_ATTRIBUTE, message->messageType()},
-        {MESSAGE_DATA_JSON_ATTRIBUTE, message->toJsonData()}
+        {MESSAGE_DATA_JSON_ATTRIBUTE, nlohmann::json::parse(message->toJsonData())}
     };
-    return jsonMessage;
+    return jsonMessage.dump();
 }
 
 std::shared_ptr<const Message> MessageWrapper::stringToMessage(const std::string& json)
 {
     nlohmann::json jsonMessage = nlohmann::json::parse(json);
     const auto messageType = jsonMessage.at(MESSAGE_TYPE_JSON_ATTRIBUTE).get<MessageType>();
-    const auto messageData = jsonMessage.at(MESSAGE_DATA_JSON_ATTRIBUTE).get<std::string>();
+    const auto messageData = jsonMessage.at(MESSAGE_DATA_JSON_ATTRIBUTE).dump();
 
     if (messageType == MessageType::CompleteGameStateMessageType)
     {

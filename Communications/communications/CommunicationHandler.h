@@ -22,5 +22,6 @@ namespace uw
     private:
         std::shared_ptr<asio::ip::tcp::socket> _socket;
         const asio::ip::tcp::endpoint _endpoint;
+        std::basic_string<char> _receiveBuffer;
     };
 }
