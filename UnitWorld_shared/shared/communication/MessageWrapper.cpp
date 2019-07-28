@@ -20,6 +20,7 @@ namespace uw
 
 using namespace uw;
 
+// todo: this in fact can be receiving multiple messages. We'd have to separate them by end of message flag, and let the client discard the one they want to
 MessageWrapper::MessageWrapper(const std::string& json) :
     _json(json),
     _innerMessage(stringToMessage(json))
