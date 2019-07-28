@@ -16,7 +16,7 @@ std::string CommunicatedVector2D::toJson() const
         {"y", _y}
     };
 
-    return jsonData;
+    return jsonData.dump();
 }
 
 CommunicatedVector2D CommunicatedVector2D::fromJson(const std::string& jsonData)

@@ -23,13 +23,13 @@ MessageType CompleteGameStateMessage::messageType() const
 
 std::string CompleteGameStateMessage::toJsonData() const
 {
-    std::vector<std::string> playerJsons;
+    nlohmann::json playerJsons;
     for (const auto& communicatedPlayer : _players)
     {
         playerJsons.emplace_back(nlohmann::json::parse(communicatedPlayer.toJson()));
     }
 
-    std::vector<std::string> singuityJsons;
+    nlohmann::json singuityJsons;
     for (const auto& communicatedSinguity : _singuities)
     {
         singuityJsons.emplace_back(nlohmann::json::parse(communicatedSinguity.toJson()));
@@ -41,7 +41,7 @@ std::string CompleteGameStateMessage::toJsonData() const
         {"currentPlayerId", _currentPlayerId.str()}
     };
 
-    return jsonData;
+    return jsonData.dump();
 }
 
 std::vector<CommunicatedPlayer> CompleteGameStateMessage::getPlayers() const
@@ -66,7 +66,7 @@ std::vector<CommunicatedPlayer> CompleteGameStateMessage::jsonDataToPlayers(cons
     std::vector<CommunicatedPlayer> players;
     for (const auto player : parsedData.at("players"))
     {
-        players.emplace_back(CommunicatedPlayer::fromJson(player));
+        players.emplace_back(CommunicatedPlayer::fromJson(player.dump()));
     }
 
     return players;
@@ -79,7 +79,7 @@ std::vector<CommunicatedSinguity> CompleteGameStateMessage::jsonDataToSinguities
     std::vector<CommunicatedSinguity> singuities;
     for (const auto singuity : parsedData.at("singuities"))
     {
-        singuities.emplace_back(CommunicatedSinguity::fromJson(singuity));
+        singuities.emplace_back(CommunicatedSinguity::fromJson(singuity.dump()));
     }
 
     return singuities;

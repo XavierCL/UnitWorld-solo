@@ -95,7 +95,7 @@ void ServerGame::waitClientReceive(const xg::Guid& playerGuid, std::shared_ptr<C
 {
     while (_isNetworkRunning)
     {
-        const auto receivedCommunication = communicationHandler->receive();
+        std::string receivedCommunication(communicationHandler->receive());
 
         handleClientReceive(playerGuid, receivedCommunication);
     }

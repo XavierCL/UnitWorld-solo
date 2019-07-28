@@ -14,7 +14,7 @@ std::string CommunicatedPlayer::toJson() const
         {"id", _playerId.str()}
     };
 
-    return jsonData;
+    return jsonData.dump();
 }
 
 CommunicatedPlayer CommunicatedPlayer::fromJson(std::string jsonData)

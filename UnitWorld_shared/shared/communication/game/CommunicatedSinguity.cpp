@@ -14,27 +14,37 @@ CommunicatedSinguity::CommunicatedSinguity(const xg::Guid& singuityId, const xg:
 
 std::string CommunicatedSinguity::toJson() const
 {
+    const auto singuityId = _singuityId.str();
+    const auto playerId = _playerId.str();
+    const auto position = nlohmann::json::parse(_position.toJson());
+    const auto speed = nlohmann::json::parse(_speed.toJson());
+    const auto destination = _destination.map<nlohmann::json>([](const auto& destination) { return nlohmann::json::parse(destination.toJson()); }).getOrElse(nlohmann::json("none"));
+
     nlohmann::json jsonData = {
-        {"id", _singuityId.str()},
-        {"playerId", _playerId.str()},
-        {"position", _position.toJson()},
-        {"speed", _speed.toJson()},
-        {"destination", _destination.map<std::string>([](const auto& destination) { return destination.toJson(); }).getOrElse(std::string("none"))}
+        {"id", singuityId},
+        {"playerId", playerId},
+        {"position", position},
+        {"speed", speed},
+        {"destination", destination}
     };
 
-    return jsonData;
+    return jsonData.dump();
 }
 
 CommunicatedSinguity CommunicatedSinguity::fromJson(const std::string& jsonData)
 {
     nlohmann::json parsedJson = nlohmann::json::parse(jsonData);
 
+    const auto destinationJson = parsedJson.at("destination").dump();
+
     return CommunicatedSinguity(
         xg::Guid(parsedJson.at("id").get<std::string>()),
         xg::Guid(parsedJson.at("playerId").get<std::string>()),
-        CommunicatedVector2D::fromJson(parsedJson.at("position")),
-        CommunicatedVector2D::fromJson(parsedJson.at("speed")),
-        CommunicatedVector2D::fromJson(parsedJson.at("destination"))
+        CommunicatedVector2D::fromJson(parsedJson.at("position").dump()),
+        CommunicatedVector2D::fromJson(parsedJson.at("speed").dump()),
+        destinationJson == "\"none\""
+            ? Option<CommunicatedVector2D>()
+            : Option<CommunicatedVector2D>(CommunicatedVector2D::fromJson(destinationJson))
     );
 }
 

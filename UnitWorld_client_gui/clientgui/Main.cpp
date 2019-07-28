@@ -29,7 +29,7 @@ int main()
     window.setActive(false);
 
     ClientConnector(ConnectionInfo(SERVER_IP, SERVER_PORT), [&window, &GRAPHICS_FRAME_PER_SECOND, &PHYSICS_FRAME_PER_SECOND](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
-        const auto firstCommunication(connectionHandler->receive());
+        std::string firstCommunication(connectionHandler->receive());
 
         const auto firstCompleteGameStateMessage(std::dynamic_pointer_cast<const CompleteGameStateMessage>(MessageWrapper(firstCommunication).innerMessage()));
         const auto currentPlayerId(firstCompleteGameStateMessage->getCurrentPlayerId());
