@@ -63,6 +63,9 @@
     <ClInclude Include="shared\game\GameManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="shared\communication\MessageSerializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="shared\communication\game\CommunicatedPlayer.cpp">

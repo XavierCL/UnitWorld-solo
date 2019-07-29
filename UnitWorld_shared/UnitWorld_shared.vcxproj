@@ -132,6 +132,7 @@
     <ClInclude Include="shared\communication\game\CommunicatedVector2D.h" />
     <ClInclude Include="shared\communication\InvalidMessage.h" />
     <ClInclude Include="shared\communication\Message.h" />
+    <ClInclude Include="shared\communication\MessageSerializer.h" />
     <ClInclude Include="shared\communication\MessageType.h" />
     <ClInclude Include="shared\communication\MessageWrapper.h" />
     <ClInclude Include="shared\game\GameManager.h" />

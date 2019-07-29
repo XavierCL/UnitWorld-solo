@@ -2,6 +2,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include <chrono>
+
 using namespace uw;
 
 CompleteGameStateMessage::CompleteGameStateMessage(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const xg::Guid& currentPlayerId) :

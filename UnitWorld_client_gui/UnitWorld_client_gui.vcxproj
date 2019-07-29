@@ -141,7 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="clientgui\game\ClientGame.cpp" />
+    <ClCompile Include="clientgui\ClientGame.cpp" />
     <ClCompile Include="clientgui\graphics\canvas\CanvasTransactionGenerator.cpp" />
     <ClCompile Include="clientgui\graphics\canvas\SFMLCanvas.cpp" />
     <ClCompile Include="clientgui\graphics\units\GraphicalSinguity.cpp" />
@@ -149,14 +149,15 @@
     <ClCompile Include="clientgui\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="clientgui\game\ClientGame.h" />
-    <ClInclude Include="clientgui\game\GameDrawer.h" />
+    <ClInclude Include="clientgui\ClientGame.h" />
+    <ClInclude Include="clientgui\graphics\GameDrawer.h" />
     <ClInclude Include="clientgui\graphics\units\GraphicalSinguity.h" />
     <ClInclude Include="clientgui\graphics\units\GraphicalUnit.h" />
     <ClInclude Include="clientgui\graphics\canvas\DisplayCanvas.h" />
     <ClInclude Include="clientgui\graphics\canvas\SFMLDrawingCanvas.h" />
     <ClInclude Include="clientgui\graphics\canvas\SFMLCanvas.h" />
     <ClInclude Include="clientgui\graphics\canvas\CanvasTransactionGenerator.h" />
+    <ClInclude Include="clientgui\networking\ServerReceiver.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Commons\Commons.vcxproj">

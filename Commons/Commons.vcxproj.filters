@@ -47,5 +47,8 @@
     <ClInclude Include="commons\Guid.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="commons\StringsHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
