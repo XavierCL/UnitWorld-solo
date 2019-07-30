@@ -1,4 +1,4 @@
-#include "game/ClientGame.h"
+#include "ClientGame.h"
 
 #include "graphics/canvas/SFMLCanvas.h"
 #include "graphics/canvas/CanvasTransactionGenerator.h"
@@ -29,15 +29,18 @@ int main()
     window.setActive(false);
 
     ClientConnector(ConnectionInfo(SERVER_IP, SERVER_PORT), [&window, &GRAPHICS_FRAME_PER_SECOND, &PHYSICS_FRAME_PER_SECOND](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
-        std::string firstCommunication(connectionHandler->receive());
 
-        const auto firstCompleteGameStateMessage(std::dynamic_pointer_cast<const CompleteGameStateMessage>(MessageWrapper(firstCommunication).innerMessage()));
+        auto messageSerializer(std::make_shared<MessageSerializer>());
+        std::vector<MessageWrapper> receivedMessages;
+        while ((receivedMessages = messageSerializer->deserialize(connectionHandler->receive())).empty()) {}
+
+        const auto firstCompleteGameStateMessage(std::dynamic_pointer_cast<const CompleteGameStateMessage>(receivedMessages.front().innerMessage()));
         const auto currentPlayerId(firstCompleteGameStateMessage->getCurrentPlayerId());
         const auto currentPlayer(std::make_shared<Player>(currentPlayerId, std::vector<std::shared_ptr<Singuity>>()));
 
         auto sharedHandler(std::make_shared<uw::CanvasTransactionGenerator>(std::make_shared<uw::SFMLCanvas>(window)));
 
-        ClientGame clientGame(GRAPHICS_FRAME_PER_SECOND, PHYSICS_FRAME_PER_SECOND, currentPlayer, connectionHandler, sharedHandler);
+        ClientGame clientGame(GRAPHICS_FRAME_PER_SECOND, PHYSICS_FRAME_PER_SECOND, currentPlayer, connectionHandler, sharedHandler, messageSerializer);
 
         clientGame.startSync();
     });

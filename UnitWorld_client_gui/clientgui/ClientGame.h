@@ -1,6 +1,8 @@
 #pragma once
 
-#include "GameDrawer.h"
+#include "clientgui/networking/ServerReceiver.h"
+
+#include "clientgui/graphics/GameDrawer.h"
 
 #include "clientgui/graphics/canvas/CanvasTransactionGenerator.h"
 
@@ -15,21 +17,20 @@ namespace uw
     {
     public:
 
-        ClientGame(const int& graphicsFramePerSecond, const int& physicsFramePerSecond, std::shared_ptr<Player> currentPlayer, std::shared_ptr<CommunicationHandler> serverHandler, std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator);
+        ClientGame(const int& graphicsFramePerSecond, const int& physicsFramePerSecond, std::shared_ptr<Player> currentPlayer, std::shared_ptr<CommunicationHandler> serverHandler, std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator, std::shared_ptr<MessageSerializer> messageSerializer);
 
         ~ClientGame();
 
         void startSync();
 
+        void stop();
+
     private:
-
-        void receiveServerStates();
-
-        std::unique_ptr<std::thread> _serverReceiver;
 
         const std::shared_ptr<GameManager> _gameManager;
         const std::shared_ptr<Player> _currentPlayer;
         const std::shared_ptr<CommunicationHandler> _serverHandler;
         GameDrawer _gameDrawer;
+        ServerReceiver _serverReceiver;
     };
 }

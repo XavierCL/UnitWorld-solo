@@ -25,8 +25,8 @@ ServerGame::ServerGame(const unsigned int& physicsFPS, const unsigned int& netwo
 
 ServerGame::~ServerGame()
 {
-    _gameManager.stop();
     _isNetworkRunning = false;
+    _gameManager.stop();
 
     _gameManagerThread->join();
     _stateSenderThread->join();

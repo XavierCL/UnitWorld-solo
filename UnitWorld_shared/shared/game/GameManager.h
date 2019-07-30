@@ -20,6 +20,16 @@ namespace uw
             _nextAddPlayer(nullptr)
         {}
 
+        ~GameManager()
+        {
+            stop();
+        }
+
+        void stop()
+        {
+            _isRunning = false;
+        }
+
         void startSync()
         {
             while(_isRunning) {
@@ -36,11 +46,6 @@ namespace uw
                     std::this_thread::sleep_for(std::chrono::milliseconds(_msPerFrame - frameTimeInMs));
                 }
             }
-        }
-
-        void stop()
-        {
-            _isRunning = false;
         }
 
         void setNextPlayer(std::shared_ptr<Player> newPlayer)

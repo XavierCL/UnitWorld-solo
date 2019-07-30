@@ -21,7 +21,7 @@ namespace uw
             return communication;
         }
 
-        std::vector<const MessageWrapper> deserialize(std::string currentCommunication)
+        std::vector<MessageWrapper> deserialize(std::string currentCommunication)
         {
             auto wholeCommunication = _remainingDeserializationBuffer + currentCommunication;
             auto communications(StringsHelper::split(wholeCommunication, END_MESSAGE_FLAG));
@@ -37,7 +37,7 @@ namespace uw
                 communications.erase(communications.end());
             }
 
-            std::vector<const MessageWrapper> messages;
+            std::vector<MessageWrapper> messages;
             for (const auto communication : communications)
             {
                 messages.emplace_back(MessageWrapper(communication));
