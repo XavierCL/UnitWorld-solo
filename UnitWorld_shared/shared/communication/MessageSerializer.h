@@ -26,15 +26,15 @@ namespace uw
             auto wholeCommunication = _remainingDeserializationBuffer + currentCommunication;
             auto communications(StringsHelper::split(wholeCommunication, END_MESSAGE_FLAG));
 
-            if (communications.back().empty())
+            if (communications.back().front() == '\0')
             {
                 _remainingDeserializationBuffer.clear();
-                communications.erase(communications.end());
+                communications.pop_back();
             }
             else
             {
                 _remainingDeserializationBuffer = communications.back();
-                communications.erase(communications.end());
+                communications.pop_back();
             }
 
             std::vector<MessageWrapper> messages;

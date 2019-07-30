@@ -12,7 +12,7 @@ public:
         current = original.find(delimiter);
         while (current != std::string::npos) {
             cont.push_back(original.substr(previous, current - previous));
-            previous = current + 1;
+            previous = current + delimiter.size();
             current = original.find(delimiter, previous);
         }
         cont.push_back(original.substr(previous, current - previous));
