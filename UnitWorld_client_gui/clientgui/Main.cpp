@@ -28,7 +28,10 @@ int main()
 
     window.setActive(false);
 
-    ClientConnector(ConnectionInfo(SERVER_IP, SERVER_PORT), [&window, &GRAPHICS_FRAME_PER_SECOND, &PHYSICS_FRAME_PER_SECOND](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
+    std::shared_ptr<ClientGame> clientGame;
+    std::shared_ptr<std::thread> clientGameThread;
+
+    ClientConnector(ConnectionInfo(SERVER_IP, SERVER_PORT), [&window, &GRAPHICS_FRAME_PER_SECOND, &PHYSICS_FRAME_PER_SECOND, &clientGame, &clientGameThread](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
 
         auto messageSerializer(std::make_shared<MessageSerializer>());
         std::vector<MessageWrapper> receivedMessages;
@@ -40,9 +43,9 @@ int main()
 
         auto sharedHandler(std::make_shared<uw::CanvasTransactionGenerator>(std::make_shared<uw::SFMLCanvas>(window)));
 
-        ClientGame clientGame(GRAPHICS_FRAME_PER_SECOND, PHYSICS_FRAME_PER_SECOND, currentPlayer, connectionHandler, sharedHandler, messageSerializer);
+        clientGame = std::make_shared<ClientGame>(GRAPHICS_FRAME_PER_SECOND, PHYSICS_FRAME_PER_SECOND, currentPlayer, connectionHandler, sharedHandler, messageSerializer);
 
-        clientGame.startSync();
+        clientGameThread = std::make_shared<std::thread>([&clientGame] { clientGame->startSync(); });
     });
 
     while (window.isOpen())
@@ -53,7 +56,11 @@ int main()
         {
             // Close window: exit
             if (event.type == sf::Event::Closed)
+            {
+                clientGame->stop();
+                clientGameThread->join();
                 window.close();
+            }
         }
     }
 
