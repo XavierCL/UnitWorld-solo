@@ -76,8 +76,8 @@ void ServerGame::loopSendCompleteState()
 
         for (auto clientPlayerIdAndCommunicationHandler : localClientCommunicationHandlers)
         {
-            const auto message = MessageWrapper(std::make_shared<CompleteGameStateMessage>(communicatedPlayers, communicatedSinguities, clientPlayerIdAndCommunicationHandler.first)).json();
-            clientPlayerIdAndCommunicationHandler.second->send(message);
+            const auto message = MessageWrapper(std::make_shared<CompleteGameStateMessage>(communicatedPlayers, communicatedSinguities, clientPlayerIdAndCommunicationHandler.first));
+            clientPlayerIdAndCommunicationHandler.second->send(_messageSerializer.serialize(std::vector<MessageWrapper>(1, message)));
         }
 
         const auto endFrameTime = std::chrono::steady_clock::now();

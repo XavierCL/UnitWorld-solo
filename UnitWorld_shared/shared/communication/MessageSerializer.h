@@ -9,13 +9,13 @@ namespace uw
     class MessageSerializer
     {
     public:
-        std::string serialize(std::vector<std::shared_ptr<const MessageWrapper>> messages) const
+        std::string serialize(std::vector<MessageWrapper> messages) const
         {
             std::string communication;
 
             for (const auto message : messages)
             {
-                communication += message->json() + END_MESSAGE_FLAG;
+                communication += message.json() + END_MESSAGE_FLAG;
             }
 
             return communication;
