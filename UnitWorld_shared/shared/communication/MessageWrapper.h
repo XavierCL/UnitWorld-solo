@@ -15,6 +15,8 @@ namespace uw
 
         std::string json() const;
 
+        unsigned long long timestamp() const;
+
     private:
 
         static const std::string MESSAGE_TYPE_JSON_ATTRIBUTE;

@@ -14,12 +14,18 @@ namespace uw
     class ServerReceiver
     {
     public:
-        ServerReceiver(std::shared_ptr<CommunicationHandler> serverHandler, std::shared_ptr<GameManager> gameManager):
+        ServerReceiver(std::shared_ptr<CommunicationHandler> serverHandler, std::shared_ptr<GameManager> gameManager, std::shared_ptr<MessageSerializer> messageSerializer) :
             _serverHandler(serverHandler),
-            _gameManager(gameManager)
+            _gameManager(gameManager),
+            _messageSerializer(messageSerializer)
         {}
 
         ~ServerReceiver()
+        {
+            stop();
+        }
+
+        void stop()
         {
             _serverHandler->close();
         }
@@ -38,18 +44,33 @@ namespace uw
         {
             const auto communication = _serverHandler->receive();
             
-            const auto messageWrappers = _messageSerializer.deserialize(communication);
+            const auto messageWrappers = _messageSerializer->deserialize(communication);
 
             handleServerMessages(messageWrappers);
         }
 
-        void handleServerMessages(const std::vector<const MessageWrapper>& messageWrappers)
+        void handleServerMessages(const std::vector<MessageWrapper>& messageWrappers)
         {
-            // Assuming all messages are complete game states
-            // find the last timestamped message
+            if (messageWrappers.empty())
+            {
+                return;
+            }
+
+            size_t maxTimestampIndex = 0;
+            size_t messageWrapperIndex = 1;
+            while (messageWrapperIndex < messageWrappers.size())
+            {
+                if (messageWrappers[messageWrapperIndex].timestamp() > messageWrappers[maxTimestampIndex].timestamp())
+                {
+                    maxTimestampIndex = messageWrapperIndex;
+                }
+                ++messageWrapperIndex;
+            }
+
+            handleServerMessage(messageWrappers[maxTimestampIndex].innerMessage());
         }
 
-        void handleServerMessage(std::shared_ptr<Message> message)
+        void handleServerMessage(std::shared_ptr<const Message> message)
         {
             const auto completeStateMessage(std::dynamic_pointer_cast<CompleteGameStateMessage const>(message));
 
@@ -88,6 +109,6 @@ namespace uw
         std::shared_ptr<CommunicationHandler> _serverHandler;
         std::shared_ptr<GameManager> _gameManager;
 
-        MessageSerializer _messageSerializer;
+        std::shared_ptr<MessageSerializer> _messageSerializer;
     };
 }

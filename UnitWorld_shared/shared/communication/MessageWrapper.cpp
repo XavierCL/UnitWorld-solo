@@ -45,6 +45,11 @@ std::string MessageWrapper::json() const
     return _json;
 }
 
+unsigned long long MessageWrapper::timestamp() const
+{
+    return _timestamp;
+}
+
 std::string MessageWrapper::wrapMessageToJson(const std::shared_ptr<const Message> message, const unsigned long long& timestamp)
 {
     nlohmann::json jsonMessage = {

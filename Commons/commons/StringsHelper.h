@@ -16,5 +16,7 @@ public:
             current = original.find_first_of(delimiter, previous);
         }
         cont.push_back(original.substr(previous, current - previous));
+
+        return cont;
     }
 };
