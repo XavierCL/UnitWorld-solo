@@ -3,6 +3,7 @@
 #include "communications/CommunicationHandler.h"
 
 #include "shared/game/GameManager.h"
+#include "shared/communication/MessageSerializer.h"
 
 #include "commons/Guid.hpp"
 
@@ -33,6 +34,7 @@ namespace uw
         GameManager _gameManager;
         const unsigned int _networkMsPerFrame;
         bool _isNetworkRunning;
+        MessageSerializer _messageSerializer;
 
         std::unique_ptr<std::thread> _gameManagerThread;
         std::unique_ptr<std::thread> _stateSenderThread;
