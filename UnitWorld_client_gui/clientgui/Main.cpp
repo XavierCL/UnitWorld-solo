@@ -26,7 +26,6 @@ int main()
 
     sf::RenderWindow window(sf::VideoMode::getFullscreenModes().front(), WINDOW_TITLE);
 
-    window.setActive(false);
 
     std::shared_ptr<ClientGame> clientGame;
     std::shared_ptr<std::thread> clientGameThread;
@@ -47,6 +46,8 @@ int main()
 
         clientGameThread = std::make_shared<std::thread>([&clientGame] { clientGame->startSync(); });
     });
+
+    window.setActive(false);
 
     while (window.isOpen())
     {
