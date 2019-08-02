@@ -2,14 +2,9 @@
 
 #include "clientgui/networking/ServerReceiver.h"
 
-#include "clientgui/graphics/GameDrawer.h"
+#include "clientgui/graphics/WindowManager.h"
 
-#include "clientgui/graphics/canvas/CanvasTransactionGenerator.h"
-
-#include "shared/game/play/Player.h"
 #include "shared/game/GameManager.h"
-
-#include "communications/CommunicationHandler.h"
 
 namespace uw
 {
@@ -17,20 +12,32 @@ namespace uw
     {
     public:
 
-        ClientGame(const int& graphicsFramePerSecond, const int& physicsFramePerSecond, std::shared_ptr<Player> currentPlayer, std::shared_ptr<CommunicationHandler> serverHandler, std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator, std::shared_ptr<MessageSerializer> messageSerializer);
+        ClientGame(std::shared_ptr<Player> currentPlayer, std::shared_ptr<GameManager> gameManager, std::shared_ptr<WindowManager> windowManager, std::shared_ptr<ServerReceiver> serverReceiver) :
+            _currentPlayer(currentPlayer),
+            _gameManager(gameManager),
+            _windowManager(windowManager),
+            _serverReceiver(serverReceiver)
+        {}
 
-        ~ClientGame();
+        void startSync()
+        {
+            std::thread gameManagerThread([this] { _gameManager->startSync(); });
+            std::thread serverReceiverThread([this] { _serverReceiver->startSync(); });
 
-        void startSync();
+            _windowManager->startSync();
 
-        void stop();
+            _serverReceiver->stop();
+            serverReceiverThread.join();
+
+            _gameManager->stop();
+            gameManagerThread.join();
+        }
 
     private:
 
-        const std::shared_ptr<GameManager> _gameManager;
         const std::shared_ptr<Player> _currentPlayer;
-        const std::shared_ptr<CommunicationHandler> _serverHandler;
-        GameDrawer _gameDrawer;
-        ServerReceiver _serverReceiver;
+        const std::shared_ptr<GameManager> _gameManager;
+        const std::shared_ptr<WindowManager> _windowManager;
+        const std::shared_ptr<ServerReceiver> _serverReceiver;
     };
 }

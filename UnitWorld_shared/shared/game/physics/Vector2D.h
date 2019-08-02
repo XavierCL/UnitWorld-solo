@@ -17,6 +17,7 @@ namespace uw
         const double distance(const Vector2D& other) const;
         const double distanceSq(const Vector2D& other) const;
         void operator+=(const Vector2D& other);
+        Vector2D operator+(const Vector2D& other);
         const double module() const;
         const double moduleSq() const;
         Vector2D& maxAt(const double& maxModule);

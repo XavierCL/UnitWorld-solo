@@ -13,8 +13,8 @@
 
 using namespace uw;
 
-ServerGame::ServerGame(const unsigned int& physicsFPS, const unsigned int& networkFPS) :
-    _gameManager(physicsFPS),
+ServerGame::ServerGame(const unsigned int& networkFPS) :
+    _gameManager(),
     _networkMsPerFrame(1000.0 / networkFPS)
 {
     _gameManagerThread = std::make_unique<std::thread>([this] { _gameManager.startSync(); });
@@ -45,7 +45,7 @@ ServerGame::~ServerGame()
 void ServerGame::addClient(std::shared_ptr<CommunicationHandler> communicationHandler)
 {
     const auto singuityInitialXPosition = (double)_communicationHandlers.size();
-    auto newPlayer(std::make_shared<Player>(xg::newGuid(), std::vector<std::shared_ptr<Singuity>> {std::make_shared<Singuity>(Vector2D(singuityInitialXPosition, 0), Vector2D(), Option<Vector2D>())}));
+    auto newPlayer(std::make_shared<Player>(xg::newGuid(), std::vector<std::shared_ptr<Singuity>> {std::make_shared<Singuity>(Vector2D(singuityInitialXPosition * 100, 0), Vector2D(), Option<Vector2D>(Vector2D(200, 200)))}));
 
     _communicationHandlers = _communicationHandlers.push_back(std::pair(newPlayer->id(), communicationHandler));
 
@@ -93,7 +93,7 @@ void ServerGame::loopSendCompleteState()
 
 void ServerGame::waitClientReceive(const xg::Guid& playerGuid, std::shared_ptr<CommunicationHandler> communicationHandler)
 {
-    while (_isNetworkRunning)
+    while (communicationHandler->isOpen())
     {
         std::string receivedCommunication(communicationHandler->receive());
 
@@ -103,6 +103,7 @@ void ServerGame::waitClientReceive(const xg::Guid& playerGuid, std::shared_ptr<C
 
 void ServerGame::handleClientReceive(const xg::Guid& playerGuid, const std::string& receivedCommunication)
 {
-    MessageWrapper messageWrapper(receivedCommunication);
+    // MessageWrapper messageWrapper(receivedCommunication);
     // _gameManager.command(messageWrapper.innerMessage); // or rather a conversion of this particular message
+    // use the message serializer
 }

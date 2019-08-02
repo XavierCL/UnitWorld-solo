@@ -20,6 +20,9 @@ namespace uw
         std::string prettyName() const;
 
     private:
+
+        void resetBufferUntilLastNonZero();
+
         std::shared_ptr<asio::ip::tcp::socket> _socket;
         const asio::ip::tcp::endpoint _endpoint;
         std::basic_string<char> _receiveBuffer;

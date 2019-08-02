@@ -10,7 +10,7 @@ namespace uw
     class SFMLCanvas : public DisplayCanvas, public SFMLDrawingCanvas
     {
     public:
-        SFMLCanvas(sf::RenderWindow& canvas);
+        SFMLCanvas(std::shared_ptr<sf::RenderWindow> canvas);
 
         void draw(const sf::Drawable& drawable, const sf::RenderStates& states = sf::RenderStates::Default);
 
@@ -24,6 +24,6 @@ namespace uw
 
     private:
 
-        sf::RenderWindow& _windowCanvas;
+        std::shared_ptr<sf::RenderWindow> _windowCanvas;
     };
 }

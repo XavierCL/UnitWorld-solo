@@ -14,7 +14,7 @@ namespace uw
     class ServerGame {
     public:
 
-        ServerGame(const unsigned int& physicsFPS, const unsigned int& networkFPS);
+        ServerGame(const unsigned int& networkFPS);
 
         ~ServerGame();
 
