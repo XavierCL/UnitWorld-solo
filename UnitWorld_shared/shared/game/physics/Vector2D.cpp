@@ -55,6 +55,11 @@ void Vector2D::operator+=(const Vector2D& other)
     _y += other._y;
 }
 
+Vector2D Vector2D::operator+(const Vector2D& other)
+{
+    return Vector2D(_x + other._x, _y + other._y);
+}
+
 const double uw::Vector2D::module() const
 {
     return sqrt(moduleSq());

@@ -13,8 +13,8 @@ namespace uw
     class GameManager
     {
     public:
-        GameManager(const unsigned int& framePerSecond):
-            _msPerFrame(1000 / framePerSecond),
+        GameManager():
+            _msPerFrame(1000 / PHISICS_FRAME_PER_SECOND),
             _isRunning(true),
             _nextPlayers(nullptr),
             _nextAddPlayer(nullptr)
@@ -33,13 +33,14 @@ namespace uw
         void startSync()
         {
             while(_isRunning) {
-                const auto startFrameTime = clock();
+
+                const auto startFrameTime = std::chrono::steady_clock::now();
 
                 loopPhysics();
 
-                const auto endFrameTime = clock();
+                const auto endFrameTime = std::chrono::steady_clock::now();
 
-                const auto frameTimeInMs = (endFrameTime - startFrameTime) / (CLOCKS_PER_SEC / 1000);
+                const auto frameTimeInMs = (unsigned int)std::chrono::duration<double, std::milli>(endFrameTime - startFrameTime).count();
 
                 if (frameTimeInMs < _msPerFrame)
                 {
@@ -109,6 +110,8 @@ namespace uw
 
             _players = immer::vector<std::shared_ptr<Player>>(workingPlayers.begin(), workingPlayers.end());
         }
+
+        static const unsigned int PHISICS_FRAME_PER_SECOND;
 
         const unsigned int _msPerFrame;
         std::atomic<Player*> _nextAddPlayer;

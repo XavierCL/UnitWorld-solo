@@ -26,7 +26,7 @@ namespace uw
             auto wholeCommunication = _remainingDeserializationBuffer + currentCommunication;
             auto communications(StringsHelper::split(wholeCommunication, END_MESSAGE_FLAG));
 
-            if (communications.back().front() == '\0')
+            if (communications.back().empty() || communications.back().front() == '\0')
             {
                 _remainingDeserializationBuffer.clear();
                 communications.pop_back();

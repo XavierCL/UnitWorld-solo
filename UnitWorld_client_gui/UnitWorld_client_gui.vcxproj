@@ -141,7 +141,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="clientgui\ClientGame.cpp" />
     <ClCompile Include="clientgui\graphics\canvas\CanvasTransactionGenerator.cpp" />
     <ClCompile Include="clientgui\graphics\canvas\SFMLCanvas.cpp" />
     <ClCompile Include="clientgui\graphics\units\GraphicalSinguity.cpp" />
@@ -158,6 +157,7 @@
     <ClInclude Include="clientgui\graphics\canvas\SFMLCanvas.h" />
     <ClInclude Include="clientgui\graphics\canvas\CanvasTransactionGenerator.h" />
     <ClInclude Include="clientgui\networking\ServerReceiver.h" />
+    <ClInclude Include="clientgui\graphics\WindowManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Commons\Commons.vcxproj">

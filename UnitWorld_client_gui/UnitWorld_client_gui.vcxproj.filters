@@ -30,9 +30,6 @@
     <ClCompile Include="clientgui\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="clientgui\ClientGame.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clientgui\graphics\canvas\CanvasTransactionGenerator.h">
@@ -60,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="clientgui\networking\ServerReceiver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\graphics\WindowManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

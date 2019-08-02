@@ -14,10 +14,12 @@ int main()
     Logger::registerInfo([](const std::string& message) {
         std::cout << message;
     });
-    ServerGame serverGame(10, 5);
+
+    ServerGame serverGame(5);
     Logger::info("Waiting for connections...\n");
     ServerConnector serverConnector(ConnectionInfo("127.0.0.1", "52124"),
         [&serverGame](std::shared_ptr<CommunicationHandler> communicationHandler) {
+            Logger::info("Connection from " + communicationHandler->prettyName());
             serverGame.addClient(communicationHandler);
         }
     );

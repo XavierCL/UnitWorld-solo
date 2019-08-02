@@ -17,7 +17,7 @@ void MobileUnit::actualize()
 
     _speed += _acceleration;
     _speed.maxAt(maximumSpeed());
-    position() += _speed;
+    position(position() + _speed);
 }
 
 void MobileUnit::setDestination(const Vector2D& destination)
