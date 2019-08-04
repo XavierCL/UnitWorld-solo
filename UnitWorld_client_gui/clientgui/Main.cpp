@@ -6,7 +6,7 @@
 #include "graphics/WindowManager.h"
 
 #include "shared/communication/MessageWrapper.h"
-#include "shared/communication/CompleteGameStateMessage.h"
+#include "shared/communication/messages/CompleteGameStateMessage.h"
 
 #include "communications/ClientConnector.h"
 

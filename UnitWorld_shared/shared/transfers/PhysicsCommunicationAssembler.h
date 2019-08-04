@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../communication/game/CommunicatedPlayer.h"
-#include "../communication/game/CommunicatedSinguity.h"
+#include "shared/communication/messages/game/CommunicatedPlayer.h"
+#include "shared/communication/messages/game/CommunicatedSinguity.h"
 
-#include "../game/play/Player.h"
+#include "shared/game/play/Player.h"
 
 #include <immer/vector.hpp>
 
@@ -32,6 +32,11 @@ namespace uw
             }
 
             return immer::vector<CommunicatedSinguity>(communicatedSinguities.begin(), communicatedSinguities.end());
+        }
+
+        Vector2D communicatedVector2DToPhysics(const CommunicatedVector2D& vector2D)
+        {
+            return Vector2D(vector2D.x(), vector2D.y());
         }
 
     private:

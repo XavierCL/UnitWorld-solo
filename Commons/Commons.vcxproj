@@ -39,6 +39,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="commons\CollectionUtils.h" />
     <ClInclude Include="commons\FastMath.hpp" />
     <ClInclude Include="commons\FixedUnorderedMap.hpp" />
     <ClInclude Include="commons\Guid.hpp" />

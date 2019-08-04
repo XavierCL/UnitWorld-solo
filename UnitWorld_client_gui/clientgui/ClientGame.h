@@ -21,16 +21,13 @@ namespace uw
 
         void startSync()
         {
-            std::thread gameManagerThread([this] { _gameManager->startSync(); });
-            std::thread serverReceiverThread([this] { _serverReceiver->startSync(); });
+            _gameManager->startAsync();
+            _serverReceiver->startAsync();
 
             _windowManager->startSync();
 
             _serverReceiver->stop();
-            serverReceiverThread.join();
-
             _gameManager->stop();
-            gameManagerThread.join();
         }
 
     private:

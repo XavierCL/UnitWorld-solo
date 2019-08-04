@@ -16,6 +16,25 @@ namespace uw
         Vector2D position() const;
         void position(const Vector2D& newPosition);
 
+        struct SharedUnitHash
+        {
+            std::size_t operator()(std::shared_ptr<Unit> const &unit) const
+            {
+                return _guidHash(unit->id());
+            }
+
+        private:
+            std::hash<xg::Guid> _guidHash;
+        };
+
+        struct SharedUnitEqual
+        {
+            bool operator()(std::shared_ptr<Unit> const &first, std::shared_ptr<Unit> const &second) const
+            {
+                return first->id() == second->id();
+            }
+        };
+
     protected:
         Unit(const Vector2D& initialPosition);
 

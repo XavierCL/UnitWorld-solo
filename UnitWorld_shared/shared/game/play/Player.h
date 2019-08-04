@@ -20,15 +20,12 @@ namespace uw
         xg::Guid id() const;
         void actualize();
         void addSinguity(std::shared_ptr<Singuity> newSinguity);
-        void selectMobileUnitsInArea(const Rectangle& area);
-        void setSelectedMobileUnitsDestination(const Vector2D& destination);
-        std::unordered_set<std::shared_ptr<const Singuity>, SharedPointerHash<const Singuity>> singuities() const;
+        void setSinguitiesDestination(const std::unordered_set<xg::Guid>& singuitiesId, const Vector2D& destination);
+        std::unordered_set<std::shared_ptr<Singuity>, Unit::SharedUnitHash, Unit::SharedUnitEqual> singuities() const;
 
     private:
         const xg::Guid _id;
 
-        std::unordered_set<std::shared_ptr<const Singuity>, SharedPointerHash<const Singuity>> _singuities;
-        std::unordered_set<std::shared_ptr<MobileUnit>, SharedPointerHash<MobileUnit>> _mobileUnits;
-        std::unordered_set<std::shared_ptr<MobileUnit>, SharedPointerHash<MobileUnit>> _selectedMobileUnits;
+        std::unordered_set<std::shared_ptr<Singuity>, Unit::SharedUnitHash, Unit::SharedUnitEqual> _singuities;
     };
 }
