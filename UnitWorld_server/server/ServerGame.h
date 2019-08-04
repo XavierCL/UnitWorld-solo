@@ -19,11 +19,11 @@ namespace uw
         void addClient(std::shared_ptr<CommunicationHandler> communicationHandler)
         {
             const auto singuityInitialXPosition = 100.0 * (double)_gameManager->players().size();
-            auto newPlayer(std::make_shared<Player>(xg::newGuid(), std::vector<std::shared_ptr<Singuity>> {std::make_shared<Singuity>(Vector2D(singuityInitialXPosition * 100, 0), Vector2D(), Option<Vector2D>(Vector2D(200, 200)))}));
+            auto newPlayer(std::make_shared<Player>(xg::newGuid(), std::vector<std::shared_ptr<Singuity>> {std::make_shared<Singuity>(Vector2D(singuityInitialXPosition, 0), Vector2D(), Option<Vector2D>(Vector2D(200, 200)))}));
             const PlayerClient playerClient(newPlayer->id(), communicationHandler);
 
-            _gameManager->setNextPlayer(newPlayer);
             _clientGameSender->addClient(playerClient);
+            _gameManager->setNextPlayer(newPlayer);
             _clientsReceiver->addPlayerClient(playerClient);
         }
 

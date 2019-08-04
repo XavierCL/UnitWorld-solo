@@ -22,7 +22,7 @@ namespace uw
             std::lock_guard<std::mutex> lockPlayerClients(_playerClientsMutex);
 
             _playerClients.push_back(playerClient);
-            _clientWaiters.emplace_back(std::make_shared<std::thread>([this, &playerClient] { loopClientReceive(playerClient); }));
+            _clientWaiters.emplace_back(std::make_shared<std::thread>([this, playerClient] { loopClientReceive(playerClient); }));
         }
 
         void stop()

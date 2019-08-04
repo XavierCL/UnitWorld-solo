@@ -5,9 +5,6 @@
 
 #include "graphics/WindowManager.h"
 
-#include "shared/communication/MessageWrapper.h"
-#include "shared/communication/messages/CompleteGameStateMessage.h"
-
 #include "communications/ClientConnector.h"
 
 #include <SFML/Graphics.hpp>
@@ -24,19 +21,7 @@ int main()
 
     auto window(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes().front(), WINDOW_TITLE));
 
-    std::shared_ptr<GameManager> gameManager;
-    std::shared_ptr<ClientGame> clientGame;
-    std::shared_ptr<std::thread> clientGameThread;
-
-    ClientConnector(ConnectionInfo(SERVER_IP, SERVER_PORT), [&window, &GRAPHICS_FRAME_PER_SECOND, &clientGame, &clientGameThread](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
-
-        auto messageSerializer(std::make_shared<MessageSerializer>());
-        std::vector<MessageWrapper> receivedMessages;
-        while ((receivedMessages = messageSerializer->deserialize(connectionHandler->receive())).empty()) {}
-
-        const auto firstCompleteGameStateMessage(std::dynamic_pointer_cast<const CompleteGameStateMessage>(receivedMessages.front().innerMessage()));
-        const auto currentPlayerId(firstCompleteGameStateMessage->getCurrentPlayerId());
-        const auto currentPlayer(std::make_shared<Player>(currentPlayerId, std::vector<std::shared_ptr<Singuity>>()));
+    ClientConnector(ConnectionInfo(SERVER_IP, SERVER_PORT), [&window, &GRAPHICS_FRAME_PER_SECOND](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
 
         const auto gameManager(std::make_shared<GameManager>());
 
@@ -45,9 +30,10 @@ int main()
         const auto canvasTransactionGenerator(std::make_shared<CanvasTransactionGenerator>(sfmlCanvas));
         const auto windowManager(std::make_shared<WindowManager>(GRAPHICS_FRAME_PER_SECOND, gameDrawer, canvasTransactionGenerator, window));
 
+        const auto messageSerializer(std::make_shared<MessageSerializer>());
         const auto serverReceiver(std::make_shared<ServerReceiver>(connectionHandler, gameManager, messageSerializer));
 
-        const auto clientGame(std::make_shared<ClientGame>(currentPlayer, gameManager, windowManager, serverReceiver));
+        const auto clientGame(std::make_shared<ClientGame>(gameManager, windowManager, serverReceiver));
 
         clientGame->startSync();
     });

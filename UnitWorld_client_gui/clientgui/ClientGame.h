@@ -12,8 +12,7 @@ namespace uw
     {
     public:
 
-        ClientGame(std::shared_ptr<Player> currentPlayer, std::shared_ptr<GameManager> gameManager, std::shared_ptr<WindowManager> windowManager, std::shared_ptr<ServerReceiver> serverReceiver) :
-            _currentPlayer(currentPlayer),
+        ClientGame(std::shared_ptr<GameManager> gameManager, std::shared_ptr<WindowManager> windowManager, std::shared_ptr<ServerReceiver> serverReceiver) :
             _gameManager(gameManager),
             _windowManager(windowManager),
             _serverReceiver(serverReceiver)
@@ -32,7 +31,6 @@ namespace uw
 
     private:
 
-        const std::shared_ptr<Player> _currentPlayer;
         const std::shared_ptr<GameManager> _gameManager;
         const std::shared_ptr<WindowManager> _windowManager;
         const std::shared_ptr<ServerReceiver> _serverReceiver;

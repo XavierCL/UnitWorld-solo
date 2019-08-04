@@ -20,7 +20,6 @@ namespace uw
         {
             for (const auto messageWrapper : messageWrappers)
             {
-                // assuming the only messages are MoveUnit commands
                 if (messageWrapper.messageType() == MessageType::MoveMobileUnitsToPositionMessageType)
                 {
                     const auto moveMessage(std::dynamic_pointer_cast<const MoveMobileUnitsToPositionMessage>(messageWrapper.innerMessage()));
