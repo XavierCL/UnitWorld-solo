@@ -21,11 +21,6 @@ namespace uw
             _messageSerializer(messageSerializer)
         {}
 
-        ~ServerReceiver()
-        {
-            stop();
-        }
-
         void stop()
         {
             _serverHandler->close();

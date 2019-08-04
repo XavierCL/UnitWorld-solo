@@ -27,6 +27,8 @@ int main()
     const auto clientsReceiver(std::make_shared<ClientsReceiver>(messageSerializer, gameReceiver));
 
     ServerGame serverGame(gameManager, clientsGameSender, clientsReceiver);
+    serverGame.startAsync();
+
     Logger::info("Waiting for connections...\n");
     ServerConnector serverConnector(ConnectionInfo("127.0.0.1", "52124"),
         [&serverGame](std::shared_ptr<CommunicationHandler> communicationHandler) {

@@ -151,7 +151,7 @@ namespace uw
 
             _players = immer::vector<std::shared_ptr<Player>>(workingPlayers.begin(), workingPlayers.end());
 
-            if (!localCommands.empty())
+            if (!localCommands.empty() || newPlayer || allPlayers)
             {
                 std::lock_guard<std::mutex> lockCallback(_somePlayerInputCallbackMutex);
 

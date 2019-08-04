@@ -56,7 +56,7 @@ namespace uw
 
         void onGameManagerHasPlayerInput(const immer::vector<std::shared_ptr<Player>>& players)
         {
-            std::thread([this] { loopSendCompleteState(); });
+            std::thread([this] { sendCompleteState(); }).detach();
         }
 
         void loopSendCompleteState()
