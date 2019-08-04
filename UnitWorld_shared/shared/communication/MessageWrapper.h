@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Message.h"
+#include "messages/Message.h"
 
 namespace uw
 {
@@ -16,6 +16,8 @@ namespace uw
         std::string json() const;
 
         unsigned long long timestamp() const;
+
+        MessageType messageType() const;
 
     private:
 

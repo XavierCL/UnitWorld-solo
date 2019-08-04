@@ -27,38 +27,30 @@ xg::Guid Player::id() const
 
 void Player::actualize()
 {
-    for (auto mobileUnit : _mobileUnits)
+    for (auto singuity : _singuities)
     {
-        mobileUnit->actualize();
+        singuity->actualize();
     }
 }
 
-void uw::Player::addSinguity(std::shared_ptr<Singuity> newSinguity)
+void Player::addSinguity(std::shared_ptr<Singuity> newSinguity)
 {
     _singuities.insert(newSinguity);
-    _mobileUnits.insert(newSinguity);
 }
 
-void Player::selectMobileUnitsInArea(const Rectangle& area)
+void Player::setSinguitiesDestination(const std::unordered_set<xg::Guid>& singuitiesId, const Vector2D& destination)
 {
-    for (auto const mobileUnit : _mobileUnits)
+    for (auto singuity : _singuities)
     {
-        if (area.contains(mobileUnit->position()))
+        auto foundSinguity(singuitiesId.find(singuity->id()));
+        if (foundSinguity != singuitiesId.cend())
         {
-            _selectedMobileUnits.insert(mobileUnit);
+            singuity->setDestination(destination);
         }
     }
 }
 
-void Player::setSelectedMobileUnitsDestination(const Vector2D& destination)
-{
-    for (auto mobileUnit : _selectedMobileUnits)
-    {
-        mobileUnit->setDestination(destination);
-    }
-}
-
-std::unordered_set<std::shared_ptr<const Singuity>, SharedPointerHash<const Singuity>> uw::Player::singuities() const
+std::unordered_set<std::shared_ptr<Singuity>, Unit::SharedUnitHash, Unit::SharedUnitEqual> Player::singuities() const
 {
     return _singuities;
 }

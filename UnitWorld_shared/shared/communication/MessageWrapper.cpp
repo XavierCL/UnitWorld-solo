@@ -1,9 +1,8 @@
 #include "MessageWrapper.h"
 
-#include "CompleteGameStateMessage.h"
-#include "InvalidMessage.h"
-
-#include "MessageType.h"
+#include "messages/CompleteGameStateMessage.h"
+#include "messages/InvalidMessage.h"
+#include "messages/MessageType.h"
 
 #include <nlohmann/json.hpp>
 
@@ -48,6 +47,11 @@ std::string MessageWrapper::json() const
 unsigned long long MessageWrapper::timestamp() const
 {
     return _timestamp;
+}
+
+MessageType MessageWrapper::messageType() const
+{
+    return _innerMessage->messageType();
 }
 
 std::string MessageWrapper::wrapMessageToJson(const std::shared_ptr<const Message> message, const unsigned long long& timestamp)

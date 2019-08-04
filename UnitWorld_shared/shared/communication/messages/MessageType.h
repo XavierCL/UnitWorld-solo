@@ -5,6 +5,7 @@ namespace uw
     enum MessageType
     {
         InvalidMessageType,
-        CompleteGameStateMessageType
+        CompleteGameStateMessageType,
+        MoveMobileUnitsToPositionMessageType
     };
 }

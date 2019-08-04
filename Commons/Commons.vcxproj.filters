@@ -50,5 +50,8 @@
     <ClInclude Include="commons\StringsHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="commons\CollectionUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -18,27 +18,6 @@
     <ClInclude Include="shared\transfers\PhysicsCommunicationAssembler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shared\communication\game\CommunicatedPlayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\communication\game\CommunicatedSinguity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\communication\game\CommunicatedVector2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\communication\CompleteGameStateMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\communication\InvalidMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\communication\Message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\communication\MessageType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="shared\communication\MessageWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -66,20 +45,35 @@
     <ClInclude Include="shared\communication\MessageSerializer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="shared\communication\messages\CompleteGameStateMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\InvalidMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\Message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\game\CommunicatedPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\game\CommunicatedSinguity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\game\CommunicatedVector2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\MessageType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\MoveMobileUnitsToPositionMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\commands\MoveMobileUnitsToPosition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="shared\communication\game\CommunicatedPlayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shared\communication\game\CommunicatedSinguity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shared\communication\game\CommunicatedVector2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shared\communication\CompleteGameStateMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="shared\communication\MessageWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -102,6 +96,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\game\GameManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\CompleteGameStateMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\game\CommunicatedPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\game\CommunicatedSinguity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\game\CommunicatedVector2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\MoveMobileUnitsToPositionMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

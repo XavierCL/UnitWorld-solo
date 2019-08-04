@@ -4,8 +4,9 @@
 #include "shared/game/GameManager.h"
 
 #include "shared/communication/MessageSerializer.h"
-#include "shared/communication/Message.h"
-#include "shared/communication/CompleteGameStateMessage.h"
+
+#include "shared/communication/messages/Message.h"
+#include "shared/communication/messages/CompleteGameStateMessage.h"
 
 #include <communications/CommunicationHandler.h>
 
@@ -28,14 +29,19 @@ namespace uw
         void stop()
         {
             _serverHandler->close();
+
+            _receiveThread.join();
         }
 
-        void startSync()
+        void startAsync()
         {
-            while (_serverHandler->isOpen())
-            {
-                receiveServerCommunications();
-            }
+            _receiveThread = std::thread([this] {
+            
+                while (_serverHandler->isOpen())
+                {
+                    receiveServerCommunications();
+                }
+            });
         }
 
     private:
@@ -105,6 +111,8 @@ namespace uw
 
             _gameManager->setNextPlayers(nextPlayers);
         }
+
+        std::thread _receiveThread;
 
         std::shared_ptr<CommunicationHandler> _serverHandler;
         std::shared_ptr<GameManager> _gameManager;

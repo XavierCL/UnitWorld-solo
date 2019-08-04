@@ -74,7 +74,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\dependencies\nlohmann-json\3.6.1\include;..\dependencies\immer\0.6.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\dependencies\nlohmann-json\3.6.1\include;..\dependencies\immer\0.6.2\include;.\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
     </ClCompile>
@@ -87,7 +87,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\dependencies\nlohmann-json\3.6.1\include;..\dependencies\immer\0.6.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\dependencies\nlohmann-json\3.6.1\include;..\dependencies\immer\0.6.2\include;.\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
     </ClCompile>
@@ -102,7 +102,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\dependencies\nlohmann-json\3.6.1\include;..\dependencies\immer\0.6.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\dependencies\nlohmann-json\3.6.1\include;..\dependencies\immer\0.6.2\include;.\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
     </ClCompile>
@@ -119,7 +119,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\dependencies\nlohmann-json\3.6.1\include;..\dependencies\immer\0.6.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\Commons;..\dependencies\nlohmann-json\3.6.1\include;..\dependencies\immer\0.6.2\include;.\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
     </ClCompile>
@@ -130,15 +130,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="shared\communication\CompleteGameStateMessage.h" />
-    <ClInclude Include="shared\communication\game\CommunicatedPlayer.h" />
-    <ClInclude Include="shared\communication\game\CommunicatedSinguity.h" />
-    <ClInclude Include="shared\communication\game\CommunicatedVector2D.h" />
-    <ClInclude Include="shared\communication\InvalidMessage.h" />
-    <ClInclude Include="shared\communication\Message.h" />
+    <ClInclude Include="shared\communication\messages\CompleteGameStateMessage.h" />
+    <ClInclude Include="shared\communication\messages\game\CommunicatedPlayer.h" />
+    <ClInclude Include="shared\communication\messages\game\CommunicatedSinguity.h" />
+    <ClInclude Include="shared\communication\messages\game\CommunicatedVector2D.h" />
+    <ClInclude Include="shared\communication\messages\InvalidMessage.h" />
+    <ClInclude Include="shared\communication\messages\Message.h" />
     <ClInclude Include="shared\communication\MessageSerializer.h" />
-    <ClInclude Include="shared\communication\MessageType.h" />
+    <ClInclude Include="shared\communication\messages\MoveMobileUnitsToPositionMessage.h" />
+    <ClInclude Include="shared\communication\messages\MessageType.h" />
     <ClInclude Include="shared\communication\MessageWrapper.h" />
+    <ClInclude Include="shared\game\commands\MoveMobileUnitsToPosition.h" />
     <ClInclude Include="shared\game\GameManager.h" />
     <ClInclude Include="shared\game\geometry\Rectangle.h" />
     <ClInclude Include="shared\game\physics\Vector2D.h" />
@@ -149,10 +151,11 @@
     <ClInclude Include="shared\transfers\PhysicsCommunicationAssembler.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="shared\communication\game\CommunicatedPlayer.cpp" />
-    <ClCompile Include="shared\communication\game\CommunicatedSinguity.cpp" />
-    <ClCompile Include="shared\communication\game\CommunicatedVector2D.cpp" />
-    <ClCompile Include="shared\communication\CompleteGameStateMessage.cpp" />
+    <ClCompile Include="shared\communication\messages\game\CommunicatedPlayer.cpp" />
+    <ClCompile Include="shared\communication\messages\game\CommunicatedSinguity.cpp" />
+    <ClCompile Include="shared\communication\messages\game\CommunicatedVector2D.cpp" />
+    <ClCompile Include="shared\communication\messages\CompleteGameStateMessage.cpp" />
+    <ClCompile Include="shared\communication\messages\MoveMobileUnitsToPositionMessage.cpp" />
     <ClCompile Include="shared\communication\MessageWrapper.cpp" />
     <ClCompile Include="shared\game\GameManager.cpp" />
     <ClCompile Include="shared\game\geometry\Rectangle.cpp" />
