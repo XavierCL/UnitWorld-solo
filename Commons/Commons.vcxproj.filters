@@ -50,7 +50,10 @@
     <ClInclude Include="commons\StringsHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="commons\CollectionUtils.h">
+    <ClInclude Include="commons\Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="commons\CollectionPipe.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

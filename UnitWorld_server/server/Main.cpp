@@ -6,6 +6,7 @@
 #include "communications/ServerConnector.h"
 
 #include "commons/Logger.hpp"
+#include "commons/CollectionPipe.h"
 
 #include <iostream>
 
