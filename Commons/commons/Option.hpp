@@ -1,6 +1,8 @@
 #ifndef OPTION_H
 #define OPTION_H
 
+#include <exception>
+
 template <typename _Type>
 class Option
 {
@@ -45,6 +47,18 @@ public:
     virtual const bool isEmpty() const
     {
         return _inner == nullptr;
+    }
+
+    const _Type& getOrThrow() const
+    {
+        if (isDefined())
+        {
+            return *_inner;
+        }
+        else
+        {
+            throw std::logic_error("Tried to access an empty option");
+        }
     }
 
     const _Type& getOrElse(const _Type& defaultValue) const
@@ -173,6 +187,21 @@ private:
     }
 
     const _Type* _inner;
+};
+
+struct OptionS
+{
+    template <typename Type>
+    static Option<Type> Some(const Type& inner)
+    {
+        return Option<Type>(inner);
+    }
+
+    template<typename Type>
+    static Option<Type> None()
+    {
+        return Option<Type>();
+    }
 };
 
 #endif

@@ -62,5 +62,11 @@
     <ClInclude Include="clientgui\graphics\WindowManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="clientgui\userControls\UserControlState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\userControls\ServerCommander.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
