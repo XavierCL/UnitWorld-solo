@@ -42,6 +42,11 @@ struct StreamIterator
         return !_currentValue.isEmpty() || !other._currentValue.isEmpty();
     }
 
+    bool operator==(const StreamIterator<Value>& other)
+    {
+        return _currentValue.isEmpty() && other._currentValue.isEmpty();
+    }
+
 private:
     Option<Value> _currentValue;
     std::function<Option<Value>()> _streamGenerator;
