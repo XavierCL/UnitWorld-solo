@@ -14,6 +14,16 @@ using namespace uw;
 
 int main()
 {
+    auto source = std::shared_ptr<std::vector<std::shared_ptr<std::vector<int>>>>(new std::vector<std::shared_ptr<std::vector<int>>>{
+        std::shared_ptr<std::vector<int>>(new std::vector<int>{1, 2}),
+        std::shared_ptr<std::vector<int>>(new std::vector<int>{3, 4}),
+        std::make_shared<std::vector<int>>(), 
+        std::make_shared<std::vector<int>>()
+    });
+    const auto a(source
+        | flatMap<int>([](const std::shared_ptr<std::vector<int>>& v) {return v; })
+        | toUnorderedSet<int>());
+
     Logger::registerInfo([](const std::string& message) {
         std::cout << message;
     });
