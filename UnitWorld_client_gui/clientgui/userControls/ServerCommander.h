@@ -1,3 +1,42 @@
 #pragma once
 
-// Commands the server and assemble physics to dto
+#include "shared/transfers/PhysicsCommunicationAssembler.h"
+
+#include "shared/communication/messages/MoveMobileUnitsToPositionMessage.h"
+#include "shared/communication/MessageSerializer.h"
+
+#include "shared/game/physics/Vector2D.h"
+
+#include "communications/CommunicationHandler.h"
+
+#include "commons/Guid.hpp"
+
+#include <vector>
+
+namespace uw
+{
+    class ServerCommander
+    {
+    public:
+        ServerCommander(std::shared_ptr<CommunicationHandler> serverCommunicator, std::shared_ptr<PhysicsCommunicationAssembler> physicsCommunicationAssembler, std::shared_ptr<MessageSerializer> messageSerializer) :
+            _serverCommunicator(_serverCommunicator),
+            _physicsCommunicationAssembler(physicsCommunicationAssembler),
+            _messageSerializer(messageSerializer)
+        {}
+
+        void moveUnitsToPosition(const std::vector<xg::Guid>& singuityIds, const Vector2D& destination)
+        {
+            const auto communicatedDestination(_physicsCommunicationAssembler->physicsVector2DToCommunicated(destination));
+
+            const auto message(std::make_shared<MoveMobileUnitsToPositionMessage>(singuityIds, communicatedDestination));
+
+            _serverCommunicator->send(_messageSerializer->serialize(std::vector<MessageWrapper> { MessageWrapper(message) }));
+        }
+
+    private:
+
+        const std::shared_ptr<CommunicationHandler> _serverCommunicator;
+        const std::shared_ptr<PhysicsCommunicationAssembler> _physicsCommunicationAssembler;
+        const std::shared_ptr<MessageSerializer> _messageSerializer;
+    };
+}

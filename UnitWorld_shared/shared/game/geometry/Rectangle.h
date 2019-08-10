@@ -7,10 +7,13 @@ namespace uw
     class Rectangle
     {
     public:
-        Rectangle(const Vector2D& corner1,
-            const Vector2D& corner2);
+        Rectangle(const Vector2D& corner1, const Vector2D& corner2);
 
-        const bool contains(const Vector2D& point) const;
+        bool contains(const Vector2D& point) const;
+
+        Vector2D size() const;
+
+        Vector2D center() const;
 
     private:
         Vector2D _upperLeftCorner;

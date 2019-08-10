@@ -24,8 +24,9 @@ int main()
     ClientConnector(ConnectionInfo(SERVER_IP, SERVER_PORT), [&window, &GRAPHICS_FRAME_PER_SECOND](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
 
         const auto gameManager(std::make_shared<GameManager>());
+        const auto userControlState(std::make_shared<UserControlState>(gameManager));
 
-        const auto gameDrawer(std::make_shared<GameDrawer>(gameManager));
+        const auto gameDrawer(std::make_shared<GameDrawer>(gameManager, userControlState));
         const auto sfmlCanvas(std::make_shared<uw::SFMLCanvas>(window));
         const auto canvasTransactionGenerator(std::make_shared<CanvasTransactionGenerator>(sfmlCanvas));
         const auto windowManager(std::make_shared<WindowManager>(GRAPHICS_FRAME_PER_SECOND, gameDrawer, canvasTransactionGenerator, window));

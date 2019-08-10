@@ -39,8 +39,6 @@ namespace uw
             return Vector2D(vector2D.x(), vector2D.y());
         }
 
-    private:
-
         CommunicatedVector2D physicsVector2DToCommunicated(const Vector2D& vector2D)
         {
             return CommunicatedVector2D(vector2D.x(), vector2D.y());
