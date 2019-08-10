@@ -2,7 +2,6 @@
 
 #include "shared/game/GameManager.h"
 
-
 #include "communications/ServerConnector.h"
 
 #include "commons/Logger.hpp"

@@ -2,6 +2,10 @@
 
 using namespace uw;
 
+Singuity::Singuity(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<Vector2D>& destination) :
+    MobileUnit(id, position, speed, destination)
+{}
+
 Singuity::Singuity(const Vector2D& position, const Vector2D& speed, const Option<Vector2D>& destination):
     MobileUnit(position, speed, destination)
 {}

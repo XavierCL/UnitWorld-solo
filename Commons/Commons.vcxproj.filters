@@ -56,5 +56,8 @@
     <ClInclude Include="commons\CollectionPipe.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="commons\MemoryExtension.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

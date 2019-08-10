@@ -253,6 +253,30 @@ struct FunctionalDefinitions
     private:
         const KeySelector _keySelector;
     };
+
+    template <typename Key, typename Value, typename KeyHash, typename KeyEqual, typename KeySelector>
+    struct GroupBy
+    {
+        GroupBy(const KeySelector& keySelector) :
+            _keySelector(keySelector)
+        {}
+
+        using Output = std::shared_ptr<std::unordered_map<Key, std::vector<Value>, KeyHash, KeyEqual>>;
+
+        template <typename InputCollection>
+        Output operator()(InputCollection input) const
+        {
+            auto generatedMap(std::make_shared<std::unordered_map<Key, std::vector<Value>, KeyHash, KeyEqual>>());
+            for (const auto& value : *input)
+            {
+                (*generatedMap)[_keySelector(value)].push_back(value);
+            }
+            return generatedMap;
+        }
+
+    private:
+        const KeySelector _keySelector;
+    };
 };
 
 struct MapExtensions
@@ -296,12 +320,12 @@ Output operator|(PointerToCollection input, const StreamModifier& modifier)
     return modifier(input);
 }
 
-FunctionalDefinitions::IsEmpty isEmpty()
+inline FunctionalDefinitions::IsEmpty isEmpty()
 {
     return FunctionalDefinitions::IsEmpty();
 }
 
-FunctionalDefinitions::Any any()
+inline FunctionalDefinitions::Any any()
 {
     return FunctionalDefinitions::Any();
 }
@@ -352,6 +376,12 @@ template <typename Key, typename Value, typename KeyHash = std::hash<Key>, typen
 FunctionalDefinitions::ToUnorderedMap<Key, Value, KeyHash, KeyEqual, KeySelector> toUnorderedMap(const KeySelector& keySelector)
 {
     return FunctionalDefinitions::ToUnorderedMap<Key, Value, KeyHash, KeyEqual, KeySelector>(keySelector);
+}
+
+template <typename Key, typename Value, typename KeyHash = std::hash<Key>, typename KeyEqual = std::equal_to<Key>, typename KeySelector>
+FunctionalDefinitions::GroupBy<Key, Value, KeyHash, KeyEqual, KeySelector> groupBy(const KeySelector& keySelector)
+{
+    return FunctionalDefinitions::GroupBy<Key, Value, KeyHash, KeyEqual, KeySelector>(keySelector);
 }
 
 template <typename Value>

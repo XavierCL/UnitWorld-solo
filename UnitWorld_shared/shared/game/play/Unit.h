@@ -36,11 +36,11 @@ namespace uw
         };
 
     protected:
+        Unit(const xg::Guid& id, const Vector2D& initialPosition);
         Unit(const Vector2D& initialPosition);
 
     private:
         const xg::Guid _id;
-
         Vector2D _position;
     };
 }
