@@ -41,9 +41,16 @@ struct FunctionalDefinitions
         template<typename InputCollection>
         Output operator()(InputCollection input) const
         {
-            auto inputBegin = input->begin();
+            bool isFirstIter = true;
+            auto inputBegin = input->end();
             auto inputEnd = input->end();
-            return std::make_shared<Stream<OutputValue>>([this, inputBegin, inputEnd, input]() mutable {
+            return std::make_shared<Stream<OutputValue>>([this, isFirstIter, inputBegin, inputEnd, input]() mutable {
+                if (isFirstIter)
+                {
+                    inputBegin = input->begin();
+                    isFirstIter = false;
+                }
+
                 if (inputBegin != inputEnd)
                 {
                     const auto returnedValue = OptionS::Some(_mapping(*inputBegin));
@@ -116,11 +123,18 @@ struct FunctionalDefinitions
         using Output = std::shared_ptr<Stream<InputValue>>;
 
         template<typename InputCollection>
-        Stream<InputValue> operator()(InputCollection input) const
+        Output operator()(InputCollection input) const
         {
-            auto inputBegin = input->begin();
+            bool isFirstIter = true;
+            auto inputBegin = input->end();
             auto inputEnd = input->end();
-            return std::make_shared<Stream<InputValue>>([this, inputBegin, inputEnd, input]() mutable {
+            return std::make_shared<Stream<InputValue>>([this, isFirstIter, inputBegin, inputEnd, input]() mutable {
+                if (isFirstIter)
+                {
+                    inputBegin = input->begin();
+                    isFirstIter = false;
+                }
+
                 while (inputBegin != inputEnd && !_filter(*inputBegin))
                 {
                     ++inputBegin;
@@ -164,6 +178,32 @@ struct FunctionalDefinitions
         const Action _action;
     };
 
+    template<typename Found, typename Value>
+    struct Find
+    {
+        Find(const Value& value) :
+            _value(value)
+        {}
+
+        using Output = Option<Found>;
+
+        template <typename InputCollection>
+        Output operator() (InputCollection input) const
+        {
+            try
+            {
+                return OptionS::Some(input->at(_value));
+            }
+            catch (...)
+            {
+                return OptionS::None<Found>();
+            }
+        }
+
+    private:
+        const Value _value;
+    };
+
     template <typename Value, typename ValueHash, typename ValueEqual>
     struct ToUnorderedSet
     {
@@ -173,6 +213,79 @@ struct FunctionalDefinitions
         Output operator()(InputCollection input) const
         {
             return std::make_shared<std::unordered_set<Value, ValueHash, ValueEqual>>(input->begin(), input->end());
+        }
+    };
+
+    template <typename Value>
+    struct ToVector
+    {
+        using Output = std::shared_ptr<std::vector<Value>>;
+
+        template<typename InputCollection>
+        Output operator()(InputCollection input) const
+        {
+            auto generatedVector(std::make_shared<std::vector<Value>>());
+            generatedVector->insert(generatedVector->begin(), input->begin(), input->end());
+            return generatedVector;
+        }
+    };
+
+    template <typename Key, typename Value, typename KeyHash, typename KeyEqual, typename KeySelector>
+    struct ToUnorderedMap
+    {
+        ToUnorderedMap(const KeySelector& keySelector) :
+            _keySelector(keySelector)
+        {}
+
+        using Output = std::shared_ptr<std::unordered_map<Key, Value, KeyHash, KeyEqual>>;
+
+        template<typename InputCollection>
+        Output operator()(InputCollection input) const
+        {
+            auto generatedMap(std::make_shared<std::unordered_map<Key, Value, KeyHash, KeyEqual>>());
+            for (const auto value : *input)
+            {
+                (*generatedMap)[_keySelector(value)] = value;
+            }
+            return generatedMap;
+        }
+
+    private:
+        const KeySelector _keySelector;
+    };
+};
+
+struct MapExtensions
+{
+    template <typename Value>
+    struct MapValues
+    {
+        using Output = std::shared_ptr<Stream<Value>>;
+
+        template <typename InputCollection>
+        Output operator() (InputCollection input) const
+        {
+            bool isFirst(true);
+            auto inputBegin(input->end());
+            auto inputEnd(input->end());
+            return std::make_shared<Stream<Value>>([input, isFirst, inputBegin, inputEnd]() mutable {
+                if (isFirst)
+                {
+                    inputBegin = input->begin();
+                    isFirst = false;
+                }
+
+                if (inputBegin != inputEnd)
+                {
+                    const auto returnedValue(OptionS::Some((*inputBegin).second));
+                    ++inputBegin;
+                    return returnedValue;
+                }
+                else
+                {
+                    return OptionS::None<Value>();
+                }
+            });
         }
     };
 };
@@ -217,8 +330,32 @@ FunctionalDefinitions::ForEach<Action> forEach(const Action& action)
     return FunctionalDefinitions::ForEach<Action>(action);
 }
 
+template <typename Found, typename Value>
+FunctionalDefinitions::Find<Found, Value> find(const Value& value)
+{
+    return FunctionalDefinitions::Find<Found, Value>(value);
+}
+
 template <typename Value, typename ValueHash = std::hash<Value>, typename ValueEqual = std::equal_to<Value>>
 FunctionalDefinitions::ToUnorderedSet<Value, ValueHash, ValueEqual> toUnorderedSet()
 {
     return FunctionalDefinitions::ToUnorderedSet<Value, ValueHash, ValueEqual>();
+}
+
+template <typename Value>
+FunctionalDefinitions::ToVector<Value> toVector()
+{
+    return FunctionalDefinitions::ToVector<Value>();
+}
+
+template <typename Key, typename Value, typename KeyHash = std::hash<Key>, typename KeyEqual = std::equal_to<Key>, typename KeySelector>
+FunctionalDefinitions::ToUnorderedMap<Key, Value, KeyHash, KeyEqual, KeySelector> toUnorderedMap(const KeySelector& keySelector)
+{
+    return FunctionalDefinitions::ToUnorderedMap<Key, Value, KeyHash, KeyEqual, KeySelector>(keySelector);
+}
+
+template <typename Value>
+MapExtensions::MapValues<Value> mapValues()
+{
+    return MapExtensions::MapValues<Value>();
 }
