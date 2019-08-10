@@ -21,7 +21,7 @@ struct StreamIterator
     typedef ptrdiff_t difference_type;
     typedef value_type* pointer;
     typedef value_type& reference;
-    typedef std::forward_iterator_tag iterator_category;
+    typedef std::input_iterator_tag iterator_category;
 
     StreamIterator(const Option<Value>& currentValue, const std::function<Option<Value>()> streamGenerator) :
         _currentValue(currentValue),

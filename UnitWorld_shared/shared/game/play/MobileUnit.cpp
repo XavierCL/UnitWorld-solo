@@ -39,8 +39,15 @@ MobileUnit::MobileUnit(const MobileUnit & copy) :
     Unit(copy)
 {
     _destination = copy._destination;
+    _acceleration = copy._acceleration;
     _speed = copy._speed;
 }
+
+MobileUnit::MobileUnit(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<Vector2D>& destination) :
+    Unit(id, position),
+    _speed(speed),
+    _destination(destination)
+{}
 
 MobileUnit::MobileUnit(const Vector2D& position, const Vector2D& speed, const Option<Vector2D>& destination):
     Unit(position),

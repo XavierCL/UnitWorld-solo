@@ -5,6 +5,8 @@
 
 #include "shared/game/play/Player.h"
 
+#include "commons/CollectionPipe.h"
+
 #include <immer/vector.hpp>
 
 namespace uw
@@ -15,6 +17,23 @@ namespace uw
         CommunicatedPlayer physicsPlayerToCommunicated(std::shared_ptr<const Player> player)
         {
             return CommunicatedPlayer(player->id());
+        }
+
+        std::shared_ptr<Player> communicatedPlayerToPhysics(CommunicatedPlayer player, immer::vector<CommunicatedSinguity> singuities)
+        {
+            return std::make_shared<Player>(
+                player.playerId(),
+                *(std::make_shared<immer::vector<CommunicatedSinguity>>(singuities)
+                    | map<std::shared_ptr<Singuity>>([this](const CommunicatedSinguity& singuity) {
+                        return std::make_shared<Singuity>(
+                            singuity.singuityId(),
+                            communicatedVector2DToPhysics(singuity.position()),
+                            communicatedVector2DToPhysics(singuity.speed()),
+                            singuity.destination().map<Vector2D>(std::bind(&PhysicsCommunicationAssembler::communicatedVector2DToPhysics, this, std::placeholders::_1))
+                        );
+                    }) | toVector<std::shared_ptr<Singuity>>()
+                )
+            );
         }
 
         immer::vector<CommunicatedSinguity> physicsPlayerToCommunicatedSinguities(std::shared_ptr<const Player> player)

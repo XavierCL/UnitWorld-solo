@@ -48,6 +48,11 @@ CommunicatedSinguity CommunicatedSinguity::fromJson(const std::string& jsonData)
     );
 }
 
+xg::Guid CommunicatedSinguity::singuityId() const
+{
+    return _singuityId;
+}
+
 xg::Guid CommunicatedSinguity::playerId() const
 {
     return _playerId;
