@@ -20,9 +20,19 @@ public:
         : _inner(inner ? new _Type(*inner) : nullptr)
     {}
 
+    Option(const _Type*&& inner)
+        : _inner(inner)
+    {}
+
     Option(const Option<_Type>& copy)
         : _inner(newFrom(copy))
     {}
+
+    Option(Option<_Type>&& moved)
+        : _inner(moved._inner)
+    {
+        moved._inner = nullptr;
+    }
 
     ~Option()
     {
@@ -35,6 +45,17 @@ public:
         {
             remove();
             _inner = newFrom(other);
+        }
+        return *this;
+    }
+
+    Option<_Type>& operator=(Option<_Type>&& moved)
+    {
+        if (&moved != this)
+        {
+            remove();
+            _inner = moved._inner;
+            moved._inner = nullptr;
         }
         return *this;
     }
