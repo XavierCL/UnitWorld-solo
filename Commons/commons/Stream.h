@@ -23,7 +23,7 @@ struct StreamIterator
     typedef value_type& reference;
     typedef std::input_iterator_tag iterator_category;
 
-    StreamIterator(const Option<Value>& currentValue, const std::function<Option<Value>()> streamGenerator) :
+    StreamIterator(Option<Value>&& currentValue, std::function<Option<Value>()>&& streamGenerator) :
         _currentValue(currentValue),
         _streamGenerator(streamGenerator)
     {}
@@ -104,13 +104,14 @@ void swap(StreamIterator<Value>& s1, StreamIterator<Value>& s2)
 template <typename Value>
 struct Stream {
 
-    Stream(const std::function<Option<Value>()>& streamGenerator) :
+    Stream(std::function<Option<Value>()>&& streamGenerator) :
         _streamGenerator(streamGenerator)
     {}
 
-    StreamIterator<Value> begin() const
+    StreamIterator<Value> begin()
     {
-        return StreamIterator<Value>(_streamGenerator(), _streamGenerator);
+        Option<Value> firstValue(_streamGenerator());
+        return StreamIterator<Value>(std::move(firstValue), std::move(_streamGenerator));
     }
 
     StreamIterator<Value> end() const
@@ -119,5 +120,5 @@ struct Stream {
     }
 
 private:
-    const std::function<Option<Value>()> _streamGenerator;
+    std::function<Option<Value>()> _streamGenerator;
 };
