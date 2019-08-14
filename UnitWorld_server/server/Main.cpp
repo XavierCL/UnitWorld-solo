@@ -32,7 +32,7 @@ int main()
     Logger::info("Waiting for connections...\n");
     ServerConnector serverConnector(ConnectionInfo("127.0.0.1", "52124"),
         [&serverGame](std::shared_ptr<CommunicationHandler> communicationHandler) {
-            Logger::info("Connection from " + communicationHandler->prettyName());
+            Logger::info("Connection from " + communicationHandler->prettyName() + "\n");
             serverGame.addClient(communicationHandler);
         }
     );

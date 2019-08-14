@@ -58,7 +58,6 @@ namespace uw
         {
             _serverCommander->moveUnitsToPosition(*_selectedUnits, position);
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>(position);
-            _selectedUnits = std::make_shared<std::vector<xg::Guid>>();
             _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>();
         }
 

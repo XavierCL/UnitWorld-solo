@@ -4,6 +4,21 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace uw;
 
+namespace Microsoft
+{
+    namespace VisualStudio
+    {
+        namespace CppUnitTestFramework
+        {
+            template <>
+            static std::wstring ToString<Vector2D>(const Vector2D& v)
+            {
+                return std::wstring(L"{x:") + std::to_wstring(v.x()) + std::wstring(L", y:") + std::to_wstring(v.y()) + std::wstring(L"}");
+            }
+        }
+    }
+}
+
 namespace UnitWorld_shared_tests
 {
     TEST_CLASS(Vector2DTests)
@@ -81,6 +96,47 @@ namespace UnitWorld_shared_tests
             testPoint.y(SECOND_ARBITRARY_VALUE);
 
             Assert::AreEqual(SECOND_ARBITRARY_VALUE, testPoint.y());
+        }
+
+        TEST_METHOD(maxAt_shouldLeaveAValueAloneIfLowerThanMaxModule)
+        {
+            Vector2D testSpeed(1, 1);
+            Vector2D expectedSpeed(testSpeed);
+
+            testSpeed.maxAt(2);
+
+            Assert::AreEqual(expectedSpeed, testSpeed);
+        }
+
+        TEST_METHOD(maxAt_shouldShortenAXDimensionedSpeedToTheGivenModule)
+        {
+            Vector2D testSpeed(4, 0);
+            Vector2D expectedSpeed(3, 0);
+
+            testSpeed.maxAt(3);
+
+            Assert::AreEqual(expectedSpeed, testSpeed);
+        }
+
+        TEST_METHOD(maxAt_shouldShortenAYDimensionedSpeedToTheGivenModule)
+        {
+            Vector2D testSpeed(0, -4);
+            Vector2D expectedSpeed(0, -3);
+
+            testSpeed.maxAt(3);
+
+            Assert::AreEqual(expectedSpeed, testSpeed);
+        }
+
+        TEST_METHOD(maxAt_shouldShortenABiDimensionedSpeedToTheGivenModule)
+        {
+            Vector2D testSpeed(-6, -8);
+            Vector2D expectedSpeed(-3, -4);
+
+            // 3^2 + 4^2 = 5^2
+            testSpeed.maxAt(5);
+
+            Assert::AreEqual(expectedSpeed, testSpeed);
         }
     };
 }

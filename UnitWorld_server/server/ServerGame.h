@@ -18,8 +18,8 @@ namespace uw
 
         void addClient(std::shared_ptr<CommunicationHandler> communicationHandler)
         {
-            const auto singuityInitialXPosition = 100.0 * (double)_gameManager->players().size();
-            auto newPlayer(std::make_shared<Player>(xg::newGuid(), std::vector<std::shared_ptr<Singuity>> {std::make_shared<Singuity>(Vector2D(singuityInitialXPosition, 0), Vector2D(), Option<Vector2D>(Vector2D(200, 200)))}));
+            const auto playerCount = _gameManager->players().size();
+            auto newPlayer(std::make_shared<Player>(xg::newGuid(), generatePlayerSinguities(playerCount)));
             const PlayerClient playerClient(newPlayer->id(), communicationHandler);
 
             _clientGameSender->addClient(playerClient);
@@ -41,6 +41,19 @@ namespace uw
         }
 
     private:
+
+        std::vector<std::shared_ptr<Singuity>> generatePlayerSinguities(int playerCount)
+        {
+            std::vector<std::shared_ptr<Singuity>> singuities;
+            for (int x = 0; x < 100; x += 10)
+            {
+                for (int y = 0; y < 100; y += 10)
+                {
+                    singuities.emplace_back(std::make_shared<Singuity>(Vector2D(x + 10 + 100 * playerCount, y + 10), Vector2D(), Options::None<Vector2D>()));
+                }
+            }
+            return singuities;
+        }
 
         const std::shared_ptr<GameManager> _gameManager;
         const std::shared_ptr<ClientsGameSender> _clientGameSender;
