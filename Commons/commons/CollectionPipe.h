@@ -44,7 +44,7 @@ struct FunctionalDefinitions
             bool isFirstIter = true;
             auto inputBegin = input->end();
             auto inputEnd = input->end();
-            return std::make_shared<Stream<OutputValue>>([this, isFirstIter, inputBegin, inputEnd, input]() mutable {
+            return Streams::generate<OutputValue>([this, isFirstIter, inputBegin, inputEnd, input]() mutable {
                 if (isFirstIter)
                 {
                     inputBegin = input->begin();
@@ -53,13 +53,13 @@ struct FunctionalDefinitions
 
                 if (inputBegin != inputEnd)
                 {
-                    const auto returnedValue = OptionS::Some(_mapping(*inputBegin));
+                    const auto returnedValue = Options::Some(_mapping(*inputBegin));
                     ++inputBegin;
                     return returnedValue;
                 }
                 else
                 {
-                    return OptionS::None<OutputValue>();
+                    return Options::None<OutputValue>();
                 }
             });
         }
@@ -81,11 +81,11 @@ struct FunctionalDefinitions
         {
             auto inputBegin = input->begin();
             const auto inputEnd = input->end();
-            if (!(inputBegin != inputEnd)) return std::make_shared<Stream<OutputValue>>(EmptyStreamGenerator<OutputValue>());
+            if (!(inputBegin != inputEnd)) return Streams::empty<OutputValue>();
             auto currentMapping = _mapping(*inputBegin);
             auto innerBegin = currentMapping->begin();
             auto innerEnd = currentMapping->end();
-            return std::make_shared<Stream<OutputValue>>([this, inputBegin, inputEnd, input, innerBegin, innerEnd, currentMapping]() mutable {
+            return Streams::generate<OutputValue>([this, inputBegin, inputEnd, input, innerBegin, innerEnd, currentMapping]() mutable {
                 while (inputBegin != inputEnd && !(innerBegin != innerEnd))
                 {
                     ++inputBegin;
@@ -98,13 +98,13 @@ struct FunctionalDefinitions
                 }
                 if (innerBegin != innerEnd)
                 {
-                    const auto returnedValue = OptionS::Some(*innerBegin);
+                    const auto returnedValue = Options::Some(*innerBegin);
                     ++innerBegin;
                     return returnedValue;
                 }
                 else
                 {
-                    return OptionS::None<OutputValue>();
+                    return Options::None<OutputValue>();
                 }
             });
         }
@@ -128,7 +128,7 @@ struct FunctionalDefinitions
             bool isFirstIter = true;
             auto inputBegin = input->end();
             auto inputEnd = input->end();
-            return std::make_shared<Stream<InputValue>>([this, isFirstIter, inputBegin, inputEnd, input]() mutable {
+            return Streams::generate<InputValue>([this, isFirstIter, inputBegin, inputEnd, input]() mutable {
                 if (isFirstIter)
                 {
                     inputBegin = input->begin();
@@ -141,13 +141,13 @@ struct FunctionalDefinitions
                 }
                 if (inputBegin != inputEnd)
                 {
-                    const auto returnedValue = OptionS::Some(*inputBegin);
+                    const auto returnedValue = Options::Some(*inputBegin);
                     ++inputBegin;
                     return returnedValue;
                 }
                 else
                 {
-                    return OptionS::None<InputValue>();
+                    return Options::None<InputValue>();
                 }
             });
         }
@@ -192,11 +192,11 @@ struct FunctionalDefinitions
         {
             try
             {
-                return OptionS::Some(input->at(_value));
+                return Options::Some(input->at(_value));
             }
             catch (...)
             {
-                return OptionS::None<Found>();
+                return Options::None<Found>();
             }
         }
 
@@ -286,93 +286,13 @@ struct MapExtensions
     {
         using Output = std::shared_ptr<Stream<Value>>;
 
-        template<typename A, typename B>
-        struct MapValueGenerator
-        {
-            MapValueGenerator(A a, B b, B c, bool isFirst):
-                _a(a),
-                _b(b),
-                _c(c),
-                _isFirst(isFirst)
-            {}
-
-            MapValueGenerator(const MapValueGenerator& copy) :
-                _a(copy._a),
-                _b(copy._b),
-                _c(copy._c),
-                _isFirst(copy._isFirst)
-            {}
-
-            MapValueGenerator(MapValueGenerator&& moved) :
-                _a(std::move(moved._a)),
-                _b(std::move(moved._b)),
-                _c(std::move(moved._c)),
-                _isFirst(std::move(moved._isFirst))
-            {}
-
-            ~MapValueGenerator()
-            {
-                int temp1 = 0;
-            }
-
-            MapValueGenerator& operator=(const MapValueGenerator& copy)
-            {
-                if (this != &copy)
-                {
-                    _a = copy._a;
-                    _b = copy._b;
-                    _c = copy._c;
-                    _isFirst = copy._isFirst;
-                }
-                return *this;
-            }
-
-            MapValueGenerator& operator=(MapValueGenerator&& moved)
-            {
-                if (this != &moved)
-                {
-                    _a = std::move(copy._a);
-                    _b = std::move(copy._b);
-                    _c = std::move(copy._c);
-                    _isFirst = std::move(copy._isFirst);
-                }
-                return *this;
-            }
-
-            Option<Value> operator()()
-            {
-                if (_isFirst)
-                {
-                    _b = _a->begin();
-                    _isFirst = false;
-                }
-
-                if (_b != _c)
-                {
-                    const auto returnedValue(OptionS::Some((*_b).second));
-                    ++_b;
-                    return returnedValue;
-                }
-                else
-                {
-                    return OptionS::None<Value>();
-                }
-            }
-
-        private:
-            A _a;
-            B _b;
-            B _c;
-            bool _isFirst;
-        };
-
         template <typename InputCollection>
         Output operator() (InputCollection input) const
         {
             bool isFirst(true);
             auto inputBegin(input->end());
             auto inputEnd(input->end());
-            return std::make_shared<Stream<Value>>(MapValueGenerator(input, inputBegin, inputEnd, isFirst));/* [input, isFirst, inputBegin, inputEnd]() mutable {
+            return Streams::generate<Value>([input, isFirst, inputBegin, inputEnd]() mutable {
                 if (isFirst)
                 {
                     inputBegin = input->begin();
@@ -381,15 +301,15 @@ struct MapExtensions
 
                 if (inputBegin != inputEnd)
                 {
-                    const auto returnedValue(OptionS::Some((*inputBegin).second));
+                    const auto returnedValue(Options::Some((*inputBegin).second));
                     ++inputBegin;
                     return returnedValue;
                 }
                 else
                 {
-                    return OptionS::None<Value>();
+                    return Options::None<Value>();
                 }
-            });*/
+            });
         }
     };
 };
