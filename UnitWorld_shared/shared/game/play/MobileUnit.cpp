@@ -57,7 +57,8 @@ MobileUnit::MobileUnit(const Vector2D& position, const Vector2D& speed, const Op
 
 void MobileUnit::setMaximalAcceleration(const Vector2D & destination)
 {
-    _acceleration = Vector2D(destination.x() - position().x(), destination.y() - position().y()).maxAt(maximumAcceleration());
+    Vector2D expectedPosition(position().x() + _speed.x() * _speed.x() / maximumAcceleration(), position().y() + _speed.y() * _speed.y() / maximumAcceleration());
+    _acceleration = Vector2D(destination.x() - expectedPosition.x(), destination.y() - expectedPosition.y()).maxAt(maximumAcceleration());
 }
 
 const double MobileUnit::stopDistanceFromTarget() const

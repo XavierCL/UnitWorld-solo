@@ -55,9 +55,14 @@ void Vector2D::operator+=(const Vector2D& other)
     _y += other._y;
 }
 
-Vector2D Vector2D::operator+(const Vector2D& other)
+Vector2D Vector2D::operator+(const Vector2D& other) const
 {
     return Vector2D(_x + other._x, _y + other._y);
+}
+
+bool Vector2D::operator==(const Vector2D& other) const
+{
+    return _x == other._x && _y == other._y;
 }
 
 const double uw::Vector2D::module() const
@@ -74,15 +79,17 @@ Vector2D& uw::Vector2D::maxAt(const double & maxModule)
 {
     if (_x * _x + _y * _y > maxModule * maxModule)
     {
-        const auto absX = abs(_x);
-        const auto absY = abs(_y);
-        const auto xSign = absX / _x;
-        const auto ySign = absY / _y;
-        const auto xySum = absX + absY;
-        const auto relativeX = absX / xySum;
-        const auto relativeY = absY / xySum;
-        _x = xSign * sqrt(relativeX * maxModule * maxModule);
-        _y = ySign * sqrt((1 - relativeX) * maxModule * maxModule);
+        if (maxModule <= 0)
+        {
+            _x = 0;
+            _y = 0;
+        }
+        else
+        {
+            const auto howSmaller = sqrt((_x * _x + _y * _y) / (maxModule * maxModule));
+            _x /= howSmaller;
+            _y /= howSmaller;
+        }
     }
     return *this;
 }
