@@ -9,6 +9,11 @@ MoveMobileUnitsToPositionMessage::MoveMobileUnitsToPositionMessage(const std::ve
     _destination(destination)
 {}
 
+MoveMobileUnitsToPositionMessage::MoveMobileUnitsToPositionMessage(const std::string& json):
+    _singuityIds(jsonToSinguityIds(json)),
+    _destination(jsonToDestination(json))
+{}
+
 MessageType MoveMobileUnitsToPositionMessage::messageType() const
 {
     return MessageType::MoveMobileUnitsToPositionMessageType;
@@ -40,4 +45,24 @@ std::vector<xg::Guid> MoveMobileUnitsToPositionMessage::singuityIds() const
 CommunicatedVector2D MoveMobileUnitsToPositionMessage::destination() const
 {
     return _destination;
+}
+
+std::vector<xg::Guid> MoveMobileUnitsToPositionMessage::jsonToSinguityIds(const std::string& json)
+{
+    nlohmann::json parsedData = nlohmann::json::parse(json);
+
+    std::vector<xg::Guid> singuityIds;
+    for (const auto singuityId : parsedData.at("mobile-units-id"))
+    {
+        singuityIds.emplace_back(singuityId.get<std::string>());
+    }
+
+    return singuityIds;
+}
+
+CommunicatedVector2D MoveMobileUnitsToPositionMessage::jsonToDestination(const std::string& json)
+{
+    nlohmann::json parsedData = nlohmann::json::parse(json);
+
+    return CommunicatedVector2D::fromJson(parsedData.at("destination-position").dump());
 }

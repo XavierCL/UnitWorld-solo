@@ -19,7 +19,7 @@ namespace uw
     {
     public:
         ServerCommander(std::shared_ptr<CommunicationHandler> serverCommunicator, std::shared_ptr<PhysicsCommunicationAssembler> physicsCommunicationAssembler, std::shared_ptr<MessageSerializer> messageSerializer) :
-            _serverCommunicator(_serverCommunicator),
+            _serverCommunicator(serverCommunicator),
             _physicsCommunicationAssembler(physicsCommunicationAssembler),
             _messageSerializer(messageSerializer)
         {}

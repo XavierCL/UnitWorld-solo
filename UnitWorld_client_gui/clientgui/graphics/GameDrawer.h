@@ -26,8 +26,9 @@ namespace uw
 
             // Last move units position
             _userControlState->getLastMoveUnitPosition().foreach([&canvas](const Vector2D& lastMoveUnitPosition) {
-                sf::CircleShape cursorDot(2);
-                cursorDot.setPosition(round(lastMoveUnitPosition.x()), round(lastMoveUnitPosition.y()));
+                const int circleRadius(2.0);
+                sf::CircleShape cursorDot(circleRadius);
+                cursorDot.setPosition(round(lastMoveUnitPosition.x() - circleRadius), round(lastMoveUnitPosition.y() - circleRadius));
                 cursorDot.setFillColor(sf::Color(255, 255, 255));
                 canvas->draw(cursorDot);
             });
@@ -36,15 +37,17 @@ namespace uw
             for (const auto selectedUnitId : _userControlState->getSelectedUnits())
             {
                 (localSinguities | find<std::shared_ptr<const Singuity>>(selectedUnitId)).foreach([&canvas](const std::shared_ptr<const Singuity>& singuity) {
-                    sf::CircleShape selectedUnitAura(5);
-                    selectedUnitAura.setPosition(round(singuity->position().x()), round(singuity->position().y()));
+                    const int circleRadius(5.0);
+                    sf::CircleShape selectedUnitAura(circleRadius);
+                    selectedUnitAura.setPosition(round(singuity->position().x() - circleRadius), round(singuity->position().y() - circleRadius));
                     selectedUnitAura.setFillColor(sf::Color(255, 255, 255));
                     canvas->draw(selectedUnitAura);
                 });
             }
 
             // Units
-            for (auto singuity : *(localSinguities | mapValues<std::shared_ptr<const Singuity>>()))
+            const auto localSinguityValues = localSinguities | mapValues<std::shared_ptr<const Singuity>>();
+            for (auto singuity : *localSinguityValues)
             {
                 canvas->draw(*(GraphicalSinguity(*singuity).drawable()));
             }
@@ -52,9 +55,9 @@ namespace uw
             // User selection rectangle
             _userControlState->getSelectionRectangle().foreach([&canvas](const Rectangle& userSelection) {
                 const auto userSelectionSize(userSelection.size());
-                const auto userSelectionCenter(userSelection.center());
+                const auto userSelectionLowerRight(userSelection.upperLeftCorner());
                 sf::RectangleShape sfUserSelection(sf::Vector2f(userSelectionSize.x(), userSelectionSize.y()));
-                sfUserSelection.setPosition(userSelectionCenter.x(), userSelectionCenter.y());
+                sfUserSelection.setPosition(userSelectionLowerRight.x(), userSelectionLowerRight.y());
                 sfUserSelection.setFillColor(sf::Color::Transparent);
                 sfUserSelection.setOutlineThickness(1);
                 canvas->draw(sfUserSelection);

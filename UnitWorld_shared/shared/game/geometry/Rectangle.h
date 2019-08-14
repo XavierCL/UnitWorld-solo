@@ -13,7 +13,7 @@ namespace uw
 
         Vector2D size() const;
 
-        Vector2D center() const;
+        Vector2D upperLeftCorner() const;
 
     private:
         Vector2D _upperLeftCorner;

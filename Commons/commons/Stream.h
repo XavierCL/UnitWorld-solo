@@ -6,15 +6,6 @@
 #include <functional>
 
 template <typename Value>
-struct EmptyStreamGenerator
-{
-    Option<Value> operator()() const
-    {
-        return OptionS::None<Value>();
-    }
-};
-
-template <typename Value>
 struct StreamIterator
 {
     typedef Value value_type;
@@ -24,31 +15,40 @@ struct StreamIterator
     typedef std::input_iterator_tag iterator_category;
 
     StreamIterator(Option<Value>&& currentValue, std::function<Option<Value>()>&& streamGenerator) :
-        _currentValue(currentValue),
-        _streamGenerator(streamGenerator)
+        _currentValue(std::forward<Option<Value>>(currentValue)),
+        _streamGenerator(std::forward<std::function<Option<Value>()>>(streamGenerator))
     {}
 
-    StreamIterator(const StreamIterator& copy) :
+    StreamIterator() :
+        _currentValue(Options::None<Value>()),
+        _streamGenerator([] { return Options::None<Value>(); })
+    {}
+
+    StreamIterator(const StreamIterator<Value>& copy) :
         _currentValue(copy._currentValue),
         _streamGenerator(copy._streamGenerator)
     {}
 
-    StreamIterator(StreamIterator&& moved) :
+    StreamIterator(StreamIterator<Value>&& moved) :
         _currentValue(std::move(moved._currentValue)),
         _streamGenerator(std::move(moved._streamGenerator))
     {}
 
-    StreamIterator& operator=(const StreamIterator& other)
+    StreamIterator<Value>& operator=(const StreamIterator<Value>& other)
     {
         _currentValue = other._currentValue;
         _streamGenerator = other._streamGenerator;
         return *this;
     }
 
-    StreamIterator& operator=(StreamIterator&& moved)
+    StreamIterator<Value>& operator=(StreamIterator<Value>&& moved)
     {
-        _currentValue = std::move(moved._currentValue);
-        _streamGenerator = std::move(moved._streamGenerator);
+        if (this != &moved)
+        {
+            _currentValue = std::move(moved._currentValue);
+            _streamGenerator = std::move(moved._streamGenerator);
+        }
+        return *this;
     }
 
     Value operator*() const
@@ -61,7 +61,7 @@ struct StreamIterator
         return &_currentValue.getOrThrow();
     }
 
-    StreamIterator& operator++()
+    StreamIterator<Value>& operator++()
     {
         if (_currentValue.isDefined())
         {
@@ -71,9 +71,9 @@ struct StreamIterator
         return *this;
     }
 
-    StreamIterator& operator++(int)
+    StreamIterator<Value>& operator++(int)
     {
-        StreamIterator copy(*this);
+        StreamIterator<Value> copy(*this);
         ++(*this);
         return copy;
     }
@@ -96,17 +96,43 @@ private:
 template<typename Value>
 void swap(StreamIterator<Value>& s1, StreamIterator<Value>& s2)
 {
-    StreamIterator s1Copy(s1);
-    s1 = s2;
-    s2 = s1;
+    StreamIterator s1Copy(std::move(s1));
+    s1 = std::move(s2);
+    s2 = std::move(s1Copy);
 }
 
 template <typename Value>
-struct Stream {
+struct Stream
+{
+    Stream(const Stream& copy) = delete;
+
+    Stream(Stream&& moved):
+        _streamGenerator(std::move(moved._streamGenerator))
+    {}
+
+    Stream(const std::function<Option<Value>()>& streamGenerator) = delete;
 
     Stream(std::function<Option<Value>()>&& streamGenerator) :
-        _streamGenerator(streamGenerator)
+        _streamGenerator(std::forward<std::function<Option<Value>()>>(streamGenerator))
     {}
+
+    Stream& operator=(const Stream& copy)
+    {
+        if (this != &copy)
+        {
+            _streamGenerator = copy._streamGenerator;
+        }
+        return *this;
+    }
+
+    Stream& operator=(Stream&& moved)
+    {
+        if (this != &moved)
+        {
+            _streamGenerator = std::move(moved._streamGenerator);
+        }
+        return *this;
+    }
 
     StreamIterator<Value> begin()
     {
@@ -116,9 +142,24 @@ struct Stream {
 
     StreamIterator<Value> end() const
     {
-        return StreamIterator<Value>(OptionS::None<Value>(), EmptyStreamGenerator<Value>());
+        return StreamIterator<Value>();
     }
 
 private:
     std::function<Option<Value>()> _streamGenerator;
+};
+
+struct Streams
+{
+    template<typename Value>
+    static std::shared_ptr<Stream<Value>> generate(std::function<Option<Value>()>&& streamGenerator)
+    {
+        return std::make_shared<Stream<Value>>(std::forward<std::function<Option<Value>()>>(streamGenerator));
+    }
+
+    template<typename Value>
+    static std::shared_ptr<Stream<Value>> empty()
+    {
+        return std::make_shared<Stream<Value>>([] { return Options::None<Value>(); });
+    }
 };

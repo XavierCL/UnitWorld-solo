@@ -24,7 +24,7 @@ Vector2D Rectangle::size() const
     return Vector2D(_lowerRightCorner.x() - _upperLeftCorner.x(), _lowerRightCorner.y() - _upperLeftCorner.y());
 }
 
-Vector2D Rectangle::center() const
+Vector2D Rectangle::upperLeftCorner() const
 {
-    return Vector2D((_upperLeftCorner.x() + _lowerRightCorner.x()) / 2.0, (_upperLeftCorner.y() + _lowerRightCorner.y()) / 2.0);
+    return _upperLeftCorner;
 }

@@ -33,7 +33,7 @@ int main()
         const auto gameDrawer(std::make_shared<GameDrawer>(gameManager, userControlState));
         const auto sfmlCanvas(std::make_shared<uw::SFMLCanvas>(window));
         const auto canvasTransactionGenerator(std::make_shared<CanvasTransactionGenerator>(sfmlCanvas));
-        const auto windowManager(std::make_shared<WindowManager>(GRAPHICS_FRAME_PER_SECOND, gameDrawer, canvasTransactionGenerator, window));
+        const auto windowManager(std::make_shared<WindowManager>(GRAPHICS_FRAME_PER_SECOND, gameDrawer, canvasTransactionGenerator, window, userControlState));
 
         const auto serverReceiver(std::make_shared<ServerReceiver>(connectionHandler, gameManager, physicsCommunicationAssembler, messageSerializer));
 

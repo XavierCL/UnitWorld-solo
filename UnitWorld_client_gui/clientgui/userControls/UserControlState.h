@@ -31,6 +31,7 @@ namespace uw
         {
             _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>(position);
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>();
+            _selectedUnits = std::make_shared<std::vector<xg::Guid>>();
         }
 
         void setUserLeftMouseUpPosition(const Vector2D position)
@@ -58,6 +59,7 @@ namespace uw
             _serverCommander->moveUnitsToPosition(*_selectedUnits, position);
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>(position);
             _selectedUnits = std::make_shared<std::vector<xg::Guid>>();
+            _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>();
         }
 
         Option<Rectangle> getSelectionRectangle() const

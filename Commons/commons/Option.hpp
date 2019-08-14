@@ -210,7 +210,7 @@ private:
     const _Type* _inner;
 };
 
-struct OptionS
+struct Options
 {
     template <typename Type>
     static Option<Type> Some(const Type& inner)

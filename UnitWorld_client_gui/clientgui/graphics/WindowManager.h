@@ -15,11 +15,12 @@ namespace uw
     class WindowManager
     {
     public:
-        WindowManager(const unsigned int& graphicsFramePerSecond, std::shared_ptr<GameDrawer> gameDrawer, std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator, std::shared_ptr<sf::RenderWindow> window) :
+        WindowManager(const unsigned int& graphicsFramePerSecond, std::shared_ptr<GameDrawer> gameDrawer, std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator, std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<UserControlState> userControlState) :
             _msPerFrame(1000 / graphicsFramePerSecond),
             _gameDrawer(gameDrawer),
             _canvasTransactionGenerator(canvasTransactionGenerator),
-            _window(window)
+            _window(window),
+            _userControlState(userControlState)
         {}
 
         void startSync()
@@ -59,6 +60,32 @@ namespace uw
                 {
                     _window->close();
                 }
+                else if (event.type == sf::Event::MouseButtonPressed)
+                {
+                    if (event.mouseButton.button == sf::Mouse::Left)
+                    {
+                        Vector2D mousePosition(event.mouseButton.x, event.mouseButton.y);
+                        _userControlState->setUserLeftMouseDownPosition(mousePosition);
+                    }
+                    else if (event.mouseButton.button == sf::Mouse::Right)
+                    {
+                        Vector2D mousePosition(event.mouseButton.x, event.mouseButton.y);
+                        _userControlState->setUserRightMouseDownPosition(mousePosition);
+                    }
+                }
+                else if (event.type == sf::Event::MouseButtonReleased)
+                {
+                    if (event.mouseButton.button == sf::Mouse::Left)
+                    {
+                        Vector2D mousePosition(event.mouseButton.x, event.mouseButton.y);
+                        _userControlState->setUserLeftMouseUpPosition(mousePosition);
+                    }
+                }
+                else if (event.type == sf::Event::MouseMoved)
+                {
+                    Vector2D mousePosition(event.mouseMove.x, event.mouseMove.y);
+                    _userControlState->setUserMousePosition(mousePosition);
+                }
             }
         }
 
@@ -74,5 +101,6 @@ namespace uw
         const std::shared_ptr<GameDrawer> _gameDrawer;
         const std::shared_ptr<CanvasTransactionGenerator> _canvasTransactionGenerator;
         const std::shared_ptr<sf::RenderWindow> _window;
+        const std::shared_ptr<UserControlState> _userControlState;
     };
 }
