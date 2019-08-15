@@ -1,8 +1,13 @@
 #pragma once
 
 #include "play/Player.h"
+#include "physics/CollidablePoint.h"
+#include "physics/CollisionDetector.h"
 
 #include "shared/game/commands/MoveMobileUnitsToPosition.h"
+
+#include "commons/CollectionPipe.h"
+#include "commons/MemoryExtension.h"
 
 #include <immer/vector.hpp>
 
@@ -123,11 +128,11 @@ namespace uw
             }
 
             auto localPlayers = _players;
-            std::vector<std::shared_ptr<Player>> workingPlayers(localPlayers.begin(), localPlayers.end());
+            auto workingPlayers(std::make_shared<std::vector<std::shared_ptr<Player>>>(localPlayers.begin(), localPlayers.end()));
 
-            for(unsigned int workingPlayerIndex = 0; workingPlayerIndex < workingPlayers.size(); ++workingPlayerIndex)
+            for(unsigned int workingPlayerIndex = 0; workingPlayerIndex < workingPlayers->size(); ++workingPlayerIndex)
             {
-                workingPlayers[workingPlayerIndex] = std::make_shared<Player>(*workingPlayers[workingPlayerIndex]);
+                (*workingPlayers)[workingPlayerIndex] = std::make_shared<Player>(*(*workingPlayers)[workingPlayerIndex]);
             }
 
             std::vector<std::shared_ptr<MoveMobileUnitsToPosition>> localCommands;
@@ -141,15 +146,66 @@ namespace uw
 
             for (const auto command : localCommands)
             {
-                command->execute(workingPlayers);
+                command->execute((*workingPlayers));
             }
 
-            for (auto workingPlayer : workingPlayers)
+            // todo update player ids by singuity id
+
+            for (const auto& player : *workingPlayers)
             {
+                const auto collidablePoints(make_shared(player->singuities()) | map<CollidablePoint>([](const auto& singuity) {
+                    return CollidablePoint(singuity->id(), singuity->position());
+                }) | toVector<CollidablePoint>());
+                _collisionDetectorsByPlayerId->at(player->id())->updateAllCollidablePoints(collidablePoints);
+            }
+
+            auto allSinguitiesById = workingPlayers | flatMap<std::shared_ptr<Singuity>>([](const auto& player) {
+                return make_shared(player->singuities());
+            }) | toUnorderedMap<xg::Guid, std::shared_ptr<Singuity>>([](const auto& singuity) { return singuity->id(); });
+
+            {
+                auto allSinguities = allSinguitiesById | mapValues<std::shared_ptr<Singuity>>();
+                for (const auto& processingSinguity : *allSinguities)
+                {
+                    Option<std::shared_ptr<Singuity>> closestSinguity;
+                    Option<std::shared_ptr<Singuity>> closestEnemySinguity;
+                    for (const auto& playerIdAndCollisionDetector : *_collisionDetectorsByPlayerId)
+                    {
+                        auto& collisionDetectorPlayerId(playerIdAndCollisionDetector.first);
+                        auto& collisionDetector(playerIdAndCollisionDetector.second);
+                        xg::Guid singuityId = collisionDetector->getClosest(processingSinguity->position());
+                        auto localClosestSinguity = allSinguitiesById | find<std::shared_ptr<Singuity>>(singuityId);
+                        localClosestSinguity.foreach([this, &closestSinguity, &closestEnemySinguity, &processingSinguity, &collisionDetectorPlayerId](const auto& foundSinguity) {
+                            closestSinguity = closestSinguity.map<std::shared_ptr<Singuity>>([&foundSinguity, &processingSinguity](const auto& singuity) {
+                                return processingSinguity->position().distanceSq(singuity->position()) > processingSinguity->position().distanceSq(foundSinguity->position())
+                                    ? foundSinguity
+                                    : singuity;
+                            }).orElse(Options::Some(foundSinguity));
+
+                            if (collisionDetectorPlayerId != _playerIdBySinguityId->at(processingSinguity->id()))
+                            {
+                                closestEnemySinguity = closestEnemySinguity.map<std::shared_ptr<Singuity>>([&foundSinguity, &processingSinguity](const auto& singuity) {
+                                    return processingSinguity->position().distanceSq(singuity->position()) > processingSinguity->position().distanceSq(foundSinguity->position())
+                                        ? foundSinguity
+                                        : singuity;
+                                }).orElse(Options::Some(foundSinguity));
+                            }
+                        });
+                    }
+
+                    // If closest enemy close enough and processing singuity can shoot, mark for shooting
+
+                    // If closest singuity close enough, accelerate outward
+                }
+            }
+
+            for (auto workingPlayer : *workingPlayers)
+            {
+                // reduce hp based on shooting, kill killed singuities, process
                 workingPlayer->actualize();
             }
 
-            _players = immer::vector<std::shared_ptr<Player>>(workingPlayers.begin(), workingPlayers.end());
+            _players = immer::vector<std::shared_ptr<Player>>(workingPlayers->begin(), workingPlayers->end());
 
             if (!localCommands.empty() || newPlayer || allPlayers)
             {
@@ -170,7 +226,11 @@ namespace uw
         std::mutex _nextCommandsMutex;
         std::vector<std::shared_ptr<MoveMobileUnitsToPosition>> _nextCommands;
         std::atomic<immer::vector<std::shared_ptr<Player>>*> _nextPlayers;
+
         immer::vector<std::shared_ptr<Player>> _players;
+        std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> _collisionDetectorsByPlayerId;
+        std::shared_ptr<std::unordered_map<xg::Guid, xg::Guid>> _playerIdBySinguityId;
+
         std::mutex _somePlayerInputCallbackMutex;
         std::unordered_map<xg::Guid, std::function<void(const immer::vector<std::shared_ptr<Player>>&)>> _somePlayerInputCallback;
         bool _isRunning;
