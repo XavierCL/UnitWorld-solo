@@ -33,7 +33,7 @@ int main()
     serverGame.startAsync();
 
     Logger::info("Waiting for connections...\n");
-    ServerConnector serverConnector(ConnectionInfo("127.0.0.1", "52124"),
+    ServerConnector serverConnector(ConnectionInfo("0.0.0.0", "52124"),
         [&serverGame](std::shared_ptr<CommunicationHandler> communicationHandler) {
             Logger::info("Connection from " + communicationHandler->prettyName() + "\n");
             serverGame.addClient(communicationHandler);

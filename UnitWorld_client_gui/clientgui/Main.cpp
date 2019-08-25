@@ -16,7 +16,7 @@ using namespace uw;
 int main()
 {
     const std::string WINDOW_TITLE("Unit World client GUI");
-    const std::string SERVER_IP("127.0.0.1");
+    const std::string SERVER_IP("127.0.0.1");// const std::string SERVER_IP("147.253.89.52");
     const std::string SERVER_PORT("52124");
 
     const unsigned int GRAPHICS_FRAME_PER_SECOND(30);
