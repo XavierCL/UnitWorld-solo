@@ -70,6 +70,7 @@ double MobileUnit::healthPoints() const
 void MobileUnit::setDestination(const Vector2D& destination)
 {
     _destination = Option<Vector2D>(destination);
+    _isBreakingForDestination = false;
 }
 
 void MobileUnit::setExternalForce(const Vector2D& outwardForcePosition)
