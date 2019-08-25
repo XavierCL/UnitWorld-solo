@@ -29,7 +29,10 @@ namespace uw
                             singuity.singuityId(),
                             communicatedVector2DToPhysics(singuity.position()),
                             communicatedVector2DToPhysics(singuity.speed()),
-                            singuity.destination().map<Vector2D>(std::bind(&PhysicsCommunicationAssembler::communicatedVector2DToPhysics, this, std::placeholders::_1))
+                            singuity.destination().map<Vector2D>(std::bind(&PhysicsCommunicationAssembler::communicatedVector2DToPhysics, this, std::placeholders::_1)),
+                            singuity.isBreakingForDestination(),
+                            singuity.healthPoint(),
+                            singuity.lastShootTimestamp()
                         );
                     }) | toVector<std::shared_ptr<Singuity>>()
                 )
@@ -39,14 +42,17 @@ namespace uw
         immer::vector<CommunicatedSinguity> physicsPlayerToCommunicatedSinguities(std::shared_ptr<const Player> player)
         {
             std::vector<CommunicatedSinguity> communicatedSinguities;
-            for (const auto& singuity : player->singuities())
+            for (const auto& singuity : *player->singuities())
             {
                 communicatedSinguities.emplace_back(
                     singuity->id(),
                     player->id(),
                     physicsVector2DToCommunicated(singuity->position()),
                     physicsVector2DToCommunicated(singuity->speed()),
-                    singuity->destination().map<CommunicatedVector2D>([this](const Vector2D& destination) { return physicsVector2DToCommunicated(destination); })
+                    singuity->destination().map<CommunicatedVector2D>([this](const Vector2D& destination) { return physicsVector2DToCommunicated(destination); }),
+                    singuity->isBreakingForDestination(),
+                    singuity->healthPoints(),
+                    singuity->lastShootTimestamp()
                 );
             }
 

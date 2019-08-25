@@ -145,6 +145,9 @@
     <ClInclude Include="shared\game\geometry\Rectangle.h" />
     <ClInclude Include="shared\game\physics\CollidablePoint.h" />
     <ClInclude Include="shared\game\physics\CollisionDetector.h" />
+    <ClInclude Include="shared\game\physics\CollisionDetectorFactory.h" />
+    <ClInclude Include="shared\game\physics\NaiveCollisionDetector.h" />
+    <ClInclude Include="shared\game\physics\NaiveCollisionDetectorFactory.h" />
     <ClInclude Include="shared\game\physics\Vector2D.h" />
     <ClInclude Include="shared\game\play\MobileUnit.h" />
     <ClInclude Include="shared\game\play\Player.h" />

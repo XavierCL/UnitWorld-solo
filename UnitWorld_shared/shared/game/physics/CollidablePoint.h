@@ -14,6 +14,21 @@ namespace uw
             _position(position)
         {}
 
+        CollidablePoint(const CollidablePoint& copy) :
+            _id(copy._id),
+            _position(copy._position)
+        {}
+
+        xg::Guid id() const
+        {
+            return _id;
+        }
+
+        Vector2D position() const
+        {
+            return _position;
+        }
+
     private:
         const xg::Guid _id;
         const Vector2D _position;

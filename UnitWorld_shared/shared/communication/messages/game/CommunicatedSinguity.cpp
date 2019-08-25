@@ -4,12 +4,15 @@
 
 using namespace uw;
 
-CommunicatedSinguity::CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedVector2D>& destination) :
+CommunicatedSinguity::CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedVector2D>& destination, const bool& isBreakingForDestination, const double& healthPoint, const unsigned long long& lastShootTimestamp) :
     _singuityId(singuityId),
     _playerId(playerId),
     _position(position),
     _speed(speed),
-    _destination(destination)
+    _destination(destination),
+    _isBreakingForDestination(isBreakingForDestination),
+    _healthPoint(healthPoint),
+    _lastShootTimestamp(lastShootTimestamp)
 {}
 
 std::string CommunicatedSinguity::toJson() const
@@ -25,7 +28,10 @@ std::string CommunicatedSinguity::toJson() const
         {"playerId", playerId},
         {"position", position},
         {"speed", speed},
-        {"destination", destination}
+        {"destination", destination},
+        {"is-breaking-for-destination", _isBreakingForDestination},
+        {"health-points", _healthPoint},
+        {"last-shoot-time", _lastShootTimestamp}
     };
 
     return jsonData.dump();
@@ -44,7 +50,10 @@ CommunicatedSinguity CommunicatedSinguity::fromJson(const std::string& jsonData)
         CommunicatedVector2D::fromJson(parsedJson.at("speed").dump()),
         destinationJson == "\"none\""
             ? Option<CommunicatedVector2D>()
-            : Option<CommunicatedVector2D>(CommunicatedVector2D::fromJson(destinationJson))
+            : Option<CommunicatedVector2D>(CommunicatedVector2D::fromJson(destinationJson)),
+        parsedJson.at("is-breaking-for-destination").get<bool>(),
+        parsedJson.at("health-points").get<double>(),
+        parsedJson.at("last-shoot-time").get<unsigned long long>()
     );
 }
 
@@ -71,4 +80,19 @@ CommunicatedVector2D CommunicatedSinguity::speed() const
 Option<CommunicatedVector2D> CommunicatedSinguity::destination() const
 {
     return _destination;
+}
+
+bool CommunicatedSinguity::isBreakingForDestination() const
+{
+    return _isBreakingForDestination;
+}
+
+double CommunicatedSinguity::healthPoint() const
+{
+    return _healthPoint;
+}
+
+unsigned long long CommunicatedSinguity::lastShootTimestamp() const
+{
+    return _lastShootTimestamp;
 }
