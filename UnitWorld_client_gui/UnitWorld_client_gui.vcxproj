@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClCompile Include="clientgui\graphics\canvas\CanvasTransactionGenerator.cpp" />
     <ClCompile Include="clientgui\graphics\canvas\SFMLCanvas.cpp" />
+    <ClCompile Include="clientgui\graphics\GameDrawer.cpp" />
     <ClCompile Include="clientgui\graphics\units\GraphicalSinguity.cpp" />
     <ClCompile Include="clientgui\graphics\units\GraphicalUnit.cpp" />
     <ClCompile Include="clientgui\Main.cpp" />

@@ -9,6 +9,6 @@ namespace uw
     class GraphicalSinguity : public GraphicalUnit, public Singuity
     {
     public:
-        GraphicalSinguity(const Singuity& self);
+        GraphicalSinguity(const Singuity& self, const sf::Color& color);
     };
 }

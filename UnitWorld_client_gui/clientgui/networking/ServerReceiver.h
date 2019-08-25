@@ -23,7 +23,8 @@ namespace uw
             _serverHandler(serverHandler),
             _gameManager(gameManager),
             _physicsCommunicationAssembler(physicsCommunicationAssembler),
-            _messageSerializer(messageSerializer)
+            _messageSerializer(messageSerializer),
+            _lastCurrentPlayerId()
         {}
 
         void stop()
@@ -42,6 +43,11 @@ namespace uw
                     receiveServerCommunications();
                 }
             });
+        }
+
+        Option<xg::Guid> lastCurrentPlayerId() const
+        {
+            return _lastCurrentPlayerId;
         }
 
     private:
@@ -79,6 +85,9 @@ namespace uw
         void handleServerMessage(std::shared_ptr<const Message> message)
         {
             const auto completeStateMessage(std::dynamic_pointer_cast<CompleteGameStateMessage const>(message));
+
+            _lastCurrentPlayerId = Options::Some(completeStateMessage->getCurrentPlayerId());
+
             auto singuitiesByPlayerId(std::make_shared<std::vector<CommunicatedSinguity>>(completeStateMessage->getSinguities())
                 | groupBy<xg::Guid, CommunicatedSinguity>([](const CommunicatedSinguity& singuity) { return singuity.playerId(); }));
 
@@ -94,6 +103,8 @@ namespace uw
         }
 
         std::thread _receiveThread;
+
+        Option<xg::Guid> _lastCurrentPlayerId;
 
         const std::shared_ptr<CommunicationHandler> _serverHandler;
         const std::shared_ptr<GameManager> _gameManager;

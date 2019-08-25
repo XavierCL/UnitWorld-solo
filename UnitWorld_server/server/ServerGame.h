@@ -49,7 +49,7 @@ namespace uw
             {
                 for (int y = 0; y < 100; y += 10)
                 {
-                    singuities.emplace_back(std::make_shared<Singuity>(Vector2D(x + 10 + 100 * playerCount, y + 10), Vector2D(), Options::None<Vector2D>()));
+                    singuities.emplace_back(std::make_shared<Singuity>(Vector2D(x + 10 + 100 * playerCount, y + 10)));
                 }
             }
             return singuities;

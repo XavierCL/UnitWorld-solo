@@ -78,6 +78,15 @@
     <ClInclude Include="shared\game\physics\CollidablePoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="shared\game\physics\CollisionDetectorFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\NaiveCollisionDetectorFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\NaiveCollisionDetector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="shared\communication\MessageWrapper.cpp">

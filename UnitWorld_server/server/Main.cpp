@@ -1,6 +1,7 @@
 #include "ServerGame.h"
 
 #include "shared/game/GameManager.h"
+#include "shared/game/physics/NaiveCollisionDetectorFactory.h"
 
 #include "communications/ServerConnector.h"
 
@@ -17,7 +18,9 @@ int main()
         std::cout << message;
     });
 
-    const auto gameManager(std::make_shared<GameManager>());
+    const auto naiveCollisionDetectorFactory(std::make_shared<NaiveCollisionDetectorFactory>());
+
+    const auto gameManager(std::make_shared<GameManager>(naiveCollisionDetectorFactory));
 
     const auto messageSerializer(std::make_shared<MessageSerializer>());
     const auto physicsCommunicationAssembler(std::make_shared<PhysicsCommunicationAssembler>());

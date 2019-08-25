@@ -81,7 +81,7 @@ struct FunctionalDefinitions
         {
             auto inputBegin = input->begin();
             const auto inputEnd = input->end();
-            if (!(inputBegin != inputEnd)) return Streams::empty<OutputValue>();
+            if (inputBegin == inputEnd) return Streams::empty<OutputValue>();
             auto currentMapping = _mapping(*inputBegin);
             auto innerBegin = currentMapping->begin();
             auto innerEnd = currentMapping->end();
@@ -224,17 +224,16 @@ struct FunctionalDefinitions
         template<typename InputCollection>
         Output operator()(InputCollection input) const
         {
-            auto generatedVector(std::make_shared<std::vector<Value>>());
-            generatedVector->insert(generatedVector->begin(), input->begin(), input->end());
-            return generatedVector;
+            return std::make_shared<std::vector<Value>>(input->begin(), input->end());
         }
     };
 
-    template <typename Key, typename Value, typename KeyHash, typename KeyEqual, typename KeySelector>
+    template <typename Key, typename Value, typename KeyHash, typename KeyEqual, typename KeySelector, typename ValueSelector>
     struct ToUnorderedMap
     {
-        ToUnorderedMap(const KeySelector& keySelector) :
-            _keySelector(keySelector)
+        ToUnorderedMap(const KeySelector& keySelector, const ValueSelector& valueSelector) :
+            _keySelector(keySelector),
+            _valueSelector(valueSelector)
         {}
 
         using Output = std::shared_ptr<std::unordered_map<Key, Value, KeyHash, KeyEqual>>;
@@ -245,13 +244,14 @@ struct FunctionalDefinitions
             auto generatedMap(std::make_shared<std::unordered_map<Key, Value, KeyHash, KeyEqual>>());
             for (const auto value : *input)
             {
-                (*generatedMap)[_keySelector(value)] = value;
+                (*generatedMap)[_keySelector(value)] = _valueSelector(value);
             }
             return generatedMap;
         }
 
     private:
         const KeySelector _keySelector;
+        const ValueSelector _valueSelector;
     };
 
     template <typename Key, typename Value, typename KeyHash, typename KeyEqual, typename KeySelector>
@@ -373,9 +373,15 @@ FunctionalDefinitions::ToVector<Value> toVector()
 }
 
 template <typename Key, typename Value, typename KeyHash = std::hash<Key>, typename KeyEqual = std::equal_to<Key>, typename KeySelector>
-FunctionalDefinitions::ToUnorderedMap<Key, Value, KeyHash, KeyEqual, KeySelector> toUnorderedMap(const KeySelector& keySelector)
+FunctionalDefinitions::ToUnorderedMap<Key, Value, KeyHash, KeyEqual, KeySelector, std::function<Value(Value)>> toUnorderedMap(const KeySelector& keySelector)
 {
-    return FunctionalDefinitions::ToUnorderedMap<Key, Value, KeyHash, KeyEqual, KeySelector>(keySelector);
+    return FunctionalDefinitions::ToUnorderedMap<Key, Value, KeyHash, KeyEqual, KeySelector, std::function<Value(Value)>>(keySelector, [](const auto& value) { return value;  });
+}
+
+template <typename Key, typename Value, typename KeyHash = std::hash<Key>, typename KeyEqual = std::equal_to<Key>, typename KeySelector, typename ValueSelector>
+FunctionalDefinitions::ToUnorderedMap<Key, Value, KeyHash, KeyEqual, KeySelector, ValueSelector> toUnorderedMap(const KeySelector& keySelector, const ValueSelector& valueSelector)
+{
+    return FunctionalDefinitions::ToUnorderedMap<Key, Value, KeyHash, KeyEqual, KeySelector, ValueSelector>(keySelector, valueSelector);
 }
 
 template <typename Key, typename Value, typename KeyHash = std::hash<Key>, typename KeyEqual = std::equal_to<Key>, typename KeySelector>
