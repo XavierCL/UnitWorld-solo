@@ -10,6 +10,7 @@
 #include "communications/CommunicationHandler.h"
 
 #include "commons/Guid.hpp"
+#include "commons/Logger.hpp"
 
 #include <vector>
 
@@ -30,7 +31,14 @@ namespace uw
 
             const auto message(std::make_shared<MoveMobileUnitsToPositionMessage>(singuityIds, communicatedDestination));
 
-            _serverCommunicator->send(_messageSerializer->serialize(std::vector<MessageWrapper> { MessageWrapper(message) }));
+            try
+            {
+                _serverCommunicator->send(_messageSerializer->serialize(std::vector<MessageWrapper> { MessageWrapper(message) }));
+            }
+            catch (std::exception error)
+            {
+                Logger::error("Error while sending command to server: " + std::string(error.what()));
+            }
         }
 
     private:

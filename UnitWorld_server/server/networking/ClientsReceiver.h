@@ -6,6 +6,8 @@
 
 #include "shared/communication/MessageSerializer.h"
 
+#include "commons/Logger.hpp"
+
 namespace uw
 {
     class ClientsReceiver
@@ -56,16 +58,15 @@ namespace uw
                     receivedCommunication = playerClient.client()->receive();
                     failureCount = 0;
                 }
-                catch (...)
+                catch (std::exception error)
                 {
+                    Logger::error("Error while receiving from client: " + std::string(error.what()));
                     ++failureCount;
                 }
 
                 const auto messages(_messageSerializer->deserialize(receivedCommunication));
                 _gameReceiver->receiveMessages(playerClient.playerId(), messages);
             }
-
-            playerClient.client()->close();
 
             std::lock_guard<std::mutex> lockPlayerClients(_playerClientsMutex);
 
@@ -75,6 +76,7 @@ namespace uw
             if (clientIndex < _playerClients.size())
             {
                 _playerClients.erase(_playerClients.begin() + clientIndex);
+                _clientWaiters[clientIndex]->detach();
                 _clientWaiters.erase(_clientWaiters.begin() + clientIndex);
             }
         }
