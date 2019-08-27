@@ -32,13 +32,13 @@ void MobileUnit::actualize()
 
     _externalForce.foreach([this](auto externalForce) {
         _acceleration += externalForce.maxAt(maximumAcceleration());
-        _acceleration.maxAt(maximumAcceleration());
+        _acceleration = _acceleration.maxAt(maximumAcceleration());
     });
 
     _externalForce = Options::None<Vector2D>();
 
     _speed += _acceleration;
-    _speed.maxAt(maximumSpeed());
+    _speed = _speed.maxAt(maximumSpeed());
     position(position() + _speed);
 }
 
@@ -124,31 +124,20 @@ MobileUnit::MobileUnit(const Vector2D& position, const double& healthPoint):
 
 void MobileUnit::setMaximalAcceleration(const Vector2D & destination)
 {
-    Vector2D expectedPosition(position().x() + _speed.x() * _speed.x() / (maximumAcceleration() * 1.2), position().y() + _speed.y() * _speed.y() / (maximumAcceleration() * 1.2));
-    _acceleration = Vector2D(destination.x() - expectedPosition.x(), destination.y() - expectedPosition.y()).maxAt(maximumAcceleration());
+    Vector2D stopDelta = _speed.atModule(stopDistanceFromTarget() * 0.98);
+    Vector2D expectedPosition(position() + stopDelta);
+    _acceleration = (destination - expectedPosition).maxAt(maximumAcceleration());
 }
 
-const double MobileUnit::stopDistanceFromTarget() const
+double MobileUnit::stopDistanceFromTargetSq() const
 {
-    return sqrt(stopDistanceFromTargetSq());
+    const auto stopDistance = stopDistanceFromTarget();
+    return stopDistance * stopDistance;
 }
 
-const double MobileUnit::stopDistanceFromTargetSq() const
+double MobileUnit::stopDistanceFromTarget() const
 {
-    const auto speedModule = _speed.module();
-    if (speedModule == 0)
-    {
-        return 0;
-    }
-    const auto relativeX = std::abs(_speed.x()) / speedModule;
-    const auto relativeY = std::abs(_speed.y()) / speedModule;
-    const auto accX = maximumAcceleration() * relativeX;
-    const auto accY = maximumAcceleration() * relativeY;
-
-    const auto numberOfMeterX = (_speed.x() / accX) * (_speed.x() / 2);
-    const auto numberOfMeterY = (_speed.y() / accY) * (_speed.y() / 2);
-
-    return Vector2D(numberOfMeterX, numberOfMeterY).moduleSq() + 1;
+    return _speed.moduleSq() / (2.0 * maximumAcceleration());
 }
 
 Vector2D MobileUnit::getBreakingAcceleration() const
