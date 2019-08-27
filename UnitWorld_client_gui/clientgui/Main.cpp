@@ -11,12 +11,28 @@
 
 #include "communications/ClientConnector.h"
 
+#include "commons/Logger.hpp"
+
 #include <SFML/Graphics.hpp>
+
+#include <fstream>
+#include <iostream>
+#include <iomanip>
+#include <ctime>
 
 using namespace uw;
 
 int main()
 {
+    Logger::registerError([](const auto& errorMessage) {
+
+        auto currentTime = std::time(nullptr);
+        auto localTime = *std::localtime(&currentTime);
+
+        std::ofstream outputFile("error.log", std::ios_base::app);
+        outputFile << std::put_time(&localTime, "%Y-%m-%dT%H-%M-%S") << ": " << errorMessage << std::endl;
+    });
+
     const std::string WINDOW_TITLE("Unit World client GUI");
     const std::string DEFAULT_SERVER_IP("127.0.0.1");
     const std::string DEFAULT_SERVER_PORT("52124");
@@ -56,6 +72,8 @@ int main()
         const auto clientGame(std::make_shared<ClientGame>(gameManager, windowManager, serverReceiver));
 
         clientGame->startSync();
+    }, [](const std::error_code& errorCode) {
+        Logger::error("Could not connect to the server. Error code #" + std::to_string(errorCode.value()) + ". Error message: " + errorCode.message());
     });
 
     return EXIT_SUCCESS;

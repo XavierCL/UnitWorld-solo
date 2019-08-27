@@ -16,7 +16,10 @@ using namespace uw;
 int main()
 {
     Logger::registerInfo([](const std::string& message) {
-        std::cout << message;
+        std::cout << "INFO: " << message << std::endl;
+    });
+    Logger::registerError([](const std::string& errorMessage) {
+        std::cout << "ERROR: " << errorMessage << std::endl;
     });
 
     const std::string DEFAULT_SERVER_PORT("52124");
@@ -39,10 +42,10 @@ int main()
     ServerGame serverGame(gameManager, clientsGameSender, clientsReceiver);
     serverGame.startAsync();
 
-    Logger::info("Waiting for connections...\n");
+    Logger::info("Waiting for connections...");
     ServerConnector serverConnector(ConnectionInfo("0.0.0.0", serverPort),
         [&serverGame](std::shared_ptr<CommunicationHandler> communicationHandler) {
-            Logger::info("Connection from " + communicationHandler->prettyName() + "\n");
+            Logger::info("Connection from " + communicationHandler->prettyName());
             serverGame.addClient(communicationHandler);
         }
     );

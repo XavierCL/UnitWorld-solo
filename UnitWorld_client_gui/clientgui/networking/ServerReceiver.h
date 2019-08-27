@@ -14,6 +14,8 @@
 
 #include "commons/MemoryExtension.h"
 
+#include "commons/Logger.hpp"
+
 namespace uw
 {
     class ServerReceiver
@@ -38,9 +40,16 @@ namespace uw
         {
             _receiveThread = std::thread([this] {
             
-                while (_serverHandler->isOpen())
+                try
                 {
-                    receiveServerCommunications();
+                    while (_serverHandler->isOpen())
+                    {
+                        receiveServerCommunications();
+                    }
+                }
+                catch (std::exception error)
+                {
+                    Logger::error("Error while receiving from the server socket the socket is likely closed. Error message: " + std::string(error.what()));
                 }
             });
         }
