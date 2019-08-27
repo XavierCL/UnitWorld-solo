@@ -32,8 +32,8 @@ namespace uw
 
     private:
         void setMaximalAcceleration(const Vector2D& destination);
-        const double stopDistanceFromTarget() const;
-        const double stopDistanceFromTargetSq() const;
+        double stopDistanceFromTargetSq() const;
+        double stopDistanceFromTarget() const;
         Vector2D getBreakingAcceleration() const;
         Vector2D getSlowBreakingAcceleration() const;
         void loseHealthPoint(const double& healthPoint);

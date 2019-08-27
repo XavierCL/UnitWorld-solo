@@ -7,6 +7,8 @@
 
 #include "shared/game/physics/NaiveCollisionDetectorFactory.h"
 
+#include "shared/configuration/ConfigurationManager.h"
+
 #include "communications/ClientConnector.h"
 
 #include <SFML/Graphics.hpp>
@@ -16,14 +18,19 @@ using namespace uw;
 int main()
 {
     const std::string WINDOW_TITLE("Unit World client GUI");
-    const std::string SERVER_IP("127.0.0.1");
-    const std::string SERVER_PORT("52124");
+    const std::string DEFAULT_SERVER_IP("127.0.0.1");
+    const std::string DEFAULT_SERVER_PORT("52124");
+
+    const ConfigurationManager configurationManager("config.json");
+
+    const std::string serverIp = configurationManager.serverIpOrDefault(DEFAULT_SERVER_IP);
+    const std::string serverPort = configurationManager.serverPortOrDefault(DEFAULT_SERVER_PORT);
 
     const unsigned int GRAPHICS_FRAME_PER_SECOND(30);
 
     auto window(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes().front(), WINDOW_TITLE));
 
-    ClientConnector(ConnectionInfo(SERVER_IP, SERVER_PORT), [&window, &GRAPHICS_FRAME_PER_SECOND](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
+    ClientConnector(ConnectionInfo(serverIp, serverPort), [&window, &GRAPHICS_FRAME_PER_SECOND](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
 
         const auto naiveCollisionDetectorFactory(std::make_shared<NaiveCollisionDetectorFactory>());
 

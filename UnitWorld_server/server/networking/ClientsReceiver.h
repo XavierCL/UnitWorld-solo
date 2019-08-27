@@ -21,7 +21,7 @@ namespace uw
         {
             std::lock_guard<std::mutex> lockPlayerClients(_playerClientsMutex);
 
-            _playerClients.push_back(playerClient);
+            _playerClients.emplace_back(std::make_shared<PlayerClient>(playerClient));
             _clientWaiters.emplace_back(std::make_shared<std::thread>([this, playerClient] { loopClientReceive(playerClient); }));
         }
 
@@ -31,7 +31,7 @@ namespace uw
 
             for (auto playerClient : _playerClients)
             {
-                playerClient.client()->close();
+                playerClient->client()->close();
             }
 
             for (auto clientWaiter : _clientWaiters)
@@ -47,18 +47,41 @@ namespace uw
 
         void loopClientReceive(const PlayerClient& playerClient)
         {
-            while (playerClient.client()->isOpen())
+            int failureCount = 0;
+            while (playerClient.client()->isOpen() && failureCount < 3)
             {
-                const auto receivedCommunication(playerClient.client()->receive());
-                const auto messages(_messageSerializer->deserialize(receivedCommunication));
+                std::string receivedCommunication;
+                try
+                {
+                    receivedCommunication = playerClient.client()->receive();
+                    failureCount = 0;
+                }
+                catch (...)
+                {
+                    ++failureCount;
+                }
 
+                const auto messages(_messageSerializer->deserialize(receivedCommunication));
                 _gameReceiver->receiveMessages(playerClient.playerId(), messages);
+            }
+
+            playerClient.client()->close();
+
+            std::lock_guard<std::mutex> lockPlayerClients(_playerClientsMutex);
+
+            int clientIndex = 0;
+            while (_playerClients[clientIndex]->playerId() != playerClient.playerId()) ++clientIndex;
+
+            if (clientIndex < _playerClients.size())
+            {
+                _playerClients.erase(_playerClients.begin() + clientIndex);
+                _clientWaiters.erase(_clientWaiters.begin() + clientIndex);
             }
         }
 
         std::mutex _playerClientsMutex;
         std::vector<std::shared_ptr<std::thread>> _clientWaiters;
-        std::vector<PlayerClient> _playerClients;
+        std::vector<std::shared_ptr<PlayerClient>> _playerClients;
         const std::shared_ptr<MessageSerializer> _messageSerializer;
         const std::shared_ptr<GameReceiver> _gameReceiver;
     };

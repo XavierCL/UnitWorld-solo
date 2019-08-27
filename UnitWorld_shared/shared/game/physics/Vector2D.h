@@ -22,10 +22,10 @@ namespace uw
         bool operator==(const Vector2D& other) const;
         const double module() const;
         const double moduleSq() const;
-        Vector2D& maxAt(const double& maxModule);
-        Vector2D& atModule(const double& module);
+        Vector2D maxAt(const double& maxModule) const;
+        Vector2D atModule(const double& module) const;
 
-        Vector2D divide(const double& divided, const double& max);
+        Vector2D divide(const double& divided, const double& max) const;
     private:
 
         double _x;

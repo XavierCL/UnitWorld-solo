@@ -87,6 +87,7 @@ namespace uw
                     _userControlState->setUserMousePosition(mousePosition);
                 }
             }
+            _userControlState->frameHappened();
         }
 
         void loopGraphics()

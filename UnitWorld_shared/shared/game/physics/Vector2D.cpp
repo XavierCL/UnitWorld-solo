@@ -80,32 +80,29 @@ const double uw::Vector2D::moduleSq() const
     return _x * _x + _y * _y;
 }
 
-Vector2D& uw::Vector2D::maxAt(const double & maxModule)
+Vector2D uw::Vector2D::maxAt(const double & maxModule) const
 {
     if (_x * _x + _y * _y > maxModule * maxModule)
     {
-        atModule(maxModule);
+        return atModule(maxModule);
     }
     return *this;
 }
 
-Vector2D& uw::Vector2D::atModule(const double & module)
+Vector2D uw::Vector2D::atModule(const double & module) const
 {
     if (module <= 0)
     {
-        _x = 0;
-        _y = 0;
+        return Vector2D(0, 0);
     }
     else
     {
         const auto modifier = sqrt((_x * _x + _y * _y) / (module * module));
-        _x /= modifier;
-        _y /= modifier;
+        return Vector2D(_x / modifier, _y / modifier);
     }
-    return *this;
 }
 
-Vector2D Vector2D::divide(const double& divided, const double& max)
+Vector2D Vector2D::divide(const double& divided, const double& max) const
 {
     auto xValue = _x == 0 ? max : divided / _x;
     if (abs(xValue) > max)

@@ -12,30 +12,15 @@ CommunicationHandler::CommunicationHandler(const std::shared_ptr<asio::ip::tcp::
 
 void CommunicationHandler::send(const std::string& message)
 {
-    try
-    {
-        asio::write(*_socket, asio::buffer(message));
-    }
-    catch (...)
-    {
-        // socket was likely closed
-    }
+    asio::write(*_socket, asio::buffer(message));
 }
 
 std::string CommunicationHandler::receive()
 {
-    try
-    {
-        _socket->read_some(asio::buffer(_receiveBuffer));
-        const std::string returnedBuffer(_receiveBuffer.c_str());
-        resetBufferUntilLastNonZero();
-        return returnedBuffer;
-    }
-    catch (...)
-    {
-        // socket was likely closed
-        return "";
-    }
+    _socket->read_some(asio::buffer(_receiveBuffer));
+    const std::string returnedBuffer(_receiveBuffer.c_str());
+    resetBufferUntilLastNonZero();
+    return returnedBuffer;
 }
 
 void CommunicationHandler::close()
