@@ -11,12 +11,13 @@ namespace uw
         Singuity(const Vector2D& position);
         Singuity(const Singuity& other);
 
+        double maximumHealthPoints() const;
+
     private:
         double maximumSpeed() const override;
         double maximumAcceleration() const override;
         unsigned long long shootTimelag() const override;
         double firePower() const override;
 
-        double maximumHealthPoints() const;
     };
 }

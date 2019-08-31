@@ -20,21 +20,45 @@ namespace uw
 
         void draw(std::shared_ptr<SFMLDrawingCanvas> canvas)
         {
-            const auto localPlayers = std::make_shared<immer::vector<std::shared_ptr<Player>>>(_gameManager->players());
+            auto completeGameState = _gameManager->completeGameState();
 
             std::shared_ptr<std::unordered_map<xg::Guid, size_t>> playerIndexByPlayerId(std::make_shared<std::unordered_map<xg::Guid, size_t>>());
-            for (size_t playerIndex = 0; playerIndex < localPlayers->size(); ++playerIndex)
+            for (size_t playerIndex = 0; playerIndex < completeGameState->players().size(); ++playerIndex)
             {
-                (*playerIndexByPlayerId)[(*localPlayers)[playerIndex]->id()] = playerIndex;
+                (*playerIndexByPlayerId)[(completeGameState->players())[playerIndex]->id()] = playerIndex;
             }
 
-            const auto currentPlayerSinguities = localPlayers
-                | filter<std::shared_ptr<Player>>([this](auto player) { return player->id() == _currentPlayerId; })
-                | flatMap<std::shared_ptr<Singuity>>([](auto player) { return player->singuities(); })
+            const auto currentPlayerSinguities = make_shared(completeGameState->players())
+                | filter<Player>([this](auto player) { return player.id() == _currentPlayerId; })
+                | flatMap<std::shared_ptr<Singuity>>([](auto player) { return player.singuities(); })
                 | toUnorderedMap<xg::Guid, std::shared_ptr<const Singuity>>([](const std::shared_ptr<const Singuity>& singuity) {
                     return singuity->id();
                 });
 
+            // Spawners
+            auto sharedSpawners(make_shared(completeGameState->spawners()));
+            sharedSpawners | forEach([&canvas, &playerIndexByPlayerId, this](std::shared_ptr<Spawner> spawner) {
+                auto spanwerOuterAndInnerColors = spawner->allegence().map<std::pair<sf::Color, sf::Color>>([&spawner, &playerIndexByPlayerId, this](SpawnerAllegence allegence) {
+                    auto playerFullColor = (playerIndexByPlayerId
+                        | find<size_t>(allegence.allegedPlayerId()))
+                        .map<sf::Color>([this](auto playerIndex) { return _playerColors[playerIndex]; })
+                        .getOrElse(sf::Color::Black);
+
+                    auto lifeRatio = allegence.healthPoint() / spawner->maxHealthPoint();
+                    sf::Color playerLifeColor(round(playerFullColor.r * lifeRatio), round(playerFullColor.g * lifeRatio), round(playerFullColor.b * lifeRatio));
+
+                    return std::make_pair(playerFullColor, playerLifeColor);
+                }).getOrElse(std::make_pair(sf::Color(70, 70, 70), sf::Color(70, 70, 70)));
+
+                const int circleRadius(20.0);
+                sf::CircleShape graphicalSpawner(circleRadius);
+                graphicalSpawner.setPosition(round(spawner->position().x() - circleRadius), round(spawner->position().y() - circleRadius));
+                graphicalSpawner.setFillColor(spanwerOuterAndInnerColors.second);
+                graphicalSpawner.setOutlineThickness(2.0);
+                graphicalSpawner.setOutlineColor(spanwerOuterAndInnerColors.first);
+                canvas->draw(graphicalSpawner);
+            });
+            
             // Last move units position
             _userControlState->getLastMoveUnitPosition().foreach([&canvas](const Vector2D& lastMoveUnitPosition) {
                 const int circleRadius(2.0);
@@ -57,7 +81,7 @@ namespace uw
             }
 
             // Units
-            for (auto player : *localPlayers)
+            for (auto player : completeGameState->players())
             {
                 sf::Color drawingSinguitiesColor = (playerIndexByPlayerId
                     | find<size_t>(player->id()))
@@ -77,7 +101,7 @@ namespace uw
                 sf::RectangleShape sfUserSelection(sf::Vector2f(userSelectionSize.x(), userSelectionSize.y()));
                 sfUserSelection.setPosition(userSelectionLowerRight.x(), userSelectionLowerRight.y());
                 sfUserSelection.setFillColor(sf::Color::Transparent);
-                sfUserSelection.setOutlineThickness(1);
+                sfUserSelection.setOutlineThickness(2.0);
                 canvas->draw(sfUserSelection);
             });
         }
