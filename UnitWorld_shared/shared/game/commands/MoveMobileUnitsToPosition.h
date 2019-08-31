@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/game/play/Player.h"
+#include "shared/game/play/CompleteGameState.h"
 
 namespace uw
 {
@@ -14,9 +14,9 @@ namespace uw
             _destination(destination)
         {}
 
-        void execute(const std::vector<std::shared_ptr<Player>>& players) const
+        void execute(std::shared_ptr<CompleteGameState> completeGameState) const
         {
-            for (auto player : players)
+            for (auto player : completeGameState->players())
             {
                 if (player->id() == _playerId)
                 {

@@ -164,7 +164,6 @@
     <ClCompile Include="shared\communication\messages\MoveMobileUnitsToPositionMessage.cpp" />
     <ClCompile Include="shared\communication\MessageWrapper.cpp" />
     <ClCompile Include="shared\configuration\ConfigurationManager.cpp" />
-    <ClCompile Include="shared\game\GameManager.cpp" />
     <ClCompile Include="shared\game\geometry\Rectangle.cpp" />
     <ClCompile Include="shared\game\physics\Vector2D.cpp" />
     <ClCompile Include="shared\game\play\MobileUnit.cpp" />
