@@ -111,10 +111,11 @@ namespace uw
 
             auto localPlayerClients(_playerClients);
 
-            const auto players = _gameManager->players();
+            const auto completeGameState = _gameManager->completeGameState();
 
             std::vector<CommunicatedPlayer> communicatedPlayers;
             std::vector<CommunicatedSinguity> communicatedSinguities;
+            std::vector<CommunicatedSpawner> communicatedSpawner;
             for (const auto player : players)
             {
                 communicatedPlayers.emplace_back(_physicsCommunicationAssembler->physicsPlayerToCommunicated(player));
