@@ -13,17 +13,30 @@ namespace uw
             _players(std::forward<std::vector<std::shared_ptr<Player>>>(players))
         {}
 
+        CompleteGameState(const CompleteGameState& copy)
+        {
+            for (const auto spawner : copy._spawners)
+            {
+                _spawners.emplace_back(*spawner);
+            }
+
+            for (const auto player : copy._players)
+            {
+                _players.emplace_back(*player);
+            }
+        }
+
         static CompleteGameState empty()
         {
             return CompleteGameState(std::vector<std::shared_ptr<Spawner>>(), std::vector<std::shared_ptr<Player>>());
         }
 
-        std::vector<std::shared_ptr<Player>> players() const
+        std::vector<std::shared_ptr<Player>>& players()
         {
             return _players;
         }
 
-        std::vector<std::shared_ptr<Spawner>> spawners() const
+        std::vector<std::shared_ptr<Spawner>>& spawners()
         {
             return _spawners;
         }

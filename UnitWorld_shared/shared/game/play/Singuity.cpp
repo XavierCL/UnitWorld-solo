@@ -31,10 +31,10 @@ double Singuity::maximumHealthPoints() const
 
 unsigned long long Singuity::shootTimelag() const
 {
-    return 10000000;
+    return 500000000;
 }
 
 double Singuity::firePower() const
 {
-    return 1.0;
+    return 5.0;
 }

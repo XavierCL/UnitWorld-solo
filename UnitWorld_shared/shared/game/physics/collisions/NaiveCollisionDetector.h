@@ -7,7 +7,7 @@ namespace uw
     class NaiveCollisionDetector: public CollisionDetector
     {
     public:
-        virtual void updateAllCollidablePoints(std::shared_ptr<std::vector<CollidablePoint>> collidablePoints) override
+        virtual void updateAllCollidablePoints(std::vector<CollidablePoint> collidablePoints) override
         {
             _points = collidablePoints;
         }
@@ -15,7 +15,7 @@ namespace uw
         virtual Option<xg::Guid> getClosest(const CollidablePoint& target) override
         {
             Option<CollidablePoint> closestPoint;
-            for (const auto& point : *_points)
+            for (const auto& point : _points)
             {
                 if (point.id() == target.id()) continue;
                 closestPoint = closestPoint.map<CollidablePoint>([&target, &point](const auto& currentClosestPoint) {
@@ -28,6 +28,6 @@ namespace uw
         }
 
     private:
-        std::shared_ptr<std::vector<CollidablePoint>> _points;
+        std::vector<CollidablePoint> _points;
     };
 }
