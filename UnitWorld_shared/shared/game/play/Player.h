@@ -18,9 +18,12 @@ namespace uw
         Player(const Player& other);
 
         xg::Guid id() const;
-        void actualize();
         void setSinguitiesDestination(const std::unordered_set<xg::Guid>& singuitiesId, const Vector2D& destination);
+        void addSinguity(std::shared_ptr<Singuity> newSinguity);
+        void setSinguities(std::shared_ptr<std::vector<std::shared_ptr<Singuity>>> singuities);
         std::shared_ptr<std::vector<std::shared_ptr<Singuity>>> singuities() const;
+
+        void OnSinguityAdded(const xg::Guid& callbackId, const std::function<void(std::shared_ptr<Singuity>)>& callback);
 
     private:
         const xg::Guid _id;

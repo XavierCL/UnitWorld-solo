@@ -5,43 +5,6 @@
 
 using namespace uw;
 
-void MobileUnit::actualize()
-{
-    _destination = _destination.filter([this](const Vector2D& destination) {
-        _isBreakingForDestination = position().distanceSq(destination) < stopDistanceFromTargetSq() | _isBreakingForDestination;
-        bool isReleaseBreakSpeed = _speed.moduleSq() < 0.01 * maximumSpeed() * maximumSpeed();
-
-        if (!_isBreakingForDestination)
-        {
-            setMaximalAcceleration(destination);
-            return true;
-        }
-        else if (!isReleaseBreakSpeed)
-        {
-            _acceleration = getBreakingAcceleration();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }).orExecute([this] {
-        _acceleration = getSlowBreakingAcceleration();
-        _isBreakingForDestination = false;
-    });
-
-    _externalForce.foreach([this](auto externalForce) {
-        _acceleration += externalForce.maxAt(maximumAcceleration());
-        _acceleration = _acceleration.maxAt(maximumAcceleration());
-    });
-
-    _externalForce = Options::None<Vector2D>();
-
-    _speed += _acceleration;
-    _speed = _speed.maxAt(maximumSpeed());
-    position(position() + _speed);
-}
-
 Vector2D MobileUnit::speed() const
 {
     return _speed;
@@ -57,41 +20,16 @@ bool MobileUnit::isBreakingForDestination() const
     return _isBreakingForDestination;
 }
 
-unsigned long long MobileUnit::lastShootTimestamp() const
-{
-    return _lastShootTimestamp;
-}
-
-double MobileUnit::healthPoints() const
-{
-    return _healthPoints;
-}
-
 void MobileUnit::setDestination(const Vector2D& destination)
 {
     _destination = Option<Vector2D>(destination);
     _isBreakingForDestination = false;
 }
 
-void MobileUnit::setExternalForce(const Vector2D& outwardForcePosition)
+void MobileUnit::clearDestination()
 {
-    _externalForce = outwardForcePosition;
-}
-
-void MobileUnit::shoot(std::shared_ptr<MobileUnit> unitWithHealthPoint, unsigned long long frameTimestamp)
-{
-    _lastShootTimestamp = frameTimestamp;
-    unitWithHealthPoint->loseHealthPoint(firePower());
-}
-
-bool MobileUnit::isDead() const
-{
-    return _healthPoints <= 0;
-}
-
-bool MobileUnit::canShoot() const
-{
-    return _lastShootTimestamp + shootTimelag() <= std::chrono::steady_clock::now().time_since_epoch().count();
+    _destination = Option<Vector2D>();
+    _isBreakingForDestination = false;
 }
 
 MobileUnit::MobileUnit(const MobileUnit & copy) :

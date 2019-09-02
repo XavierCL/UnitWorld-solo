@@ -11,7 +11,7 @@ namespace uw
     class CollisionDetector
     {
     public:
-        virtual void updateAllCollidablePoints(std::shared_ptr<std::vector<CollidablePoint>> collidablePoints) = 0;
+        virtual void updateAllCollidablePoints(const std::vector<CollidablePoint>& collidablePoint) = 0;
 
         virtual Option<xg::Guid> getClosest(const CollidablePoint& target) = 0;
     };

@@ -29,18 +29,6 @@ xg::Guid Player::id() const
     return _id;
 }
 
-void Player::actualize()
-{
-    _singuities = _singuities
-        | filter<std::shared_ptr<Singuity>>([](auto singuity) {return !singuity->isDead(); })
-        | toVector<std::shared_ptr<Singuity>>();
-
-    for (auto singuity : *_singuities)
-    {
-        singuity->actualize();
-    }
-}
-
 void Player::setSinguitiesDestination(const std::unordered_set<xg::Guid>& singuitiesId, const Vector2D& destination)
 {
     _singuities

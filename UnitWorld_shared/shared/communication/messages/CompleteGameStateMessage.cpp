@@ -6,15 +6,13 @@
 
 using namespace uw;
 
-CompleteGameStateMessage::CompleteGameStateMessage(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const xg::Guid& currentPlayerId) :
-    _players(players),
-    _singuities(singuities),
+CompleteGameStateMessage::CompleteGameStateMessage(const CommunicatedCompleteGameState& completeGameState, const xg::Guid& currentPlayerId) :
+    _completeGameState(completeGameState),
     _currentPlayerId(currentPlayerId)
 {}
 
 CompleteGameStateMessage::CompleteGameStateMessage(const std::string jsonData) :
-    _players(jsonDataToPlayers(jsonData)),
-    _singuities(jsonDataToSinguities(jsonData)),
+    _completeGameState(jsonDataToCompleteGameState(jsonData)),
     _currentPlayerId(jsonDataToCurrentPlayerId(jsonData))
 {}
 
@@ -25,35 +23,17 @@ MessageType CompleteGameStateMessage::messageType() const
 
 std::string CompleteGameStateMessage::toJsonData() const
 {
-    nlohmann::json playerJsons;
-    for (const auto& communicatedPlayer : _players)
-    {
-        playerJsons.emplace_back(nlohmann::json::parse(communicatedPlayer.toJson()));
-    }
-
-    nlohmann::json singuityJsons;
-    for (const auto& communicatedSinguity : _singuities)
-    {
-        singuityJsons.emplace_back(nlohmann::json::parse(communicatedSinguity.toJson()));
-    }
-
     nlohmann::json jsonData = {
-        {"players", playerJsons},
-        {"singuities", singuityJsons},
+        {"complete-game-state", nlohmann::json::parse(_completeGameState.toJson())},
         {"currentPlayerId", _currentPlayerId.str()}
     };
 
     return jsonData.dump();
 }
 
-std::vector<CommunicatedPlayer> CompleteGameStateMessage::getPlayers() const
+CommunicatedCompleteGameState CompleteGameStateMessage::completeGameState() const
 {
-    return _players;
-}
-
-std::vector<CommunicatedSinguity> CompleteGameStateMessage::getSinguities() const
-{
-    return _singuities;
+    return _completeGameState;
 }
 
 xg::Guid CompleteGameStateMessage::getCurrentPlayerId() const
@@ -61,30 +41,11 @@ xg::Guid CompleteGameStateMessage::getCurrentPlayerId() const
     return _currentPlayerId;
 }
 
-std::vector<CommunicatedPlayer> CompleteGameStateMessage::jsonDataToPlayers(const std::string& jsonData)
+CommunicatedCompleteGameState CompleteGameStateMessage::jsonDataToCompleteGameState(const std::string& jsonData)
 {
     nlohmann::json parsedData = nlohmann::json::parse(jsonData);
 
-    std::vector<CommunicatedPlayer> players;
-    for (const auto player : parsedData.at("players"))
-    {
-        players.emplace_back(CommunicatedPlayer::fromJson(player.dump()));
-    }
-
-    return players;
-}
-
-std::vector<CommunicatedSinguity> CompleteGameStateMessage::jsonDataToSinguities(const std::string& jsonData)
-{
-    nlohmann::json parsedData = nlohmann::json::parse(jsonData);
-
-    std::vector<CommunicatedSinguity> singuities;
-    for (const auto singuity : parsedData.at("singuities"))
-    {
-        singuities.emplace_back(CommunicatedSinguity::fromJson(singuity.dump()));
-    }
-
-    return singuities;
+    return CommunicatedCompleteGameState::fromJson(parsedData.at("complete-game-state").dump());
 }
 
 xg::Guid CompleteGameStateMessage::jsonDataToCurrentPlayerId(const std::string& jsonData)

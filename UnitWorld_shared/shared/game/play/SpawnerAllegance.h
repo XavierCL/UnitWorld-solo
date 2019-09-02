@@ -8,10 +8,35 @@ namespace uw
     {
     public:
 
-        bool isClaimed() const;
+        SpawnerAllegence(const bool& isClaimed, const double& healthPoint, const xg::Guid& playerId) :
+            _isClaimed(isClaimed),
+            _healthPoint(healthPoint),
+            _allegedPlayerId(playerId)
+        {}
 
-        double healthPoint() const;
+        bool isClaimed() const
+        {
+            return _isClaimed;
+        }
 
-        xg::Guid allegedPlayerId() const;
+        double healthPoint() const
+        {
+            return _healthPoint;
+        }
+
+        xg::Guid allegedPlayerId() const
+        {
+            return _allegedPlayerId;
+        }
+
+        SpawnerAllegence loseHealthPoint(const double& healthPoint) const
+        {
+            return SpawnerAllegence(_isClaimed, _healthPoint - healthPoint, _allegedPlayerId);
+        }
+
+    private:
+        const bool _isClaimed;
+        const double _healthPoint;
+        const xg::Guid& _allegedPlayerId;
     };
 }

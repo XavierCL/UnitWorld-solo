@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../physics/Vector2D.h"
+#include "shared/game/geometry/Vector2D.h"
 
 #include "commons/Guid.hpp"
 
@@ -10,8 +10,6 @@ namespace uw
     {
     public:
         xg::Guid id() const;
-
-        virtual void actualize() = 0;
 
         Vector2D position() const;
         void position(const Vector2D& newPosition);
