@@ -9,7 +9,8 @@ using namespace uw;
 
 ConfigurationManager::ConfigurationManager(const std::string& fileName):
     _serverIp(Options::None<std::string>()),
-    _serverPort(Options::None<std::string>())
+    _serverPort(Options::None<std::string>()),
+    _firstSpawners()
 {
     std::ifstream configurationFile(fileName);
     const auto jsonConfiguration(nlohmann::json::parse(configurationFile, nullptr, false));
@@ -23,6 +24,14 @@ ConfigurationManager::ConfigurationManager(const std::string& fileName):
     {
         _serverPort = Options::Some(jsonConfiguration.at("server port").get<std::string>());
     }
+
+    if (jsonConfiguration.contains("spawners"))
+    {
+        for (const auto& jsonSpawner : jsonConfiguration.at("spawners"))
+        {
+            _firstSpawners.emplace_back(jsonSpawner.at("x").get<double>(), jsonSpawner.at("y").get<double>());
+        }
+    }
 }
 
 std::string ConfigurationManager::serverIpOrDefault(const std::string& defaultValue) const
@@ -33,4 +42,9 @@ std::string ConfigurationManager::serverIpOrDefault(const std::string& defaultVa
 std::string ConfigurationManager::serverPortOrDefault(const std::string& defaultValue) const
 {
     return _serverPort.getOrElse(defaultValue);
+}
+
+std::vector<Vector2D> ConfigurationManager::firstSpawners() const
+{
+    return _firstSpawners;
 }

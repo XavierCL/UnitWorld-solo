@@ -25,12 +25,18 @@ namespace uw
             _nextAddPlayer(nullptr)
         {}
 
-        void setNextPlayer(std::shared_ptr<Player> newPlayer)
+        void setNextPlayer(std::shared_ptr<Player> newPlayer, const std::vector<std::shared_ptr<Spawner>>& spawners)
         {
-            auto oldStoredValue = _nextAddPlayer.exchange(new Player(*newPlayer));
-            if (oldStoredValue)
+            auto oldStoredPlayer = _nextAddPlayer.exchange(new Player(*newPlayer));
+            if (oldStoredPlayer)
             {
-                delete oldStoredValue;
+                delete oldStoredPlayer;
+            }
+
+            auto oldStoredSpawners = _nextAddSpawners.exchange(new std::vector<std::shared_ptr<Spawner>>(spawners));
+            if (oldStoredSpawners)
+            {
+                delete oldStoredSpawners;
             }
         }
 
@@ -103,6 +109,13 @@ namespace uw
                 workingGameState->addPlayer(std::shared_ptr<Player>(newPlayer));
             }
 
+            auto newSpawners = _nextAddSpawners.exchange(nullptr);
+            if (newSpawners)
+            {
+                workingGameState->addSpawners(*newSpawners);
+                delete newSpawners;
+            }
+
             const auto truthCompleteGameState = _nextCompleteGameState.exchange(nullptr);
             if (truthCompleteGameState)
             {
@@ -149,6 +162,7 @@ namespace uw
         static const unsigned int PHISICS_FRAME_PER_SECOND;
 
         std::atomic<Player*> _nextAddPlayer;
+        std::atomic<std::vector<std::shared_ptr<Spawner>>*> _nextAddSpawners;
         std::mutex _nextCommandsMutex;
         std::vector<std::shared_ptr<MoveMobileUnitsToPosition>> _nextCommands;
         std::atomic<CompleteGameState*> _nextCompleteGameState;
