@@ -168,7 +168,8 @@ struct FunctionalDefinitions
         template <typename InputCollection>
         void operator() (InputCollection input) const
         {
-            for (const auto inputValue : *input)
+            auto inputCopy = input;
+            for (const auto inputValue : *inputCopy)
             {
                 _action(inputValue);
             }
@@ -176,6 +177,33 @@ struct FunctionalDefinitions
 
     private:
         const Action _action;
+    };
+
+    template<typename Found, typename Predicate>
+    struct First
+    {
+        First(const Predicate& predicate) :
+            _predicate(predicate)
+        {}
+
+        using Output = Option<Found>;
+
+        template <typename InputCollection>
+        Output operator() (InputCollection input) const
+        {
+            auto inputCopy = input;
+            for (auto inputValue : *inputCopy)
+            {
+                if (_predicate(inputValue))
+                {
+                    return Options::Some(inputValue);
+                }
+            }
+            return Options::None<Found>();
+        }
+
+    private:
+        const Predicate _predicate;
     };
 
     template<typename Found, typename Value>
@@ -242,7 +270,8 @@ struct FunctionalDefinitions
         Output operator()(InputCollection input) const
         {
             auto generatedMap(std::make_shared<std::unordered_map<Key, Value, KeyHash, KeyEqual>>());
-            for (const auto value : *input)
+            auto inputCopy = input;
+            for (const auto value : *inputCopy)
             {
                 (*generatedMap)[_keySelector(value)] = _valueSelector(value);
             }
@@ -267,7 +296,8 @@ struct FunctionalDefinitions
         Output operator()(InputCollection input) const
         {
             auto generatedMap(std::make_shared<std::unordered_map<Key, std::vector<Value>, KeyHash, KeyEqual>>());
-            for (const auto& value : *input)
+            auto inputCopy = input;
+            for (const auto& value : *inputCopy)
             {
                 (*generatedMap)[_keySelector(value)].push_back(value);
             }
@@ -352,6 +382,12 @@ template <typename Action>
 FunctionalDefinitions::ForEach<Action> forEach(const Action& action)
 {
     return FunctionalDefinitions::ForEach<Action>(action);
+}
+
+template <typename Found, typename Predicate>
+FunctionalDefinitions::First<Found, Predicate> first(const Predicate& predicate)
+{
+    return FunctionalDefinitions::First<Found, Predicate>(predicate);
 }
 
 template <typename Found, typename Value>

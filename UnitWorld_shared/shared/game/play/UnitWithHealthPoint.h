@@ -28,10 +28,17 @@ namespace uw
             return _healthPoint <= 0.0;
         }
 
+        double healthPoint() const
+        {
+            return _healthPoint;
+        }
+
         virtual void loseHealthPoint(const double& healthPoint)
         {
             _healthPoint -= healthPoint;
         }
+
+        virtual double maximumHealthPoint() const = 0;
 
     private:
 

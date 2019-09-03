@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Vector2D.h"
+#include "shared/game/geometry/Vector2D.h"
 
 #include "commons/Guid.hpp"
 
@@ -30,7 +30,7 @@ namespace uw
         }
 
     private:
-        const xg::Guid _id;
-        const Vector2D _position;
+        xg::Guid _id;
+        Vector2D _position;
     };
 }

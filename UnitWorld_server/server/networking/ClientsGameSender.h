@@ -59,7 +59,7 @@ namespace uw
 
     private:
 
-        void onGameManagerHasPlayerInput(const immer::vector<std::shared_ptr<Player>>& players)
+        void onGameManagerHasPlayerInput(std::shared_ptr<const CompleteGameState> completeGameState)
         {
             std::thread([this] { sendCompleteState(); }).detach();
         }
@@ -92,8 +92,7 @@ namespace uw
             {
                 std::lock_guard<std::mutex> playerClientsModificationGuard(_updatePlayerClients);
 
-                const auto sharedPlayerClients = std::make_shared<immer::vector<PlayerClient>>(_playerClients);
-                const auto openClients = sharedPlayerClients | filter<PlayerClient>([](const PlayerClient& playerClient) {
+                const auto openClients = &_playerClients | filter<PlayerClient>([](const PlayerClient& playerClient) {
                     if (!playerClient.client()->isOpen())
                     {
                         Logger::info("client " + playerClient.client()->prettyName() + " was no longer open while sending complete state, removing it from the sending list");
@@ -113,20 +112,11 @@ namespace uw
 
             const auto completeGameState = _gameManager->completeGameState();
 
-            std::vector<CommunicatedPlayer> communicatedPlayers;
-            std::vector<CommunicatedSinguity> communicatedSinguities;
-            std::vector<CommunicatedSpawner> communicatedSpawner;
-            for (const auto player : players)
-            {
-                communicatedPlayers.emplace_back(_physicsCommunicationAssembler->physicsPlayerToCommunicated(player));
-                const auto assembledPlayerSinguities(_physicsCommunicationAssembler->physicsPlayerToCommunicatedSinguities(player));
-
-                std::copy(assembledPlayerSinguities.begin(), assembledPlayerSinguities.end(), std::back_inserter(communicatedSinguities));
-            }
+            CommunicatedCompleteGameState communicatedCompleteGameState(_physicsCommunicationAssembler->physicsCompleteGameStateToCommunicated(completeGameState));
 
             for (auto playerClient : localPlayerClients)
             {
-                const auto message = MessageWrapper(std::make_shared<CompleteGameStateMessage>(communicatedPlayers, communicatedSinguities, playerClient.playerId()));
+                const auto message = MessageWrapper(std::make_shared<CompleteGameStateMessage>(communicatedCompleteGameState, playerClient.playerId()));
                 try
                 {
                     playerClient.client()->send(_messageSerializer->serialize(std::vector<MessageWrapper>(1, message)));

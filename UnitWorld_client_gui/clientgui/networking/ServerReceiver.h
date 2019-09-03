@@ -25,8 +25,7 @@ namespace uw
             _serverHandler(serverHandler),
             _gameManager(gameManager),
             _physicsCommunicationAssembler(physicsCommunicationAssembler),
-            _messageSerializer(messageSerializer),
-            _lastCurrentPlayerId()
+            _messageSerializer(messageSerializer)
         {}
 
         void stop()
@@ -52,11 +51,6 @@ namespace uw
                     Logger::error("Error while receiving from the server socket the socket is likely closed. Error message: " + std::string(error.what()));
                 }
             });
-        }
-
-        Option<xg::Guid> lastCurrentPlayerId() const
-        {
-            return _lastCurrentPlayerId;
         }
 
     private:
@@ -94,26 +88,12 @@ namespace uw
         void handleServerMessage(std::shared_ptr<const Message> message)
         {
             const auto completeStateMessage(std::dynamic_pointer_cast<CompleteGameStateMessage const>(message));
+            const auto currentPlayerId = completeStateMessage->getCurrentPlayerId();
 
-            _lastCurrentPlayerId = Options::Some(completeStateMessage->getCurrentPlayerId());
-
-            auto singuitiesByPlayerId(std::make_shared<std::vector<CommunicatedSinguity>>(completeStateMessage->getSinguities())
-                | groupBy<xg::Guid, CommunicatedSinguity>([](const CommunicatedSinguity& singuity) { return singuity.playerId(); }));
-
-            auto players(make_shared(completeStateMessage->getPlayers())
-                | map<std::shared_ptr<Player>>([this, &singuitiesByPlayerId](const CommunicatedPlayer& player) {
-                    auto singuities = (*singuitiesByPlayerId)[player.playerId()];
-                    return _physicsCommunicationAssembler->communicatedPlayerToPhysics(player, immer::vector<CommunicatedSinguity>(singuities.begin(), singuities.end()));
-                }));
-
-            const immer::vector<std::shared_ptr<Player>> nextPlayers(players->begin(), players->end());
-
-            _gameManager->setNextPlayers(nextPlayers);
+            _gameManager->setNextPlayers(_physicsCommunicationAssembler->communicatedCompleteGameStateToPhysics(completeStateMessage->completeGameState()), currentPlayerId);
         }
 
         std::thread _receiveThread;
-
-        Option<xg::Guid> _lastCurrentPlayerId;
 
         const std::shared_ptr<CommunicationHandler> _serverHandler;
         const std::shared_ptr<GameManager> _gameManager;

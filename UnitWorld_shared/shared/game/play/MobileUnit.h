@@ -30,10 +30,13 @@ namespace uw
 
     protected:
         MobileUnit(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<Vector2D>& destination, const bool& isBreakingForDestination);
+        MobileUnit(const Vector2D& position, const Vector2D& speed);
         MobileUnit(const Vector2D& position);
         MobileUnit(const MobileUnit& copy);
 
     private:
+
+        double stopDistanceFromTarget() const;
 
         Option<Vector2D> _destination;
         Vector2D _speed;

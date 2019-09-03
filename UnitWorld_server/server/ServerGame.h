@@ -3,6 +3,8 @@
 #include "networking/ClientsGameSender.h"
 #include "networking/ClientsReceiver.h"
 
+#include "shared/game/physics/PhysicsManager.h"
+
 #include "shared/game/GameManager.h"
 
 namespace uw
@@ -10,15 +12,16 @@ namespace uw
     class ServerGame {
     public:
 
-        ServerGame(std::shared_ptr<GameManager> gameManager, std::shared_ptr<ClientsGameSender> clientGameSender, std::shared_ptr<ClientsReceiver> clientsReceiver) :
+        ServerGame(std::shared_ptr<GameManager> gameManager, std::shared_ptr<PhysicsManager> physicsManager, std::shared_ptr<ClientsGameSender> clientGameSender, std::shared_ptr<ClientsReceiver> clientsReceiver) :
             _gameManager(gameManager),
+            _physicsManager(physicsManager),
             _clientGameSender(clientGameSender),
             _clientsReceiver(clientsReceiver)
         {}
 
         void addClient(std::shared_ptr<CommunicationHandler> communicationHandler)
         {
-            const auto playerCount = _gameManager->players().size();
+            const auto playerCount = _gameManager->completeGameState()->players().size();
             auto newPlayer(std::make_shared<Player>(xg::newGuid(), generatePlayerSinguities(playerCount)));
             const PlayerClient playerClient(newPlayer->id(), communicationHandler);
 
@@ -29,7 +32,7 @@ namespace uw
 
         void startAsync()
         {
-            _gameManager->startAsync();
+            _physicsManager->startAsync();
             _clientGameSender->startAsync();
         }
 
@@ -37,7 +40,7 @@ namespace uw
         {
             _clientsReceiver->stop();
             _clientGameSender->stop();
-            _gameManager->stop();
+            _physicsManager->stop();
         }
 
     private:
@@ -56,6 +59,7 @@ namespace uw
         }
 
         const std::shared_ptr<GameManager> _gameManager;
+        const std::shared_ptr<PhysicsManager> _physicsManager;
         const std::shared_ptr<ClientsGameSender> _clientGameSender;
         const std::shared_ptr<ClientsReceiver> _clientsReceiver;
     };

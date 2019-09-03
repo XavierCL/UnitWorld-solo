@@ -52,7 +52,7 @@ CommunicatedCompleteGameState CommunicatedCompleteGameState::fromJson(const std:
     std::vector<CommunicatedSinguity> singuities;
     for (const auto& parsedSinguity : parsedJson.at("singuities"))
     {
-        players.emplace_back(CommunicatedSinguity::fromJson(parsedSinguity.dump()));
+        singuities.emplace_back(CommunicatedSinguity::fromJson(parsedSinguity.dump()));
     }
 
     std::vector<CommunicatedSpawner> spawners;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Vector2D.h"
+#include "shared/game/geometry/Vector2D.h"
 #include "CollidablePoint.h"
 
 #include "commons/Guid.hpp"

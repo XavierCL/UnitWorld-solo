@@ -99,17 +99,27 @@ namespace uw
         // It creates an allegence if none and adds up to the spawner life
         // it does nothing and returns false if the spawner life is already at max
 
+        double maximumHealthPoint() const override
+        {
+            return 2000.0;
+        }
+
+        unsigned long long lastSpawnTimestamp() const
+        {
+            return _lastSpawnTimestamp;
+        }
+
+        unsigned long long totalSpawnedCount() const
+        {
+            return _totalSpawnedCount;
+        }
+
     private:
         static std::vector<Vector2D> UNIT_SPAWN_DIRECTION;
 
         static unsigned long long spawnTimeLag()
         {
             return 1000000000;
-        }
-
-        static double maximumHealthPoint()
-        {
-            return 2000.0;
         }
 
         Option<SpawnerAllegence> _allegence;

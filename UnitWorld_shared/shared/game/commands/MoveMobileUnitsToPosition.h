@@ -2,15 +2,17 @@
 
 #include "shared/game/play/CompleteGameState.h"
 
+#include <immer/set.hpp>
+
 namespace uw
 {
     class MoveMobileUnitsToPosition
     {
     public:
 
-        MoveMobileUnitsToPosition(const xg::Guid& playerId, const std::vector<xg::Guid>& singuityIds, const Vector2D& destination) :
+        MoveMobileUnitsToPosition(const xg::Guid& playerId, const immer::set<xg::Guid>& singuityIds, const Vector2D& destination) :
             _playerId(playerId),
-            _singuityIds(singuityIds.begin(), singuityIds.end()),
+            _singuityIds(singuityIds),
             _destination(destination)
         {}
 
@@ -28,7 +30,7 @@ namespace uw
 
     private:
         const xg::Guid _playerId;
-        const std::unordered_set<xg::Guid> _singuityIds;
+        const immer::set<xg::Guid> _singuityIds;
         const Vector2D _destination;
     };
 }

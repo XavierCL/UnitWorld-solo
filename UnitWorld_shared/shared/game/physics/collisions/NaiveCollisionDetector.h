@@ -7,7 +7,7 @@ namespace uw
     class NaiveCollisionDetector: public CollisionDetector
     {
     public:
-        virtual void updateAllCollidablePoints(std::vector<CollidablePoint> collidablePoints) override
+        virtual void updateAllCollidablePoints(const std::vector<CollidablePoint>& collidablePoints) override
         {
             _points = collidablePoints;
         }

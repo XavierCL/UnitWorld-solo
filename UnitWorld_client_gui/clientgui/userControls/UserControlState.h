@@ -4,7 +4,7 @@
 
 #include "shared/game/GameManager.h"
 
-#include "shared/game/physics/Vector2D.h"
+#include "shared/game/geometry/Vector2D.h"
 #include "shared/game/geometry/Rectangle.h"
 
 #include "commons/Option.hpp"
@@ -46,11 +46,12 @@ namespace uw
                 _leftMouseDownPosition->foreach([this, position](const Vector2D& leftMouseDownPosition) {
                     const auto selectionRectangle(Rectangle(leftMouseDownPosition, position));
 
-                    _selectedUnits = std::make_shared<immer::vector<std::shared_ptr<const Singuity>>>(_gameManager->singuities())
-                        | filter<std::shared_ptr<const Singuity>>([this, &selectionRectangle](const std::shared_ptr<const Singuity>& singuity) {
-                        return selectionRectangle.contains(singuity->position());
-                    }) | map<xg::Guid>([](const std::shared_ptr<const Singuity>& singuity) { return singuity->id(); })
-                        | toVector<xg::Guid>();
+                    _selectedUnits = _gameManager->currentPlayer().map<std::shared_ptr<std::vector<xg::Guid>>>([&selectionRectangle](std::shared_ptr<Player> player) {
+                        return player->singuities() | filter<std::shared_ptr<Singuity>>([&selectionRectangle](std::shared_ptr<Singuity> singuity) {
+                            return selectionRectangle.contains(singuity->position());
+                        }) | map<xg::Guid>([](std::shared_ptr<Singuity> singuity) { return singuity->id(); })
+                            | toVector<xg::Guid>();
+                    }).getOrElse(std::make_shared<std::vector<xg::Guid>>());
                 });
             });
         }

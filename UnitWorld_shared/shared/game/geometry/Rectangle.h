@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../physics/Vector2D.h"
+#include "shared/game/geometry/Vector2D.h"
 
 namespace uw
 {

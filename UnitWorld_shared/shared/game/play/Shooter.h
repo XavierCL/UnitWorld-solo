@@ -19,7 +19,7 @@ namespace uw
             _lastShootTimestamp(lastShootTimestamp)
         {}
 
-        Shooter(const xg::Guid& id, const Vector2D& position, unsigned long long& lastShootTimestamp) :
+        Shooter(const xg::Guid& id, const Vector2D& position, const unsigned long long& lastShootTimestamp) :
             Unit(id, position),
             _lastShootTimestamp(lastShootTimestamp)
         {}
