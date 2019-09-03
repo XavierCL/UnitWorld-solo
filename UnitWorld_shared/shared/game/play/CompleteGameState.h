@@ -56,6 +56,11 @@ namespace uw
             _players.push_back(player);
         }
 
+        void addSpawners(const std::vector<std::shared_ptr<Spawner>>& spawners)
+        {
+            _spawners.insert(_spawners.end(), spawners.begin(), spawners.end());
+        }
+
     private:
         std::vector<std::shared_ptr<Spawner>> _spawners;
         std::vector<std::shared_ptr<Player>> _players;
