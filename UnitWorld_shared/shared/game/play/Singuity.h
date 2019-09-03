@@ -14,6 +14,9 @@ namespace uw
         Singuity(const Vector2D& position);
         Singuity(const Singuity& other);
 
+        static Singuity spawn(const Vector2D& position, const Vector2D& speed);
+        static double spawnSpeed();
+
         double maximumSpeed() const override;
         double maximumAcceleration() const override;
         double maximumHealthPoint() const override;

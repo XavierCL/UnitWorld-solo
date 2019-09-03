@@ -104,15 +104,8 @@ Vector2D uw::Vector2D::atModule(const double & module) const
 
 Vector2D Vector2D::divide(const double& divided, const double& max) const
 {
-    auto xValue = _x == 0 ? max : divided / _x;
-    if (abs(xValue) > max)
-    {
-        xValue *= max / abs(xValue);
-    }
-    auto yValue = _y == 0 ? max : divided / _y;
-    if (abs(xValue) > max)
-    {
-        xValue *= max / abs(xValue);
-    }
-    return Vector2D(xValue, yValue);
+    return Vector2D(
+        _x == 0 ? 0.0 : fmax(fmin(divided / _x, max), -max),
+        _y == 0 ? 0.0 : fmax(fmin(divided / _y, max), -max)
+    );
 }

@@ -13,6 +13,7 @@ namespace uw
     {
     public:
         PhysicsManager(std::shared_ptr<GameManager> gameManager, std::shared_ptr<CollisionDetectorFactory> collisionDetectorFactory):
+            _gameManager(gameManager),
             _msPerFrame(1000 / PHISICS_FRAME_PER_SECOND),
             _isRunning(true),
             _collisionDetectorsByPlayerId(std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>>()),
@@ -70,7 +71,6 @@ namespace uw
                     return player->id();
                 });
 
-
                 auto shootablesById(std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>>());
                 for (auto player : workingPlayers)
                 {
@@ -85,18 +85,8 @@ namespace uw
                     shootablesById->emplace(std::make_pair<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>(spawner->id(), spawner));
                 }
 
-                for (auto spawner : workingSpawners)
-                {
-                    spawner->allegence().foreach([&collidablePointsByPlayerId, spawner](const SpawnerAllegence& allegence) {
-                        collidablePointsByPlayerId[allegence.allegedPlayerId()].emplace_back(spawner->id(), spawner->position());
-                    }).orExecute([&neutralCollidablePoints, spawner]() {
-                        neutralCollidablePoints.emplace_back(spawner->id(), spawner->position());
-                    });
-                }
-
                 for (unsigned int workingPlayerIndex = 0; workingPlayerIndex < workingPlayers.size(); ++workingPlayerIndex)
                 {
-                    workingPlayers[workingPlayerIndex] = std::make_shared<Player>(*workingPlayers[workingPlayerIndex]);
                     if (_collisionDetectorsByPlayerId->count(workingPlayers[workingPlayerIndex]->id()) == 0)
                     {
                         (*_collisionDetectorsByPlayerId)[workingPlayers[workingPlayerIndex]->id()] = _collisionDetectorFactory->create();
@@ -117,10 +107,6 @@ namespace uw
 
                 for (auto player : workingPlayers)
                 {
-                    for (auto singuity : *player->singuities())
-                    {
-                        collidablePointsByPlayerId[player->id()].emplace_back(singuity->id(), singuity->position());
-                    }
                     _collisionDetectorsByPlayerId->at(player->id())->updateAllCollidablePoints(collidablePointsByPlayerId[player->id()]);
                 }
 

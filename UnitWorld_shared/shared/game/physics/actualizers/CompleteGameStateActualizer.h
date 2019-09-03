@@ -26,17 +26,17 @@ namespace uw
 
         void updateShootingAndPhysicsPredictions(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<CollisionDetector> neutralCollisionDetector, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
         {
-            for (auto& playerActualizer : _playerActualizers)
+            for (auto playerActualizer : _playerActualizers)
             {
-                playerActualizer.updateShootingAndRepulsionForces(collisionDetectorsByPlayerId, neutralCollisionDetector, shootablesById, frameTimestamp);
+                playerActualizer->updateShootingAndRepulsionForces(collisionDetectorsByPlayerId, neutralCollisionDetector, shootablesById, frameTimestamp);
             }
         }
 
         void updatePhysics()
         {
-            for (auto& playerActualizer : _playerActualizers)
+            for (auto playerActualizer : _playerActualizers)
             {
-                playerActualizer.removeSinguitiesAndUpdateTheirPhysics();
+                playerActualizer->removeSinguitiesAndUpdateTheirPhysics();
             }
         }
 
@@ -61,19 +61,19 @@ namespace uw
             return *spawnerActualizers;
         }
 
-        static std::vector<PlayerActualizer> initializePlayerActualizers(std::shared_ptr<CompleteGameState> completeGameState)
+        static std::vector<std::shared_ptr<PlayerActualizer>> initializePlayerActualizers(std::shared_ptr<CompleteGameState> completeGameState)
         {
             auto playerActualizers =
                 &completeGameState->players()
-                | map<PlayerActualizer>([](std::shared_ptr<Player> player) {
-                return PlayerActualizer(player);
-            }) | toVector<PlayerActualizer>();
+                | map<std::shared_ptr<PlayerActualizer>>([](std::shared_ptr<Player> player) {
+                return std::make_shared<PlayerActualizer>(player);
+            }) | toVector<std::shared_ptr<PlayerActualizer>>();
 
             return *playerActualizers;
         }
 
         const std::shared_ptr<CompleteGameState> _completeGameState;
         std::vector<SpawnerActualizer> _spawnerActualizers;
-        std::vector<PlayerActualizer> _playerActualizers;
+        std::vector<std::shared_ptr<PlayerActualizer>> _playerActualizers;
     };
 }
