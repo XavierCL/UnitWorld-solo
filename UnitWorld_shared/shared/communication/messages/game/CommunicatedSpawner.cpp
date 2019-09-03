@@ -6,14 +6,14 @@ using namespace uw;
 
 std::string CommunicatedSpawner::toJson() const
 {
-    std::string allegenceData = _allegence.map<std::string>([](const CommunicatedSpawnerAllegence& allegence) {
-        return allegence.toJson();
-    }).getOrElse([] { return "none"; });
+    nlohmann::json allegenceData = _allegence.map<nlohmann::json>([](const CommunicatedSpawnerAllegence& allegence) {
+        return nlohmann::json::parse(allegence.toJson());
+    }).getOrElse([] { return nlohmann::json("none"); });
 
     nlohmann::json jsonData = {
         {"id", _id.str()},
         {"position", nlohmann::json::parse(_position.toJson())},
-        {"allegence", nlohmann::json::parse(allegenceData)},
+        {"allegence", allegenceData},
         {"last-spawn-timestamp", _lastSpawnTimestamp},
         {"total-spawned-count", _totalSpawnedCount}
     };

@@ -154,6 +154,8 @@
     <ClInclude Include="shared\game\physics\collisions\CollisionDetector.h" />
     <ClInclude Include="shared\game\physics\collisions\CollisionDetectorFactory.h" />
     <ClInclude Include="shared\game\physics\actualizers\SinguityActualizer.h" />
+    <ClInclude Include="shared\game\physics\collisions\KdtreeCollisionDetector.h" />
+    <ClInclude Include="shared\game\physics\collisions\KdtreeCollisionDetectorFactory.h" />
     <ClInclude Include="shared\game\physics\collisions\NaiveCollisionDetector.h" />
     <ClInclude Include="shared\game\physics\collisions\NaiveCollisionDetectorFactory.h" />
     <ClInclude Include="shared\game\physics\PhysicsManager.h" />
