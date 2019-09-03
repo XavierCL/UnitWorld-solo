@@ -129,6 +129,12 @@
     <ClInclude Include="shared\communication\messages\game\CommunicatedSpawnerAllegence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="shared\game\physics\collisions\KdtreeCollisionDetector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\collisions\KdtreeCollisionDetectorFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="shared\communication\MessageWrapper.cpp">

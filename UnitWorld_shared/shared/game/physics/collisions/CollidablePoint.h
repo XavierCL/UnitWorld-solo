@@ -9,6 +9,11 @@ namespace uw
     class CollidablePoint
     {
     public:
+        CollidablePoint() :
+            _id(),
+            _position()
+        {}
+
         CollidablePoint(const xg::Guid& id, const Vector2D& position) :
             _id(id),
             _position(position)
