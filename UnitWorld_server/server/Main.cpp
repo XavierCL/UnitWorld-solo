@@ -1,7 +1,7 @@
 #include "ServerGame.h"
 
 #include "shared/game/GameManager.h"
-#include "shared/game/physics/NaiveCollisionDetectorFactory.h"
+#include "shared/game/physics/collisions/NaiveCollisionDetectorFactory.h"
 #include "shared/configuration/ConfigurationManager.h"
 
 #include "communications/ServerConnector.h"
@@ -28,9 +28,10 @@ int main()
 
     const std::string serverPort = configurationManager.serverPortOrDefault(DEFAULT_SERVER_PORT);
 
-    const auto naiveCollisionDetectorFactory(std::make_shared<NaiveCollisionDetectorFactory>());
+    const auto gameManager(std::make_shared<GameManager>());
 
-    const auto gameManager(std::make_shared<GameManager>(naiveCollisionDetectorFactory));
+    const auto naiveCollisionDetectorFactory(std::make_shared<NaiveCollisionDetectorFactory>());
+    const auto physicsManager(std::make_shared<PhysicsManager>(gameManager, naiveCollisionDetectorFactory));
 
     const auto messageSerializer(std::make_shared<MessageSerializer>());
     const auto physicsCommunicationAssembler(std::make_shared<PhysicsCommunicationAssembler>());
@@ -39,7 +40,7 @@ int main()
     const auto gameReceiver(std::make_shared<GameReceiver>(gameManager, physicsCommunicationAssembler));
     const auto clientsReceiver(std::make_shared<ClientsReceiver>(messageSerializer, gameReceiver));
 
-    ServerGame serverGame(gameManager, clientsGameSender, clientsReceiver);
+    ServerGame serverGame(gameManager, physicsManager, clientsGameSender, clientsReceiver);
     serverGame.startAsync();
 
     Logger::info("Waiting for connections...");

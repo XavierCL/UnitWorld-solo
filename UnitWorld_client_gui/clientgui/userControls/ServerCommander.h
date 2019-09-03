@@ -5,7 +5,7 @@
 #include "shared/communication/messages/MoveMobileUnitsToPositionMessage.h"
 #include "shared/communication/MessageSerializer.h"
 
-#include "shared/game/physics/Vector2D.h"
+#include "shared/game/geometry/Vector2D.h"
 
 #include "communications/CommunicationHandler.h"
 

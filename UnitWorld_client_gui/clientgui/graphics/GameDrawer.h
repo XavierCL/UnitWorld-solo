@@ -12,10 +12,9 @@ namespace uw
     class GameDrawer
     {
     public:
-        GameDrawer(std::shared_ptr<GameManager> gameManager, std::shared_ptr<UserControlState> userControlState, const xg::Guid& currentPlayerId):
+        GameDrawer(std::shared_ptr<GameManager> gameManager, std::shared_ptr<UserControlState> userControlState):
             _gameManager(gameManager),
-            _userControlState(userControlState),
-            _currentPlayerId(currentPlayerId)
+            _userControlState(userControlState)
         {}
 
         void draw(std::shared_ptr<SFMLDrawingCanvas> canvas)
@@ -28,15 +27,16 @@ namespace uw
                 (*playerIndexByPlayerId)[(completeGameState->players())[playerIndex]->id()] = playerIndex;
             }
 
-            const auto currentPlayerSinguities = make_shared(completeGameState->players())
-                | filter<Player>([this](auto player) { return player.id() == _currentPlayerId; })
-                | flatMap<std::shared_ptr<Singuity>>([](auto player) { return player.singuities(); })
-                | toUnorderedMap<xg::Guid, std::shared_ptr<const Singuity>>([](const std::shared_ptr<const Singuity>& singuity) {
-                    return singuity->id();
-                });
+            const auto currentPlayerSinguities = _gameManager->currentPlayer()
+                .map<std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<Singuity>>>>([](std::shared_ptr<Player> player) {
+                    return player->singuities()
+                        | toUnorderedMap<xg::Guid, std::shared_ptr<Singuity>>([](std::shared_ptr<Singuity> singuity) {
+                        return singuity->id();
+                    });
+                }).getOrElse([] {return std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<Singuity>>>(); });
 
             // Spawners
-            auto sharedSpawners(make_shared(completeGameState->spawners()));
+            auto sharedSpawners(std::make_shared<const std::vector<std::shared_ptr<Spawner>>>(completeGameState->spawners()));
             sharedSpawners | forEach([&canvas, &playerIndexByPlayerId, this](std::shared_ptr<Spawner> spawner) {
                 auto spanwerOuterAndInnerColors = spawner->allegence().map<std::pair<sf::Color, sf::Color>>([&spawner, &playerIndexByPlayerId, this](SpawnerAllegence allegence) {
                     auto playerFullColor = (playerIndexByPlayerId
@@ -44,7 +44,7 @@ namespace uw
                         .map<sf::Color>([this](auto playerIndex) { return _playerColors[playerIndex]; })
                         .getOrElse(sf::Color::Black);
 
-                    auto lifeRatio = allegence.healthPoint() / spawner->maxHealthPoint();
+                    auto lifeRatio = allegence.healthPoint() / spawner->maximumHealthPoint();
                     sf::Color playerLifeColor(round(playerFullColor.r * lifeRatio), round(playerFullColor.g * lifeRatio), round(playerFullColor.b * lifeRatio));
 
                     return std::make_pair(playerFullColor, playerLifeColor);
@@ -71,7 +71,7 @@ namespace uw
             // Selected unit white aura
             for (const auto selectedUnitId : _userControlState->getSelectedUnits())
             {
-                (currentPlayerSinguities | find<std::shared_ptr<const Singuity>>(selectedUnitId)).foreach([&canvas](const std::shared_ptr<const Singuity>& singuity) {
+                (currentPlayerSinguities | find<std::shared_ptr<Singuity>>(selectedUnitId)).foreach([&canvas](std::shared_ptr<Singuity> singuity) {
                     const int circleRadius(5.0);
                     sf::CircleShape selectedUnitAura(circleRadius);
                     selectedUnitAura.setPosition(round(singuity->position().x() - circleRadius), round(singuity->position().y() - circleRadius));
@@ -90,7 +90,7 @@ namespace uw
 
                 for (auto singuity : *player->singuities())
                 {
-                    canvas->draw(*(GraphicalSinguity(*singuity, drawingSinguitiesColor).drawable()));
+                    canvas->draw(*(GraphicalSinguity(singuity, drawingSinguitiesColor).drawable()));
                 }
             }
 
@@ -112,6 +112,5 @@ namespace uw
 
         const std::shared_ptr<GameManager> _gameManager;
         const std::shared_ptr<UserControlState> _userControlState;
-        const xg::Guid _currentPlayerId;
     };
 }

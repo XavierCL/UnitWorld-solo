@@ -123,6 +123,12 @@
     <ClInclude Include="shared\game\physics\actualizers\PlayerActualizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="shared\game\physics\actualizers\CompleteGameStateActualizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\game\CommunicatedSpawnerAllegence.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="shared\communication\MessageWrapper.cpp">
@@ -171,6 +177,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\game\play\Spawner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\game\CommunicatedSpawnerAllegence.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\game\CommunicatedSpawner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

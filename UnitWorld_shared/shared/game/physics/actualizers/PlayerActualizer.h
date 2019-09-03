@@ -14,9 +14,14 @@ namespace uw
             _player(player),
             _singuityActualizers(initializeSinguityActualizers(player))
         {
-            _player->OnSinguityAdded(singuityAddedCallbackId(), [this](std::shared_ptr<Singuity> singuity) {
+            _player->addSinguityAddedCallback(singuityAddedCallbackId(), [this](std::shared_ptr<Singuity> singuity) {
                 _singuityActualizers.emplace_back(SinguityActualizer(singuity));
             });
+        }
+
+        ~PlayerActualizer()
+        {
+            _player->removeSinguityAddedCallback(singuityAddedCallbackId());
         }
 
         void updateShootingAndRepulsionForces(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<CollisionDetector> neutralCollisionDetector, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)

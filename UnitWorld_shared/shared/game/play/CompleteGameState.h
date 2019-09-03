@@ -17,12 +17,12 @@ namespace uw
         {
             for (const auto spawner : copy._spawners)
             {
-                _spawners.emplace_back(*spawner);
+                _spawners.emplace_back(std::make_shared<Spawner>(*spawner));
             }
 
             for (const auto player : copy._players)
             {
-                _players.emplace_back(*player);
+                _players.emplace_back(std::make_shared<Player>(*player));
             }
         }
 
@@ -36,7 +36,17 @@ namespace uw
             return _players;
         }
 
+        const std::vector<std::shared_ptr<Player>>& players() const
+        {
+            return _players;
+        }
+
         std::vector<std::shared_ptr<Spawner>>& spawners()
+        {
+            return _spawners;
+        }
+
+        const std::vector<std::shared_ptr<Spawner>>& spawners() const
         {
             return _spawners;
         }

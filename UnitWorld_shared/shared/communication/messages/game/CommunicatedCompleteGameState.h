@@ -15,6 +15,21 @@ namespace uw
 
         std::string toJson() const;
 
+        const std::vector<CommunicatedSpawner>& spawners() const
+        {
+            return _spawners;
+        }
+
+        const std::vector<CommunicatedPlayer>& players() const
+        {
+            return _players;
+        }
+
+        const std::vector<CommunicatedSinguity>& singuities() const
+        {
+            return _singuities;
+        }
+
         static CommunicatedCompleteGameState fromJson(const std::string& jsonData);
 
     private:

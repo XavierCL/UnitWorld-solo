@@ -16,10 +16,11 @@ namespace uw
 
         double maximumSpeed() const override;
         double maximumAcceleration() const override;
+        double maximumHealthPoint() const override;
 
     private:
         unsigned long long shootTimelag() const override;
         double firePower() const override;
-        double maximumHealthPoint() const override;
+        double maxShootingRangeSq() const override;
     };
 }

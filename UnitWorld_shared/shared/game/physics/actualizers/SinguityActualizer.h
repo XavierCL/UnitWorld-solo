@@ -41,7 +41,7 @@ namespace uw
                             {
                                 return thing;
                             }
-                        }).orElse(unitWithHealthPoint);
+                        }).orElse(Options::Some(unitWithHealthPoint));
 
                         if (playerId != collisionDetectorPlayerId)
                         {
@@ -54,7 +54,7 @@ namespace uw
                                 {
                                     return enemy;
                                 }
-                            }).orElse(unitWithHealthPoint);
+                            }).orElse(Options::Some(unitWithHealthPoint));
                         }
                     });
                 });

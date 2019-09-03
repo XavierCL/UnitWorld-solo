@@ -11,7 +11,7 @@ namespace uw
     class CompleteGameStateMessage : public Message
     {
     public:
-        CompleteGameStateMessage(const CommunicatedCompleteGameState& players, const xg::Guid& currentPlayerId);
+        CompleteGameStateMessage(const CommunicatedCompleteGameState& completeGameState, const xg::Guid& currentPlayerId);
 
         CompleteGameStateMessage(const std::string jsonData);
 
