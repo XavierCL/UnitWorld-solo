@@ -30,9 +30,19 @@ Singuity::Singuity(const Singuity& other) :
     UnitWithHealthPoint(other)
 {}
 
+Singuity Singuity::spawn(const Vector2D& position, const Vector2D& speed)
+{
+    return Singuity(position, speed.maxAt(spawnSpeed()));
+}
+
+double Singuity::spawnSpeed()
+{
+    return 0.05;
+}
+
 double Singuity::maximumSpeed() const
 {
-    return 1.5;
+    return 0.8;
 }
 
 double Singuity::maximumAcceleration() const

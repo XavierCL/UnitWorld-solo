@@ -37,6 +37,6 @@ namespace uw
     private:
         const bool _isClaimed;
         const double _healthPoint;
-        const xg::Guid& _allegedPlayerId;
+        const xg::Guid _allegedPlayerId;
     };
 }

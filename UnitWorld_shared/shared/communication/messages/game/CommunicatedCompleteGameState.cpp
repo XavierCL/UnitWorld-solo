@@ -36,7 +36,7 @@ std::string CommunicatedCompleteGameState::toJson() const
         {"spawners", jsonSpawners}
     };
 
-    return jsonData;
+    return jsonData.dump();
 }
 
 CommunicatedCompleteGameState CommunicatedCompleteGameState::fromJson(const std::string& jsonData)

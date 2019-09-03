@@ -22,7 +22,8 @@ namespace uw
             _completeGameState(std::make_shared<CompleteGameState>(CompleteGameState::empty())),
             _nextCompleteGameState(nullptr),
             _nextCurrentPlayerId(nullptr),
-            _nextAddPlayer(nullptr)
+            _nextAddPlayer(nullptr),
+            _nextAddSpawners(nullptr)
         {}
 
         void setNextPlayer(std::shared_ptr<Player> newPlayer, const std::vector<std::shared_ptr<Spawner>>& spawners)
@@ -60,7 +61,7 @@ namespace uw
             immer::set<xg::Guid> mobileUnitSet;
             for (const auto& mobileUnitId : mobileUnitIds)
             {
-                mobileUnitSet.insert(mobileUnitId);
+                mobileUnitSet = std::move(mobileUnitSet).insert(mobileUnitId);
             }
 
             const auto nextCommand(std::make_shared<MoveMobileUnitsToPosition>(playerId, mobileUnitSet, destination));

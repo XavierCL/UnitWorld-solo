@@ -19,6 +19,8 @@ namespace uw
             });
         }
 
+        PlayerActualizer(const PlayerActualizer& playerActualizer) = delete;
+
         ~PlayerActualizer()
         {
             _player->removeSinguityAddedCallback(singuityAddedCallbackId());

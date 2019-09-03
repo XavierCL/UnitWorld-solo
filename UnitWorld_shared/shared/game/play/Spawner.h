@@ -63,7 +63,7 @@ namespace uw
                 {
                     _lastSpawnTimestamp = frameTimestamp;
                     ++_totalSpawnedCount;
-                    spawned(allegence.allegedPlayerId(), std::make_shared<Singuity>(position(), UNIT_SPAWN_DIRECTION[_totalSpawnedCount % UNIT_SPAWN_DIRECTION.size()]));
+                    spawned(allegence.allegedPlayerId(), std::make_shared<Singuity>(Singuity::spawn(position(), UNIT_SPAWN_DIRECTION[_totalSpawnedCount % UNIT_SPAWN_DIRECTION.size()])));
                 }
             });
         }
@@ -80,7 +80,7 @@ namespace uw
         void updateAllegence()
         {
             _allegence = _allegence.flatMap<SpawnerAllegence>([this](const SpawnerAllegence& oldAllegence) {
-                if (oldAllegence.isClaimed() && isDead())// || !oldAllegence.isClaimed() && oldAllegence.healthPoint() >= maximumHealthPoint())
+                if (oldAllegence.isClaimed() && isDead())
                 {
                     return Options::None<SpawnerAllegence>();
                 }
