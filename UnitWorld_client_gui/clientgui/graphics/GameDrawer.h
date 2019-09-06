@@ -36,8 +36,7 @@ namespace uw
                 }).getOrElse([] {return std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<Singuity>>>(); });
 
             // Spawners
-            auto sharedSpawners(std::make_shared<const std::vector<std::shared_ptr<Spawner>>>(completeGameState->spawners()));
-            sharedSpawners | forEach([&canvas, &playerIndexByPlayerId, this](std::shared_ptr<Spawner> spawner) {
+            &completeGameState->spawners() | forEach([&canvas, &playerIndexByPlayerId, this](std::shared_ptr<Spawner> spawner) {
                 auto spanwerOuterAndInnerColors = spawner->allegence().map<std::pair<sf::Color, sf::Color>>([&spawner, &playerIndexByPlayerId, this](SpawnerAllegence allegence) {
                     auto playerFullColor = (playerIndexByPlayerId
                         | find<size_t>(allegence.allegedPlayerId()))
