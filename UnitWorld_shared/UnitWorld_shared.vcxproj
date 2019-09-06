@@ -146,6 +146,7 @@
     <ClInclude Include="shared\configuration\ConfigurationManager.h" />
     <ClInclude Include="shared\game\commands\MoveMobileUnitsToPosition.h" />
     <ClInclude Include="shared\game\GameManager.h" />
+    <ClInclude Include="shared\game\geometry\Circle.h" />
     <ClInclude Include="shared\game\geometry\Rectangle.h" />
     <ClInclude Include="shared\game\physics\actualizers\CompleteGameStateActualizer.h" />
     <ClInclude Include="shared\game\physics\actualizers\PlayerActualizer.h" />
