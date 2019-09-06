@@ -6,6 +6,7 @@
 
 #include "shared/game/geometry/Vector2D.h"
 #include "shared/game/geometry/Rectangle.h"
+#include "shared/game/geometry/Circle.h"
 
 #include "commons/Option.hpp"
 #include "commons/Guid.hpp"
@@ -63,6 +64,16 @@ namespace uw
 
         void setUserRightMouseDownPosition(const Vector2D& position)
         {
+            auto completeGameState = _gameManager->completeGameState();
+            auto reverseSpawners = &completeGameState->spawners() | reverse<std::shared_ptr<Spawner>>();
+            for (auto spawner : *reverseSpawners)
+            {
+                Circle spawnerShape(spawner->position(), 20.0);
+                if (spawnerShape.contains(position) && spawner is enemy or neutral or damaged)
+                {
+                    _serverCommander->moveUnitsToSpawner()
+                }
+            }
             _serverCommander->moveUnitsToPosition(*_selectedUnits, position);
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>(position);
             _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>();
@@ -86,6 +97,12 @@ namespace uw
         {
             return *_lastMoveUnitPosition;
         }
+
+        Option<const xg::Guid> getLastSelectedSpawnerId() const
+        {
+            return *_lastSelectedSpawnerId;
+        }
+
     private:
         const std::shared_ptr<GameManager> _gameManager;
         const std::shared_ptr<ServerCommander> _serverCommander;
@@ -93,6 +110,7 @@ namespace uw
         std::shared_ptr<Option<const Vector2D>> _leftMouseDownPosition;
         std::shared_ptr<Option<const Vector2D>> _lastMousePosition;
         std::shared_ptr<Option<const Vector2D>> _lastMoveUnitPosition;
+        std::shared_ptr<Option<const xg::Guid>> _lastSelectedSpawnerId;
 
         std::shared_ptr<std::vector<xg::Guid>> _selectedUnits;
     };

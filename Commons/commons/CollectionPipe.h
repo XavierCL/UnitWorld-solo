@@ -156,6 +156,38 @@ struct FunctionalDefinitions
         const std::function<bool(InputValue)> _filter;
     };
 
+    template <typename Value>
+    struct Reverse
+    {
+        using Output = std::shared_ptr<Stream<Value>>;
+
+        template <typename InputCollection>
+        void operator() (InputCollection input) const
+        {
+            bool isFirstIter = true;
+            auto inputBegin = input->rend();
+            auto inputEnd = input->rend();
+            return Streams::generate<Value>([isFirstIter, inputBegin, inputEnd, input]() mutable {
+                if (isFirstIter)
+                {
+                    isFirstIter = false;
+                    inputBegin = input->rbegin();
+                }
+
+                if (inputBegin != inputEnd)
+                {
+                    const auto returnedValue = Options::Some(*inputBegin);
+                    ++inputBegin;
+                    return returnedValue;
+                }
+                else
+                {
+                    return Options::None<InputValue>();
+                }
+            });
+        }
+    };
+
     template <typename Action>
     struct ForEach
     {
@@ -382,6 +414,12 @@ template <typename Action>
 FunctionalDefinitions::ForEach<Action> forEach(const Action& action)
 {
     return FunctionalDefinitions::ForEach<Action>(action);
+}
+
+template <typename Value>
+FunctionalDefinitions::Reverse<Value> reverse()
+{
+    return FunctionalDefinitions::Reverse<Value>();
 }
 
 template <typename Found, typename Predicate>
