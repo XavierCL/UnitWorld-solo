@@ -135,6 +135,9 @@
     <ClInclude Include="shared\game\physics\collisions\KdtreeCollisionDetectorFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="shared\game\geometry\Circle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="shared\communication\MessageWrapper.cpp">
