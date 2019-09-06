@@ -25,7 +25,8 @@ namespace uw
             _serverHandler(serverHandler),
             _gameManager(gameManager),
             _physicsCommunicationAssembler(physicsCommunicationAssembler),
-            _messageSerializer(messageSerializer)
+            _messageSerializer(messageSerializer),
+            _mostRecentCompleteStateTimestamp(0)
         {}
 
         void stop()
@@ -61,39 +62,35 @@ namespace uw
             
             const auto messageWrappers = _messageSerializer->deserialize(communication);
 
-            handleServerMessages(messageWrappers);
+            for (const auto& messageWrapper : messageWrappers)
+            {
+                handleServerMessage(messageWrapper);
+            }
         }
 
-        void handleServerMessages(const std::vector<MessageWrapper>& messageWrappers)
+        void handleServerMessage(const MessageWrapper& messageWrapper)
         {
-            if (messageWrappers.empty())
+            if (messageWrapper.messageType() == MessageType::CompleteGameStateMessageType)
             {
-                return;
-            }
-
-            size_t maxTimestampIndex = 0;
-            size_t messageWrapperIndex = 1;
-            while (messageWrapperIndex < messageWrappers.size())
-            {
-                if (messageWrappers[messageWrapperIndex].timestamp() > messageWrappers[maxTimestampIndex].timestamp())
+                if (messageWrapper.timestamp() > _mostRecentCompleteStateTimestamp)
                 {
-                    maxTimestampIndex = messageWrapperIndex;
+                    _mostRecentCompleteStateTimestamp = messageWrapper.timestamp();
+                    const auto completeStateMessage(std::dynamic_pointer_cast<CompleteGameStateMessage const>(messageWrapper.innerMessage()));
+                    handleCompleteGameStateMessage(completeStateMessage);
                 }
-                ++messageWrapperIndex;
             }
-
-            handleServerMessage(messageWrappers[maxTimestampIndex].innerMessage());
         }
 
-        void handleServerMessage(std::shared_ptr<const Message> message)
+        void handleCompleteGameStateMessage(std::shared_ptr<CompleteGameStateMessage const> completeStateMessage)
         {
-            const auto completeStateMessage(std::dynamic_pointer_cast<CompleteGameStateMessage const>(message));
             const auto currentPlayerId = completeStateMessage->getCurrentPlayerId();
 
             _gameManager->setNextPlayers(_physicsCommunicationAssembler->communicatedCompleteGameStateToPhysics(completeStateMessage->completeGameState()), currentPlayerId);
         }
 
         std::thread _receiveThread;
+
+        unsigned long long _mostRecentCompleteStateTimestamp;
 
         const std::shared_ptr<CommunicationHandler> _serverHandler;
         const std::shared_ptr<GameManager> _gameManager;

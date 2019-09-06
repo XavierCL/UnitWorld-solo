@@ -66,17 +66,25 @@ namespace uw
         {
             auto completeGameState = _gameManager->completeGameState();
             auto reverseSpawners = &completeGameState->spawners() | reverse<std::shared_ptr<Spawner>>();
+
+            _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>();
+
             for (auto spawner : *reverseSpawners)
             {
                 Circle spawnerShape(spawner->position(), 20.0);
-                if (spawnerShape.contains(position) && spawner is enemy or neutral or damaged)
+                auto currentPlayerId = _gameManager->currentPlayer().map<xg::Guid>([](std::shared_ptr<Player> player) { return player->id(); });
+                bool spawnerBelongsToPlayerAndIsHurt =
+                    spawner->allegence().map<xg::Guid>([](const SpawnerAllegence& allegence) { return allegence.allegedPlayerId(); }) == currentPlayerId
+                        && !spawner->isAtMaximumHealth();
+                if (spawnerShape.contains(position) && (spawnerBelongsToPlayerAndIsHurt || spawner->allegence().isEmpty()))
                 {
-                    _serverCommander->moveUnitsToSpawner()
+                    // _serverCommander->moveUnitsToSpawner(*_selectedUnits, spawner->id());
+                    _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>(spawner->id());
+                    return;
                 }
             }
             _serverCommander->moveUnitsToPosition(*_selectedUnits, position);
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>(position);
-            _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>();
         }
 
         Option<Rectangle> getSelectionRectangle() const

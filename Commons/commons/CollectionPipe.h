@@ -162,7 +162,7 @@ struct FunctionalDefinitions
         using Output = std::shared_ptr<Stream<Value>>;
 
         template <typename InputCollection>
-        void operator() (InputCollection input) const
+        Output operator() (InputCollection input) const
         {
             bool isFirstIter = true;
             auto inputBegin = input->rend();
@@ -182,7 +182,7 @@ struct FunctionalDefinitions
                 }
                 else
                 {
-                    return Options::None<InputValue>();
+                    return Options::None<Value>();
                 }
             });
         }
