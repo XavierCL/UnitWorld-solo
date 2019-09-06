@@ -28,6 +28,11 @@ namespace uw
             return _healthPoint <= 0.0;
         }
 
+        bool isAtMaximumHealth() const
+        {
+            return _healthPoint >= maximumHealthPoint();
+        }
+
         double healthPoint() const
         {
             return _healthPoint;

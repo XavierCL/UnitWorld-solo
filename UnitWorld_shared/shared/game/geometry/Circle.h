@@ -14,7 +14,7 @@ namespace uw
 
         bool contains(const Vector2D& point)
         {
-            sq(_center.x() - point.x()) + sq(_center.y() - point.y()) <= sq(_radius);
+            return sq(_center.x() - point.x()) + sq(_center.y() - point.y()) <= sq(_radius);
         }
 
     private:

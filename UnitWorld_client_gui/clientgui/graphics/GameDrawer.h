@@ -27,6 +27,9 @@ namespace uw
                 (*playerIndexByPlayerId)[(completeGameState->players())[playerIndex]->id()] = playerIndex;
             }
 
+            auto spawnersById = &completeGameState->spawners()
+                | toUnorderedMap<xg::Guid, std::shared_ptr<Spawner>>([](std::shared_ptr<Spawner> spawner) { return spawner->id(); });
+
             const auto currentPlayerSinguities = _gameManager->currentPlayer()
                 .map<std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<Singuity>>>>([](std::shared_ptr<Player> player) {
                     return player->singuities()
@@ -34,6 +37,16 @@ namespace uw
                         return singuity->id();
                     });
                 }).getOrElse([] {return std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<Singuity>>>(); });
+
+            _userControlState->getLastSelectedSpawnerId().foreach([&canvas, spawnersById](const xg::Guid selectedSpawnerId) {
+                (spawnersById | find<std::shared_ptr<Spawner>>(selectedSpawnerId)).foreach([&canvas](std::shared_ptr<Spawner> spawner) {
+                    const int circleRadius(23.0);
+                    sf::CircleShape graphicalSpawner(circleRadius);
+                    graphicalSpawner.setPosition(round(spawner->position().x() - circleRadius), round(spawner->position().y() - circleRadius));
+                    graphicalSpawner.setFillColor(sf::Color::White);
+                    canvas->draw(graphicalSpawner);
+                });
+            });
 
             // Spawners
             &completeGameState->spawners() | forEach([&canvas, &playerIndexByPlayerId, this](std::shared_ptr<Spawner> spawner) {

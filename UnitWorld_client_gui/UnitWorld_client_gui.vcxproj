@@ -159,7 +159,7 @@
     <ClInclude Include="clientgui\graphics\canvas\CanvasTransactionGenerator.h" />
     <ClInclude Include="clientgui\networking\ServerReceiver.h" />
     <ClInclude Include="clientgui\graphics\WindowManager.h" />
-    <ClInclude Include="clientgui\userControls\ServerCommander.h" />
+    <ClInclude Include="clientgui\networking\ServerCommander.h" />
     <ClInclude Include="clientgui\userControls\UserControlState.h" />
   </ItemGroup>
   <ItemGroup>
