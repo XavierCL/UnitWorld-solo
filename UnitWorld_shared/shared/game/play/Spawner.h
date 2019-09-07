@@ -95,6 +95,17 @@ namespace uw
             });
         }
 
+        bool hasSameAllegenceState(const Option<SpawnerAllegence>& otherAllegence)
+        {
+            return otherAllegence.map<bool>([this](const SpawnerAllegence& allegence) {
+                return _allegence.map<bool>([&allegence](const SpawnerAllegence& ownAllegence) {
+                    return allegence.hasSameState(ownAllegence);
+                }).getOrElse([]() { return false; });
+            }).getOrElse([this]() {
+                return _allegence.isEmpty();
+            });
+        }
+
         // bool reguvenate(), which only works if player id == allegence player id or there are no allegence.
         // It creates an allegence if none and adds up to the spawner life
         // it does nothing and returns false if the spawner life is already at max

@@ -85,7 +85,8 @@ namespace uw
         {
             const auto currentPlayerId = completeStateMessage->getCurrentPlayerId();
 
-            _gameManager->setNextPlayers(_physicsCommunicationAssembler->communicatedCompleteGameStateToPhysics(completeStateMessage->completeGameState()), currentPlayerId);
+            _gameManager->setNextCompleteGameState(_physicsCommunicationAssembler->communicatedCompleteGameStateToPhysics(completeStateMessage->completeGameState()));
+            _gameManager->setNextCurrentPlayerId(currentPlayerId);
         }
 
         std::thread _receiveThread;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ServerCommander.h"
+#include "clientgui/networking/ServerCommander.h"
 
 #include "shared/game/GameManager.h"
 
@@ -25,13 +25,17 @@ namespace uw
             _leftMouseDownPosition(std::make_shared<Option<const Vector2D>>()),
             _lastMousePosition(std::make_shared<Option<const Vector2D>>()),
             _lastMoveUnitPosition(std::make_shared<Option<const Vector2D>>()),
-            _selectedUnits(std::make_shared<std::vector<xg::Guid>>())
+            _selectedUnits(std::make_shared<std::vector<xg::Guid>>()),
+            _lastSelectedSpawnerId(std::make_shared<Option<const xg::Guid>>()),
+            _lastSelectedSpawnerAllegence(std::make_shared<Option<SpawnerAllegence>>())
         {}
 
         void setUserLeftMouseDownPosition(const Vector2D& position)
         {
             _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>(position);
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>();
+            _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
+            _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();
             _selectedUnits = std::make_shared<std::vector<xg::Guid>>();
         }
 
@@ -39,6 +43,8 @@ namespace uw
         {
             _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>();
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>();
+            _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
+            _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();
         }
 
         void frameHappened()
@@ -55,6 +61,21 @@ namespace uw
                     }).getOrElse(std::make_shared<std::vector<xg::Guid>>());
                 });
             });
+
+            _lastSelectedSpawnerId->foreach([this](const xg::Guid& spawnerId) {
+                (&_gameManager->completeGameState()->spawners() | first<std::shared_ptr<Spawner>>([&spawnerId](std::shared_ptr<Spawner> spawner) {
+                    return spawner->id() == spawnerId;
+                })).foreach([this](std::shared_ptr<Spawner> foundSpawner) {
+                    if (!foundSpawner->hasSameAllegenceState(*_lastSelectedSpawnerAllegence))
+                    {
+                        _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
+                        _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();
+                    }
+                }).orExecute([this]() {
+                    _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
+                    _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();
+                });
+            });
         }
 
         void setUserMousePosition(const Vector2D& position)
@@ -68,6 +89,9 @@ namespace uw
             auto reverseSpawners = &completeGameState->spawners() | reverse<std::shared_ptr<Spawner>>();
 
             _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>();
+            _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>();
+            _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
+            _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();
 
             for (auto spawner : *reverseSpawners)
             {
@@ -80,6 +104,7 @@ namespace uw
                 {
                     // _serverCommander->moveUnitsToSpawner(*_selectedUnits, spawner->id());
                     _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>(spawner->id());
+                    _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>(spawner->allegence());
                     return;
                 }
             }
@@ -119,6 +144,7 @@ namespace uw
         std::shared_ptr<Option<const Vector2D>> _lastMousePosition;
         std::shared_ptr<Option<const Vector2D>> _lastMoveUnitPosition;
         std::shared_ptr<Option<const xg::Guid>> _lastSelectedSpawnerId;
+        std::shared_ptr<Option<SpawnerAllegence>> _lastSelectedSpawnerAllegence;
 
         std::shared_ptr<std::vector<xg::Guid>> _selectedUnits;
     };

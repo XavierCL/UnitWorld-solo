@@ -41,14 +41,17 @@ namespace uw
             }
         }
 
-        void setNextPlayers(CompleteGameState&& nextCompleteGameState, const xg::Guid& currentPlayerId)
+        void setNextCompleteGameState(CompleteGameState&& nextCompleteGameState)
         {
             auto oldStoredState = _nextCompleteGameState.exchange(new CompleteGameState(std::forward<CompleteGameState>(nextCompleteGameState)));
             if (oldStoredState)
             {
                 delete oldStoredState;
             }
+        }
 
+        void setNextCurrentPlayerId(const xg::Guid& currentPlayerId)
+        {
             auto oldStoredCurrent = _nextCurrentPlayerId.exchange(new xg::Guid(currentPlayerId));
             if (oldStoredCurrent)
             {

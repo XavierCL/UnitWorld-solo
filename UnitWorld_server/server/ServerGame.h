@@ -12,12 +12,13 @@ namespace uw
     class ServerGame {
     public:
 
-        ServerGame(std::shared_ptr<GameManager> gameManager, std::shared_ptr<PhysicsManager> physicsManager, std::shared_ptr<ClientsGameSender> clientGameSender, std::shared_ptr<ClientsReceiver> clientsReceiver, const std::vector<Vector2D>& firstSpawners) :
+        ServerGame(std::shared_ptr<GameManager> gameManager, std::shared_ptr<PhysicsManager> physicsManager, std::shared_ptr<ClientsGameSender> clientGameSender, std::shared_ptr<ClientsReceiver> clientsReceiver, const std::vector<std::vector<Vector2D>>& firstSpawners, const std::vector<std::vector<size_t>>& singuitiesBySpawner) :
             _gameManager(gameManager),
             _physicsManager(physicsManager),
             _clientGameSender(clientGameSender),
             _clientsReceiver(clientsReceiver),
-            _firstSpawners(firstSpawners)
+            _firstSpawners(firstSpawners),
+            _singuitiesBySpawner(singuitiesBySpawner)
         {}
 
         void addClient(std::shared_ptr<CommunicationHandler> communicationHandler)
@@ -35,6 +36,9 @@ namespace uw
 
         void startAsync()
         {
+            auto initialMap(generateInitialMap());
+            _gameManager->setNextCompleteGameState(generateInitialMap());
+
             _physicsManager->startAsync();
             _clientGameSender->startAsync();
         }
@@ -50,42 +54,69 @@ namespace uw
 
         std::vector<std::shared_ptr<Singuity>> generatePlayerSinguities(int playerCount)
         {
-            if (playerCount >= _firstSpawners.size())
+            if (playerCount >= _singuitiesBySpawner.size())
             {
                 return std::vector<std::shared_ptr<Singuity>> {};
             }
             else
             {
-                Vector2D averageSinguityPosition = _firstSpawners[playerCount];
-
                 std::vector<std::shared_ptr<Singuity>> singuities;
-                for (int x = averageSinguityPosition.x() - 50; x < averageSinguityPosition.x() + 50; x += 10)
+
+                for (size_t spawnerCount = 0; spawnerCount < _firstSpawners[playerCount + 1].size(); ++spawnerCount)
                 {
-                    for (int y = averageSinguityPosition.y() - 50; y < averageSinguityPosition.y() + 50; y += 10)
+                    Vector2D averageSinguityPosition = _firstSpawners[playerCount + 1][spawnerCount];
+                    size_t singuityCount = _singuitiesBySpawner[playerCount][spawnerCount];
+                    for (int x = averageSinguityPosition.x() - 50; x < averageSinguityPosition.x() + 50; x += 100 / sqrt(singuityCount))
                     {
-                        singuities.emplace_back(std::make_shared<Singuity>(Vector2D(x, y)));
+                        for (int y = averageSinguityPosition.y() - 50; y < averageSinguityPosition.y() + 50; y += 100 / sqrt(singuityCount))
+                        {
+                            singuities.emplace_back(std::make_shared<Singuity>(Vector2D(x, y)));
+                        }
                     }
                 }
+
                 return singuities;
             }
         }
 
         std::vector<std::shared_ptr<Spawner>> generatePlayerSpawners(const xg::Guid& playerId, int playerCount)
         {
-            if (playerCount >= _firstSpawners.size())
+            auto spawnerIndex = playerCount + 1;
+            if (spawnerIndex >= _firstSpawners.size())
             {
                 return std::vector<std::shared_ptr<Spawner>> {};
             }
             else
             {
-                return std::vector<std::shared_ptr<Spawner>> { std::make_shared<Spawner>(_firstSpawners[playerCount], playerId) };
+                std::vector<std::shared_ptr<Spawner>> spawners;
+                for (const auto& initialSpawnerLocation : _firstSpawners[spawnerIndex])
+                {
+                    spawners.emplace_back(std::make_shared<Spawner>(initialSpawnerLocation, playerId));
+                }
+                return spawners;
             }
+        }
+
+        CompleteGameState generateInitialMap() const
+        {
+            std::vector<std::shared_ptr<Spawner>> spawners;
+
+            if (_firstSpawners.size() > 0)
+            {
+                for (const auto& emptySpawnerCoordinate : _firstSpawners.front())
+                {
+                    spawners.emplace_back(std::make_shared<Spawner>(emptySpawnerCoordinate));
+                }
+            }
+
+            return CompleteGameState(std::move(spawners), std::vector<std::shared_ptr<Player>> {});
         }
 
         const std::shared_ptr<GameManager> _gameManager;
         const std::shared_ptr<PhysicsManager> _physicsManager;
         const std::shared_ptr<ClientsGameSender> _clientGameSender;
         const std::shared_ptr<ClientsReceiver> _clientsReceiver;
-        const std::vector<Vector2D> _firstSpawners;
+        const std::vector<std::vector<Vector2D>> _firstSpawners;
+        const std::vector<std::vector<size_t>> _singuitiesBySpawner;
     };
 }
