@@ -34,6 +34,11 @@ namespace uw
             return SpawnerAllegence(_isClaimed, _healthPoint - healthPoint, _allegedPlayerId);
         }
 
+        bool hasSameState(const SpawnerAllegence& allegence) const
+        {
+            return _isClaimed == allegence._isClaimed && _allegedPlayerId == allegence._allegedPlayerId;
+        }
+
     private:
         const bool _isClaimed;
         const double _healthPoint;
