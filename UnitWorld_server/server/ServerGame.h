@@ -66,11 +66,14 @@ namespace uw
                 {
                     Vector2D averageSinguityPosition = _firstSpawners[playerCount + 1][spawnerCount];
                     size_t singuityCount = _singuitiesBySpawner[playerCount][spawnerCount];
-                    for (int x = averageSinguityPosition.x() - 50; x < averageSinguityPosition.x() + 50; x += 100 / sqrt(singuityCount))
+                    if (singuityCount > 0)
                     {
-                        for (int y = averageSinguityPosition.y() - 50; y < averageSinguityPosition.y() + 50; y += 100 / sqrt(singuityCount))
+                        for (int x = averageSinguityPosition.x() - 50; x < averageSinguityPosition.x() + 50; x += 100 / sqrt(singuityCount))
                         {
-                            singuities.emplace_back(std::make_shared<Singuity>(Vector2D(x, y)));
+                            for (int y = averageSinguityPosition.y() - 50; y < averageSinguityPosition.y() + 50; y += 100 / sqrt(singuityCount))
+                            {
+                                singuities.emplace_back(std::make_shared<Singuity>(Vector2D(x, y)));
+                            }
                         }
                     }
                 }

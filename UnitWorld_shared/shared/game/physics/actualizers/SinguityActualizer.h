@@ -75,7 +75,7 @@ namespace uw
             Vector2D acceleration = _singuity->destination().flatMap<Vector2D>([this, &playerId, &spawnersById](const std::variant<Vector2D, SpawnerDestination>& destination) {
                 return std::visit(overloaded{
                     [this](const Vector2D& point) {
-                    bool willBreakForDestination = (_singuity->position() + _singuity->speed().atModule(_singuity->stopDistanceFromTargetSq())).distanceSq(point) < 64;
+                    bool willBreakForDestination = (_singuity->position() + _singuity->speed().atModule(_singuity->stopDistanceFromTargetSq())).distanceSq(point) < 350;
 
                     if (willBreakForDestination)
                     {
