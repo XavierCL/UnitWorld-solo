@@ -10,30 +10,27 @@ namespace uw
 
         UnitWithHealthPoint(const xg::Guid& id, const Vector2D& position, const double& healthPoint) :
             Unit(id, position),
-            _healthPoint(healthPoint),
-            _hasBeenDead(healthPoint <= 0)
+            _healthPoint(healthPoint)
         {}
 
         UnitWithHealthPoint(const Vector2D& position, const double& maximumHealthPoint):
             Unit(position),
-            _healthPoint(maximumHealthPoint),
-            _hasBeenDead(maximumHealthPoint <= 0)
+            _healthPoint(maximumHealthPoint)
         {}
 
         UnitWithHealthPoint(const UnitWithHealthPoint& copy) :
             Unit(copy),
-            _healthPoint(copy._healthPoint),
-            _hasBeenDead(copy._hasBeenDead)
+            _healthPoint(copy._healthPoint)
         {}
 
         bool isDead() const
         {
-            return _hasBeenDead;
+            return _healthPoint <= 0.0;
         }
 
         bool isAtMaximumHealth() const
         {
-            return _healthPoint >= maximumHealthPoint() && !_hasBeenDead;
+            return _healthPoint >= maximumHealthPoint();
         }
 
         double healthPoint() const
@@ -49,12 +46,11 @@ namespace uw
         virtual void loseHealthPoint(const double& healthPoint)
         {
             _healthPoint -= healthPoint;
-            _hasBeenDead = _healthPoint <= 0 || _hasBeenDead;
         }
 
-        virtual void kill()
+        virtual void makeHealthPointNone()
         {
-            _hasBeenDead = true;
+            _healthPoint = 0.0;
         }
 
         virtual double maximumHealthPoint() const = 0;
@@ -62,6 +58,5 @@ namespace uw
     private:
 
         double _healthPoint;
-        bool _hasBeenDead;
     };
 }
