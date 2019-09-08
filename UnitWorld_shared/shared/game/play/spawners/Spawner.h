@@ -87,7 +87,7 @@ namespace uw
         void updateAllegence()
         {
             _allegence = _allegence.flatMap<SpawnerAllegence>([this](const SpawnerAllegence& oldAllegence) {
-                if (oldAllegence.isClaimed() && isDead())
+                if (isDead())
                 {
                     return Options::None<SpawnerAllegence>();
                 }
