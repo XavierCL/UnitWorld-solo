@@ -9,7 +9,7 @@ namespace uw
     class Singuity : virtual public MobileUnit, virtual public Shooter, virtual public UnitWithHealthPoint
     {
     public:
-        Singuity(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<Vector2D>& destination, const bool& isBreakingForDestination, const double& healthPoints, const unsigned long long& lastShootTimestamp);
+        Singuity(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<std::variant<Vector2D, SpawnerDestination>>& destination, const double& healthPoints, const unsigned long long& lastShootTimestamp);
         Singuity(const Vector2D& position, const Vector2D& speed);
         Singuity(const Vector2D& position);
         Singuity(const Singuity& other);

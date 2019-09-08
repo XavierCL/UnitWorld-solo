@@ -4,13 +4,12 @@
 
 using namespace uw;
 
-CommunicatedSinguity::CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedVector2D>& destination, const bool& isBreakingForDestination, const double& healthPoint, const unsigned long long& lastShootTimestamp) :
+CommunicatedSinguity::CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedSinguityDestination>& destination, const double& healthPoint, const unsigned long long& lastShootTimestamp) :
     _singuityId(singuityId),
     _playerId(playerId),
     _position(position),
     _speed(speed),
     _destination(destination),
-    _isBreakingForDestination(isBreakingForDestination),
     _healthPoint(healthPoint),
     _lastShootTimestamp(lastShootTimestamp)
 {}
@@ -21,7 +20,9 @@ std::string CommunicatedSinguity::toJson() const
     const auto playerId = _playerId.str();
     const auto position = nlohmann::json::parse(_position.toJson());
     const auto speed = nlohmann::json::parse(_speed.toJson());
-    const auto destination = _destination.map<nlohmann::json>([](const auto& destination) { return nlohmann::json::parse(destination.toJson()); }).getOrElse(nlohmann::json("none"));
+    const auto destination = _destination
+        .map<nlohmann::json>([](const CommunicatedSinguityDestination& destination) { return nlohmann::json::parse(destination.toJson()); })
+        .getOrElse(nlohmann::json("none"));
 
     nlohmann::json jsonData = {
         {"id", singuityId},
@@ -29,7 +30,6 @@ std::string CommunicatedSinguity::toJson() const
         {"position", position},
         {"speed", speed},
         {"destination", destination},
-        {"is-breaking-for-destination", _isBreakingForDestination},
         {"health-points", _healthPoint},
         {"last-shoot-time", _lastShootTimestamp}
     };
@@ -49,9 +49,8 @@ CommunicatedSinguity CommunicatedSinguity::fromJson(const std::string& jsonData)
         CommunicatedVector2D::fromJson(parsedJson.at("position").dump()),
         CommunicatedVector2D::fromJson(parsedJson.at("speed").dump()),
         destinationJson == "\"none\""
-            ? Option<CommunicatedVector2D>()
-            : Option<CommunicatedVector2D>(CommunicatedVector2D::fromJson(destinationJson)),
-        parsedJson.at("is-breaking-for-destination").get<bool>(),
+            ? Options::None<CommunicatedSinguityDestination>()
+            : Options::Some(CommunicatedSinguityDestination::fromJson(destinationJson)),
         parsedJson.at("health-points").get<double>(),
         parsedJson.at("last-shoot-time").get<unsigned long long>()
     );
@@ -77,14 +76,9 @@ CommunicatedVector2D CommunicatedSinguity::speed() const
     return _speed;
 }
 
-Option<CommunicatedVector2D> CommunicatedSinguity::destination() const
+Option<CommunicatedSinguityDestination> CommunicatedSinguity::destination() const
 {
     return _destination;
-}
-
-bool CommunicatedSinguity::isBreakingForDestination() const
-{
-    return _isBreakingForDestination;
 }
 
 double CommunicatedSinguity::healthPoint() const

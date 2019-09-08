@@ -2,9 +2,9 @@
 
 using namespace uw;
 
-Singuity::Singuity(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<Vector2D>& destination, const bool& isBreakingForDestination, const double& healthPoints, const unsigned long long& lastShootTimestamp) :
+Singuity::Singuity(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<std::variant<Vector2D, SpawnerDestination>>& destination, const double& healthPoints, const unsigned long long& lastShootTimestamp) :
     Unit(id, position),
-    MobileUnit(id, position, speed, destination, isBreakingForDestination),
+    MobileUnit(id, position, speed, destination),
     Shooter(id, position, lastShootTimestamp),
     UnitWithHealthPoint(id, position, healthPoints)
 {}

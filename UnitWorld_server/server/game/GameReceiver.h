@@ -4,6 +4,7 @@
 
 #include "shared/communication/MessageWrapper.h"
 #include "shared/communication/messages/MoveMobileUnitsToPositionMessage.h"
+#include "shared/communication/messages/MoveMobileUnitsToSpawnerMessage.h"
 #include "shared/transfers/PhysicsCommunicationAssembler.h"
 
 namespace uw
@@ -30,6 +31,16 @@ namespace uw
                     const auto destination(_physicsCommunicationAssembler->communicatedVector2DToPhysics(communicatedDestination));
 
                     _gameManager->setNextMobileUnitsDestination(playerId, singuityIds, destination);
+                }
+
+                else if (messageWrapper.messageType() == MessageType::MoveMobileUnitsToSpawnerMessageType)
+                {
+                    const auto moveMessage(std::dynamic_pointer_cast<const MoveMobileUnitsToSpawnerMessage>(messageWrapper.innerMessage()));
+
+                    const auto singuityIds(moveMessage->singuityIds());
+                    const auto spawnerId(moveMessage->spawnerId());
+
+                    _gameManager->setNextMobileUnitsSpawnerDestination(playerId, singuityIds, spawnerId);
                 }
             }
         }

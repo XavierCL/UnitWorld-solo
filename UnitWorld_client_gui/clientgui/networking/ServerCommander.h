@@ -3,6 +3,7 @@
 #include "shared/transfers/PhysicsCommunicationAssembler.h"
 
 #include "shared/communication/messages/MoveMobileUnitsToPositionMessage.h"
+#include "shared/communication/messages/MoveMobileUnitsToSpawnerMessage.h"
 #include "shared/communication/MessageSerializer.h"
 
 #include "shared/game/geometry/Vector2D.h"
@@ -30,6 +31,20 @@ namespace uw
             const auto communicatedDestination(_physicsCommunicationAssembler->physicsVector2DToCommunicated(destination));
 
             const auto message(std::make_shared<MoveMobileUnitsToPositionMessage>(singuityIds, communicatedDestination));
+
+            try
+            {
+                _serverCommunicator->send(_messageSerializer->serialize(std::vector<MessageWrapper> { MessageWrapper(message) }));
+            }
+            catch (std::exception error)
+            {
+                Logger::error("Error while sending command to server: " + std::string(error.what()));
+            }
+        }
+
+        void moveUnitsToSpawner(const std::vector<xg::Guid>& singuityIds, const xg::Guid& spawnerId)
+        {
+            const auto message(std::make_shared<MoveMobileUnitsToSpawnerMessage>(singuityIds, spawnerId));
 
             try
             {

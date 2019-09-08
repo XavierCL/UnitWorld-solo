@@ -1,5 +1,5 @@
 #include "CppUnitTest.h"
-#include "shared/game/play/Player.h"
+#include "shared/game/play/players/Player.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace uw;

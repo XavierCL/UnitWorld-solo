@@ -79,8 +79,7 @@ namespace uw
                     singuity.singuityId(),
                     communicatedVector2DToPhysics(singuity.position()),
                     communicatedVector2DToPhysics(singuity.speed()),
-                    singuity.destination().map<Vector2D>(std::bind(&PhysicsCommunicationAssembler::communicatedVector2DToPhysics, this, std::placeholders::_1)),
-                    singuity.isBreakingForDestination(),
+                    singuity.destination().map<std::variant<Vector2D, SpawnerDestination>>(std::bind(&PhysicsCommunicationAssembler::communicatedSinguityDestinationToPhysics, this, std::placeholders::_1)),
                     singuity.healthPoint(),
                     singuity.lastShootTimestamp()
                 );
@@ -102,8 +101,7 @@ namespace uw
                     player->id(),
                     physicsVector2DToCommunicated(singuity->position()),
                     physicsVector2DToCommunicated(singuity->speed()),
-                    singuity->destination().map<CommunicatedVector2D>([this](const Vector2D& destination) { return physicsVector2DToCommunicated(destination); }),
-                    singuity->isBreakingForDestination(),
+                    singuity->destination().map<CommunicatedSinguityDestination>([this](const std::variant<Vector2D, SpawnerDestination>& destination) { return physicsSinguityDestinationToCommunicated(destination); }),
                     singuity->healthPoint(),
                     singuity->lastShootTimestamp()
                 );
@@ -117,8 +115,8 @@ namespace uw
             return CommunicatedSpawner(
                 spawner->id(),
                 physicsVector2DToCommunicated(spawner->position()),
-                spawner->allegence().map<CommunicatedSpawnerAllegence>([](const SpawnerAllegence& allegence) {
-                    return CommunicatedSpawnerAllegence(allegence.isClaimed(), allegence.healthPoint(), allegence.allegedPlayerId());
+                spawner->allegence().map<CommunicatedSpawnerAllegence>([this](const SpawnerAllegence& allegence) {
+                    return physicsSpawnerAllegenceToCommunicated(allegence);
                 }),
                 spawner->lastSpawnTimestamp(),
                 spawner->totalSpawnedCount()
@@ -130,12 +128,52 @@ namespace uw
             return std::make_shared<Spawner>(
                 spawner.id(),
                 communicatedVector2DToPhysics(spawner.position()),
-                spawner.allegence().map<SpawnerAllegence>([](const CommunicatedSpawnerAllegence& allegence) {
-                    return SpawnerAllegence(allegence.isClaimed(), allegence.healthPoint(), allegence.playerId());
+                spawner.allegence().map<SpawnerAllegence>([this](const CommunicatedSpawnerAllegence& allegence) {
+                    return communicatedSpawnerAllegenceToPhysics(allegence);
                 }),
                 spawner.lastSpawnTimestamp(),
                 spawner.totalSpawnedCount()
             );
+        }
+
+        std::variant<Vector2D, SpawnerDestination> communicatedSinguityDestinationToPhysics(const CommunicatedSinguityDestination& singuityDestination) const
+        {
+            return std::visit(overloaded{
+                [this](const CommunicatedVector2D& point) {
+                    return std::variant<Vector2D, SpawnerDestination> { communicatedVector2DToPhysics(point) };
+                },
+                [this](const CommunicatedSpawnerDestination& spawnerDestination) {
+                    return std::variant<Vector2D, SpawnerDestination> {
+                        SpawnerDestination(spawnerDestination.spawnerId(), spawnerDestination.spawnerAllegence().map<SpawnerAllegence>([this](const CommunicatedSpawnerAllegence& allegence) { return communicatedSpawnerAllegenceToPhysics(allegence); }))
+                    };
+                }
+            }, singuityDestination.destination());
+        }
+
+        CommunicatedSinguityDestination physicsSinguityDestinationToCommunicated(const std::variant<Vector2D, SpawnerDestination>& singuityDestination) const
+        {
+            return CommunicatedSinguityDestination(std::visit(overloaded{
+                [this](const Vector2D& point) {
+                    return std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> {physicsVector2DToCommunicated(point)};
+                },
+                [this](const SpawnerDestination& spawnerDestination) {
+                    return std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> {
+                        CommunicatedSpawnerDestination(spawnerDestination.spawnerId(), spawnerDestination.spawnerAllegence().map<CommunicatedSpawnerAllegence>([this](const SpawnerAllegence& allegence) {
+                            return physicsSpawnerAllegenceToCommunicated(allegence);
+                        }))
+                    };
+                }
+            }, singuityDestination));
+        }
+
+        CommunicatedSpawnerAllegence physicsSpawnerAllegenceToCommunicated(const SpawnerAllegence& allegence) const
+        {
+            return CommunicatedSpawnerAllegence(allegence.isClaimed(), allegence.healthPoint(), allegence.allegedPlayerId());
+        }
+
+        SpawnerAllegence communicatedSpawnerAllegenceToPhysics(const CommunicatedSpawnerAllegence& allegence) const
+        {
+            return SpawnerAllegence(allegence.isClaimed(), allegence.healthPoint(), allegence.playerId());
         }
     };
 }

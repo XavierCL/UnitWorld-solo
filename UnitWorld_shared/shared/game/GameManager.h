@@ -3,6 +3,8 @@
 #include "shared/game/play/CompleteGameState.h"
 
 #include "shared/game/commands/MoveMobileUnitsToPosition.h"
+#include "shared/game/commands/MoveMobileUnitsToSpawner.h"
+#include "shared/game/commands/GameCommand.h"
 
 #include <immer/vector.hpp>
 #include <immer/set.hpp>
@@ -74,6 +76,21 @@ namespace uw
             _nextCommands.push_back(nextCommand);
         }
 
+        void setNextMobileUnitsSpawnerDestination(const xg::Guid& playerId, const std::vector<xg::Guid>& mobileUnitIds, const xg::Guid& spawnerId)
+        {
+            immer::set<xg::Guid> mobileUnitSet;
+            for (const auto& mobileUnitId : mobileUnitIds)
+            {
+                mobileUnitSet = std::move(mobileUnitSet).insert(mobileUnitId);
+            }
+
+            const auto nextCommand(std::make_shared<MoveMobileUnitsToSpawner>(playerId, mobileUnitSet, spawnerId));
+
+            std::lock_guard<std::mutex> lockPlayerCommands(_nextCommandsMutex);
+
+            _nextCommands.push_back(nextCommand);
+        }
+
         void addPlayerInputCallback(const xg::Guid& callbackId, const std::function<void(std::shared_ptr<const CompleteGameState>)>& callback)
         {
             std::lock_guard<std::mutex> lockCallbacks(_somePlayerInputCallbackMutex);
@@ -132,7 +149,7 @@ namespace uw
                 _currentPlayerId = Option<xg::Guid>(truthNextCurrentPlayerId);
             }
 
-            std::vector<std::shared_ptr<MoveMobileUnitsToPosition>> localCommands;
+            std::vector<std::shared_ptr<GameCommand>> localCommands;
             {
                 std::lock_guard<std::mutex> lockCommands(_nextCommandsMutex);
 
@@ -168,7 +185,7 @@ namespace uw
         std::atomic<Player*> _nextAddPlayer;
         std::atomic<std::vector<std::shared_ptr<Spawner>>*> _nextAddSpawners;
         std::mutex _nextCommandsMutex;
-        std::vector<std::shared_ptr<MoveMobileUnitsToPosition>> _nextCommands;
+        std::vector<std::shared_ptr<GameCommand>> _nextCommands;
         std::atomic<CompleteGameState*> _nextCompleteGameState;
         std::atomic<xg::Guid*> _nextCurrentPlayerId;
 

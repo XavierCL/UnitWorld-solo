@@ -32,11 +32,11 @@ namespace uw
             }
         }
 
-        void updatePhysics()
+        void updatePhysics(const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById)
         {
             for (auto playerActualizer : _playerActualizers)
             {
-                playerActualizer->removeSinguitiesAndUpdateTheirPhysics();
+                playerActualizer->removeSinguitiesAndUpdateTheirPhysics(spawnersById);
             }
         }
 

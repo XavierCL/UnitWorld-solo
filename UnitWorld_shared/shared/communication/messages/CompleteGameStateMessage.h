@@ -13,7 +13,7 @@ namespace uw
     public:
         CompleteGameStateMessage(const CommunicatedCompleteGameState& completeGameState, const xg::Guid& currentPlayerId);
 
-        CompleteGameStateMessage(const std::string jsonData);
+        static std::shared_ptr<CompleteGameStateMessage> fromJson(const std::string& jsonData);
 
         virtual MessageType messageType() const;
 
@@ -24,9 +24,6 @@ namespace uw
         xg::Guid getCurrentPlayerId() const;
 
     private:
-
-        static CommunicatedCompleteGameState jsonDataToCompleteGameState(const std::string& jsonData);
-        static xg::Guid jsonDataToCurrentPlayerId(const std::string& jsonData);
 
         const CommunicatedCompleteGameState _completeGameState;
         const xg::Guid _currentPlayerId;

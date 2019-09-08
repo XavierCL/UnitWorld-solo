@@ -33,7 +33,14 @@ void Player::setSinguitiesDestination(const immer::set<xg::Guid>& singuitiesId, 
 {
     _singuities
         | filter<std::shared_ptr<Singuity>>([&singuitiesId](auto singuity) { return singuitiesId.count(singuity->id()) > 0; })
-        | forEach([&destination](auto singuity) { singuity->setDestination(destination); });
+        | forEach([&destination](auto singuity) { singuity->setPointDestination(destination); });
+}
+
+void Player::setSinguitiesSpawnerDestination(const immer::set<xg::Guid>& singuitiesId, const SpawnerDestination& spawnerDestination)
+{
+    _singuities
+        | filter<std::shared_ptr<Singuity>>([&singuitiesId](std::shared_ptr<Singuity> singuity) { return singuitiesId.count(singuity->id()) > 0; })
+        | forEach([&spawnerDestination](std::shared_ptr<Singuity> singuity) { singuity->setSpawnerDestination(spawnerDestination); });
 }
 
 void Player::addSinguity(std::shared_ptr<Singuity> newSinguity)
