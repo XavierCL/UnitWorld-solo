@@ -21,6 +21,8 @@ namespace uw
 
     private:
 
+        static const size_t MAX_TCP_BUFFER_SIZE;
+
         void resetBufferUntilLastNonZero();
 
         std::shared_ptr<asio::ip::tcp::socket> _socket;

@@ -7,7 +7,7 @@ CommunicationHandler::CommunicationHandler(const std::shared_ptr<asio::ip::tcp::
     _endpoint(endpoint)
 {
     // Max TCP receive size
-    _receiveBuffer.resize(65535);
+    _receiveBuffer.resize(MAX_TCP_BUFFER_SIZE);
 }
 
 void CommunicationHandler::send(const std::string& message)
@@ -62,3 +62,5 @@ void CommunicationHandler::resetBufferUntilLastNonZero()
         _receiveBuffer[bufferIndex] = '\0';
     }
 }
+
+const size_t CommunicationHandler::MAX_TCP_BUFFER_SIZE = 65535;
