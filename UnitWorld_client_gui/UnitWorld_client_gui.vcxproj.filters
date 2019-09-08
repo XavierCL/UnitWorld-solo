@@ -15,45 +15,51 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="clientgui\graphics\canvas\CanvasTransactionGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\GameLoop.cpp">
+    <ClCompile Include="clientgui\graphics\canvas\SFMLCanvas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graphics\canvas\CanvasTransactionGenerator.cpp">
+    <ClCompile Include="clientgui\graphics\units\GraphicalSinguity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graphics\canvas\SFMLCanvas.cpp">
+    <ClCompile Include="clientgui\graphics\units\GraphicalUnit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graphics\units\GraphicalSinguity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="graphics\units\GraphicalUnit.cpp">
+    <ClCompile Include="clientgui\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="game\GameLoop.h">
+    <ClInclude Include="clientgui\graphics\canvas\CanvasTransactionGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\canvas\SFMLCanvas.h">
+    <ClInclude Include="clientgui\graphics\canvas\DisplayCanvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\canvas\DisplayCanvas.h">
+    <ClInclude Include="clientgui\graphics\canvas\SFMLCanvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\units\GraphicalSinguity.h">
+    <ClInclude Include="clientgui\graphics\canvas\SFMLDrawingCanvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\units\GraphicalUnit.h">
+    <ClInclude Include="clientgui\graphics\units\GraphicalSinguity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\canvas\CanvasTransactionGenerator.h">
+    <ClInclude Include="clientgui\graphics\units\GraphicalUnit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\canvas\SFMLDrawingCanvas.h">
+    <ClInclude Include="clientgui\graphics\GameDrawer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\ClientGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\networking\ServerReceiver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\graphics\WindowManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

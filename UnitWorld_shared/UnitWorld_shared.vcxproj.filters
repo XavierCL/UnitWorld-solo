@@ -15,45 +15,93 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="game\play\MobileUnit.h">
+    <ClInclude Include="shared\transfers\PhysicsCommunicationAssembler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\play\Player.h">
+    <ClInclude Include="shared\communication\game\CommunicatedPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\play\Singuity.h">
+    <ClInclude Include="shared\communication\game\CommunicatedSinguity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\play\Unit.h">
+    <ClInclude Include="shared\communication\game\CommunicatedVector2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\GameManager.h">
+    <ClInclude Include="shared\communication\CompleteGameStateMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\geometry\Rectangle.h">
+    <ClInclude Include="shared\communication\InvalidMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\physics\Vector2D.h">
+    <ClInclude Include="shared\communication\Message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\MessageType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\MessageWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\geometry\Rectangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\Vector2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\MobileUnit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\Player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\Singuity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\Unit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\GameManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\MessageSerializer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="game\geometry\Rectangle.cpp">
+    <ClCompile Include="shared\communication\game\CommunicatedPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\play\Player.cpp">
+    <ClCompile Include="shared\communication\game\CommunicatedSinguity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\play\Unit.cpp">
+    <ClCompile Include="shared\communication\game\CommunicatedVector2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\play\MobileUnit.cpp">
+    <ClCompile Include="shared\communication\CompleteGameStateMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\physics\Vector2D.cpp">
+    <ClCompile Include="shared\communication\MessageWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\play\Singuity.cpp">
+    <ClCompile Include="shared\game\geometry\Rectangle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\physics\Vector2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\play\MobileUnit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\play\Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\play\Singuity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\play\Unit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\GameManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
