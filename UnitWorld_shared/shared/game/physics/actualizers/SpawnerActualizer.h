@@ -1,7 +1,7 @@
 #pragma once
 
-#include "shared/game/play/Spawner.h"
-#include "shared/game/play/Player.h"
+#include "shared/game/play/spawners/Spawner.h"
+#include "shared/game/play/players/Player.h"
 
 #include "commons/CollectionPipe.h"
 

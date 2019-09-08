@@ -9,10 +9,21 @@ MoveMobileUnitsToPositionMessage::MoveMobileUnitsToPositionMessage(const std::ve
     _destination(destination)
 {}
 
-MoveMobileUnitsToPositionMessage::MoveMobileUnitsToPositionMessage(const std::string& json):
-    _singuityIds(jsonToSinguityIds(json)),
-    _destination(jsonToDestination(json))
-{}
+std::shared_ptr<MoveMobileUnitsToPositionMessage> MoveMobileUnitsToPositionMessage::fromJson(const std::string& json)
+{
+    nlohmann::json parsedData = nlohmann::json::parse(json);
+
+    std::vector<xg::Guid> singuityIds;
+    for (const auto singuityId : parsedData.at("mobile-units-id"))
+    {
+        singuityIds.emplace_back(singuityId.get<std::string>());
+    }
+
+    return std::make_shared<MoveMobileUnitsToPositionMessage>(
+        std::move(singuityIds),
+        CommunicatedVector2D::fromJson(parsedData.at("destination-position").dump())
+    );
+}
 
 MessageType MoveMobileUnitsToPositionMessage::messageType() const
 {
@@ -32,7 +43,7 @@ std::string MoveMobileUnitsToPositionMessage::toJsonData() const
     nlohmann::json returnedJson({
         {"mobile-units-id", singuityStringIds},
         {"destination-position", parsedDestination}
-        });
+    });
 
     return returnedJson.dump();
 }
@@ -45,24 +56,4 @@ std::vector<xg::Guid> MoveMobileUnitsToPositionMessage::singuityIds() const
 CommunicatedVector2D MoveMobileUnitsToPositionMessage::destination() const
 {
     return _destination;
-}
-
-std::vector<xg::Guid> MoveMobileUnitsToPositionMessage::jsonToSinguityIds(const std::string& json)
-{
-    nlohmann::json parsedData = nlohmann::json::parse(json);
-
-    std::vector<xg::Guid> singuityIds;
-    for (const auto singuityId : parsedData.at("mobile-units-id"))
-    {
-        singuityIds.emplace_back(singuityId.get<std::string>());
-    }
-
-    return singuityIds;
-}
-
-CommunicatedVector2D MoveMobileUnitsToPositionMessage::jsonToDestination(const std::string& json)
-{
-    nlohmann::json parsedData = nlohmann::json::parse(json);
-
-    return CommunicatedVector2D::fromJson(parsedData.at("destination-position").dump());
 }

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Singuity.h"
+#include "shared/game/play/units/Singuity.h"
+#include "shared/game/play/units/SpawnerDestination.h"
 
-#include "../geometry/Rectangle.h"
+#include "shared/game/geometry/Vector2D.h"
 
-#include "commons/Hash.hpp"
 #include "commons/Guid.hpp"
 
 #include <immer/map.hpp>
@@ -20,6 +20,7 @@ namespace uw
 
         xg::Guid id() const;
         void setSinguitiesDestination(const immer::set<xg::Guid>& singuitiesId, const Vector2D& destination);
+        void setSinguitiesSpawnerDestination(const immer::set<xg::Guid>& singuitiesId, const SpawnerDestination& spawnerDestination);
         void addSinguity(std::shared_ptr<Singuity> newSinguity);
         void setSinguities(std::shared_ptr<std::vector<std::shared_ptr<Singuity>>> singuities);
         std::shared_ptr<std::vector<std::shared_ptr<Singuity>>> singuities() const;

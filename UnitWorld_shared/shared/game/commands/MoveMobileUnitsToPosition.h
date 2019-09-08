@@ -1,12 +1,14 @@
 #pragma once
 
+#include "GameCommand.h"
+
 #include "shared/game/play/CompleteGameState.h"
 
 #include <immer/set.hpp>
 
 namespace uw
 {
-    class MoveMobileUnitsToPosition
+    class MoveMobileUnitsToPosition: public GameCommand
     {
     public:
 

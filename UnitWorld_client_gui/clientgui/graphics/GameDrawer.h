@@ -59,15 +59,17 @@ namespace uw
                     auto lifeRatio = allegence.healthPoint() / spawner->maximumHealthPoint();
                     sf::Color playerLifeColor(round(playerFullColor.r * lifeRatio), round(playerFullColor.g * lifeRatio), round(playerFullColor.b * lifeRatio));
 
-                    return std::make_pair(playerFullColor, playerLifeColor);
+                    return allegence.isClaimed()
+                        ? std::make_pair(playerLifeColor, playerFullColor)
+                        : std::make_pair(sf::Color(70, 70, 70), playerLifeColor);
                 }).getOrElse(std::make_pair(sf::Color(70, 70, 70), sf::Color(70, 70, 70)));
 
                 const int circleRadius(20.0);
                 sf::CircleShape graphicalSpawner(circleRadius);
                 graphicalSpawner.setPosition(round(spawner->position().x() - circleRadius), round(spawner->position().y() - circleRadius));
-                graphicalSpawner.setFillColor(spanwerOuterAndInnerColors.second);
+                graphicalSpawner.setFillColor(spanwerOuterAndInnerColors.first);
                 graphicalSpawner.setOutlineThickness(2.0);
-                graphicalSpawner.setOutlineColor(spanwerOuterAndInnerColors.first);
+                graphicalSpawner.setOutlineColor(spanwerOuterAndInnerColors.second);
                 canvas->draw(graphicalSpawner);
             });
             

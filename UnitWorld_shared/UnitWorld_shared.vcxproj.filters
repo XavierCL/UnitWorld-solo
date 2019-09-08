@@ -24,18 +24,6 @@
     <ClInclude Include="shared\game\geometry\Rectangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shared\game\play\MobileUnit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\game\play\Player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\game\play\Singuity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\game\play\Unit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="shared\game\GameManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -75,12 +63,6 @@
     <ClInclude Include="shared\communication\messages\game\CommunicatedSpawner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shared\game\play\Spawner.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\game\play\SpawnerAllegance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="shared\game\play\CompleteGameState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -88,12 +70,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="shared\game\physics\PhysicsManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\game\play\UnitWithHealthPoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\game\play\Shooter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="shared\game\physics\collisions\CollidablePoint.h">
@@ -138,24 +114,54 @@
     <ClInclude Include="shared\game\geometry\Circle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="shared\communication\messages\MoveMobileUnitsToSpawnerMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\commands\MoveMobileUnitsToSpawner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\commands\GameCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\units\MobileUnit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\units\Shooter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\units\Singuity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\units\SpawnerDestination.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\units\Unit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\units\UnitWithHealthPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\players\Player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\spawners\Spawner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\spawners\SpawnerAllegance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\game\CommunicatedSinguityDestination.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\game\CommunicatedSpawnerDestination.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="shared\communication\MessageWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\game\geometry\Rectangle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shared\game\play\MobileUnit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shared\game\play\Player.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shared\game\play\Singuity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shared\game\play\Unit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\communication\messages\CompleteGameStateMessage.cpp">
@@ -185,13 +191,31 @@
     <ClCompile Include="shared\game\geometry\Vector2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shared\game\play\Spawner.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="shared\communication\messages\game\CommunicatedSpawnerAllegence.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\communication\messages\game\CommunicatedSpawner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\MoveMobileUnitsToSpawner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\play\units\Singuity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\play\units\Unit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\play\players\Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\play\spawners\Spawner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\game\CommunicatedSinguityDestination.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\game\CommunicatedSpawnerDestination.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

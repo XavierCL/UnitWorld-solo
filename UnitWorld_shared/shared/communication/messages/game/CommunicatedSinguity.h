@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CommunicatedVector2D.h"
+#include "CommunicatedSinguityDestination.h"
 
 #include "commons/Guid.hpp"
 #include "commons/Option.hpp"
@@ -10,7 +11,7 @@ namespace uw
     class CommunicatedSinguity
     {
     public:
-        CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedVector2D>& destination, const bool& isBreakingForDestination, const double& healthPoint, const unsigned long long& lastShootTimestamp);
+        CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedSinguityDestination>& destination, const double& healthPoint, const unsigned long long& lastShootTimestamp);
 
         std::string toJson() const;
 
@@ -21,7 +22,7 @@ namespace uw
 
         CommunicatedVector2D position() const;
         CommunicatedVector2D speed() const;
-        Option<CommunicatedVector2D> destination() const;
+        Option<CommunicatedSinguityDestination> destination() const;
         bool isBreakingForDestination() const;
         double healthPoint() const;
         unsigned long long lastShootTimestamp() const;
@@ -31,8 +32,7 @@ namespace uw
         const xg::Guid _playerId;
         const CommunicatedVector2D _position;
         const CommunicatedVector2D _speed;
-        const Option<CommunicatedVector2D> _destination;
-        const bool _isBreakingForDestination;
+        const Option<CommunicatedSinguityDestination> _destination;
         const double _healthPoint;
         const unsigned long long _lastShootTimestamp;
     };
