@@ -133,7 +133,7 @@ namespace uw
                 }).orElse([this, &playerId, &gainedHealthPoint]() {
                     return SpawnerAllegence(false, gainedHealthPoint, playerId);
                 });
-                reguvenator->kill();
+                reguvenator->makeHealthPointNone();
             }
         }
 
