@@ -13,7 +13,7 @@ std::string CommunicatedSpawnerDestination::toJson() const
     return nlohmann::json {
         {"spawner-id", _spawnerId.str()},
         {"spawner-allegence", parsedSpawnerAllegence}
-    };
+    }.dump();
 }
 
 CommunicatedSpawnerDestination CommunicatedSpawnerDestination::fromJson(const std::string& jsonData)

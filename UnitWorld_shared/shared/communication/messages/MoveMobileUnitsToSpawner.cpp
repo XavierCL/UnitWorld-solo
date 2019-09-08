@@ -40,7 +40,7 @@ std::string MoveMobileUnitsToSpawnerMessage::toJsonData() const
 
     nlohmann::json returnedJson({
         {"mobile-units-id", singuityStringIds},
-        {"destination-position", _spawnerId.str()}
+        {"spawner-id", _spawnerId.str()}
     });
 
     return returnedJson.dump();
