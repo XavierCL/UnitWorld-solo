@@ -26,11 +26,11 @@ namespace uw
             _player->removeSinguityAddedCallback(singuityAddedCallbackId());
         }
 
-        void updateShootingAndRepulsionForces(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<CollisionDetector> neutralCollisionDetector, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
+        void updateShootingAndRepulsionForces(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
         {
             for (auto& singuityActualizer : _singuityActualizers)
             {
-                singuityActualizer.updateShootingAndRepulsionForce(_player->id(), collisionDetectorsByPlayerId, neutralCollisionDetector, shootablesById, frameTimestamp);
+                singuityActualizer.updateShootingAndRepulsionForce(_player->id(), collisionDetectorsByPlayerId, shootablesById, frameTimestamp);
             }
         }
 

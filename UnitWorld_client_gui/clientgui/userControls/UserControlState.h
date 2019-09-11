@@ -97,8 +97,8 @@ namespace uw
             {
                 Circle spawnerShape(spawner->position(), 20.0);
                 auto currentPlayerId = _gameManager->currentPlayer().map<xg::Guid>([](std::shared_ptr<Player> player) { return player->id(); });
-                bool spawnerCanBeReguvenated = currentPlayerId.map<bool>([spawner](const xg::Guid& id) { return spawner->canBeReguvanatedBy(id); }).getOrElse(false);
-                if (spawnerShape.contains(position) && spawnerCanBeReguvenated)
+                bool spawnerCanBeInterractedWith = currentPlayerId.map<bool>([spawner](const xg::Guid& id) { return spawner->canBeInteractedWithBy(id); }).getOrElse(false);
+                if (spawnerShape.contains(position) && spawnerCanBeInterractedWith)
                 {
                     _serverCommander->moveUnitsToSpawner(*_selectedUnits, spawner->id());
                     _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>(spawner->id());
