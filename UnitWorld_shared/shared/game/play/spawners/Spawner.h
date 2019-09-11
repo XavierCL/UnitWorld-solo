@@ -115,25 +115,50 @@ namespace uw
             });
         }
 
-        bool canBeReguvanatedBy(const xg::Guid& playerId)
+        bool canBeReguvenatedBy(const xg::Guid& playerId) const
         {
             return isAllegedToPlayer(playerId) && !isAtMaximumHealth() || _allegence.isEmpty();
         }
 
+        bool canBeAttackedBy(const xg::Guid& playerId) const
+        {
+            return !isAllegedToPlayer(playerId) && healthPoint() > 0 && _allegence.isDefined();
+        }
+
+        bool canBeInteractedWithBy(const xg::Guid& playerId) const
+        {
+            return canBeReguvenatedBy(playerId) || canBeAttackedBy(playerId);
+        }
+
         void reguvenate(const xg::Guid& playerId, std::shared_ptr<Singuity> reguvenator)
         {
-            if (canBeReguvanatedBy(playerId))
+            if (canBeReguvenatedBy(playerId))
             {
                 double gainedHealthPoint = healthPoint() + 20.0 > maximumHealthPoint()
                     ? maximumHealthPoint() - healthPoint()
                     : 20.0;
                 UnitWithHealthPoint::gainHealthPoint(gainedHealthPoint);
-                _allegence = _allegence.map<SpawnerAllegence>([this, &gainedHealthPoint](const SpawnerAllegence& oldAllegence) {
+                _allegence = _allegence.map<SpawnerAllegence>([&gainedHealthPoint](const SpawnerAllegence& oldAllegence) {
                     return oldAllegence.gainHealthPoint(gainedHealthPoint);
-                }).orElse([this, &playerId, &gainedHealthPoint]() {
+                }).orElse([&playerId, &gainedHealthPoint]() {
                     return SpawnerAllegence(false, gainedHealthPoint, playerId);
                 });
                 reguvenator->makeHealthPointNone();
+            }
+        }
+
+        void attackedBy(const xg::Guid& playerId, std::shared_ptr<Singuity> attacker)
+        {
+            if (canBeAttackedBy(playerId))
+            {
+                double lostHealthPoint = healthPoint() - 20.0 < 0.0
+                    ? healthPoint()
+                    : 20.0;
+                UnitWithHealthPoint::loseHealthPoint(lostHealthPoint);
+                _allegence = _allegence.map<SpawnerAllegence>([&lostHealthPoint](const SpawnerAllegence& oldAllegence) {
+                    return oldAllegence.loseHealthPoint(lostHealthPoint);
+                });
+                attacker->makeHealthPointNone();
             }
         }
 

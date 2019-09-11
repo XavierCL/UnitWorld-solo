@@ -18,7 +18,7 @@ namespace uw
             _singuity(singuity)
         {}
 
-        void updateShootingAndRepulsionForce(const xg::Guid& playerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<CollisionDetector> neutralCollisionDetector, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
+        void updateShootingAndRepulsionForce(const xg::Guid& playerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
         {
             Option<std::shared_ptr<UnitWithHealthPoint>> closestThing;
             Option<std::shared_ptr<UnitWithHealthPoint>> closestEnemy;
@@ -75,33 +75,38 @@ namespace uw
             Vector2D acceleration = _singuity->destination().flatMap<Vector2D>([this, &playerId, &spawnersById](const std::variant<Vector2D, SpawnerDestination>& destination) {
                 return std::visit(overloaded{
                     [this](const Vector2D& point) {
-                    bool willBreakForDestination = (_singuity->position() + _singuity->speed().atModule(_singuity->stopDistanceFromTargetSq())).distanceSq(point) < 100;
+                        bool willBreakForDestination = (_singuity->position() + _singuity->speed().atModule(_singuity->stopDistanceFromTargetSq())).distanceSq(point) < 100;
 
-                    if (willBreakForDestination)
-                    {
-                        bool isReleaseBreakSpeed = _singuity->speed().moduleSq() < 0.01 * _singuity->maximumSpeed() * _singuity->maximumSpeed();
-
-                        if (isReleaseBreakSpeed)
+                        if (willBreakForDestination)
                         {
-                            _singuity->clearDestination();
-                            return Options::None<Vector2D>();
+                            bool isReleaseBreakSpeed = _singuity->speed().moduleSq() < 0.01 * _singuity->maximumSpeed() * _singuity->maximumSpeed();
+
+                            if (isReleaseBreakSpeed)
+                            {
+                                _singuity->clearDestination();
+                                return Options::None<Vector2D>();
+                            }
+                            else
+                            {
+                                return Options::Some(_singuity->getBreakingAcceleration());
+                            }
                         }
                         else
                         {
-                            return Options::Some(_singuity->getBreakingAcceleration());
+                            return Options::Some(_singuity->getMaximalAcceleration(point));
                         }
-                    }
-                    else
-                    {
-                        return Options::Some(_singuity->getMaximalAcceleration(point));
-                    }
                     }, [this, &playerId, &spawnersById](const SpawnerDestination spawnerDestination) {
                         return (&spawnersById | find<std::shared_ptr<Spawner>>(spawnerDestination.spawnerId())).map<Vector2D>([this, &playerId, &spawnerDestination](std::shared_ptr<Spawner> spawner) {
                             if (spawner->hasSameAllegenceState(spawnerDestination.spawnerAllegence()))
                             {
-                                if (spawner->canBeReguvanatedBy(playerId) && Circle(spawner->position(), 8).contains(_singuity->position()))
+                                if (spawner->canBeReguvenatedBy(playerId) && Circle(spawner->position(), 8).contains(_singuity->position()))
                                 {
                                     spawner->reguvenate(playerId, _singuity);
+                                    return Vector2D();
+                                }
+                                else if (spawner->canBeAttackedBy(playerId) && Circle(spawner->position(), 8).contains(_singuity->position()))
+                                {
+                                    spawner->attackedBy(playerId, _singuity);
                                     return Vector2D();
                                 }
                                 else
