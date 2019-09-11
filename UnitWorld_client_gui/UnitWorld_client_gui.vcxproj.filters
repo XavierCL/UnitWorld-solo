@@ -62,13 +62,22 @@
     <ClInclude Include="clientgui\networking\ServerReceiver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="clientgui\graphics\WindowManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="clientgui\userControls\UserControlState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="clientgui\networking\ServerCommander.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\cameras\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\cameras\CameraRelativeGameManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\WindowManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\userControls\WindowInputs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
