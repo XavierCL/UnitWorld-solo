@@ -27,7 +27,7 @@ namespace uw
             {
                 if (spawner->id() == _spawnerId)
                 {
-                    if (spawner->canBeReguvanatedBy(_playerId))
+                    if (spawner->canBeInteractedWithBy(_playerId))
                     {
                         for (auto player : completeGameState->players())
                         {
