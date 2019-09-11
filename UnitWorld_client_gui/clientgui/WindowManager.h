@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GameDrawer.h"
+#include "graphics/GameDrawer.h"
 
-#include "canvas/CanvasTransactionGenerator.h"
+#include "graphics/canvas/CanvasTransactionGenerator.h"
 
 #include "shared/game/GameManager.h"
 
@@ -15,7 +15,7 @@ namespace uw
     class WindowManager
     {
     public:
-        WindowManager(const unsigned int& graphicsFramePerSecond, std::shared_ptr<GameDrawer> gameDrawer, std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator, std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<UserControlState> userControlState) :
+        WindowManager(const unsigned int& graphicsFramePerSecond, std::shared_ptr<GameDrawer> gameDrawer, std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator, std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<WindowInputs> windowInputs) :
             _msPerFrame(1000 / graphicsFramePerSecond),
             _gameDrawer(gameDrawer),
             _canvasTransactionGenerator(canvasTransactionGenerator),
@@ -87,6 +87,7 @@ namespace uw
                     _userControlState->setUserMousePosition(mousePosition);
                 }
             }
+            _camera->frameHappened();
             _userControlState->frameHappened();
         }
 

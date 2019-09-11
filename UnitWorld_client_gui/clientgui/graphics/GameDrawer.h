@@ -12,7 +12,7 @@ namespace uw
     class GameDrawer
     {
     public:
-        GameDrawer(std::shared_ptr<GameManager> gameManager, std::shared_ptr<UserControlState> userControlState):
+        GameDrawer(std::shared_ptr<CameraRelativeGameManager> gameManager, std::shared_ptr<UserControlState> userControlState):
             _gameManager(gameManager),
             _userControlState(userControlState)
         {}

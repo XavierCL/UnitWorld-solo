@@ -150,6 +150,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clientgui\ClientGame.h" />
+    <ClInclude Include="clientgui\cameras\Camera.h" />
+    <ClInclude Include="clientgui\cameras\CameraRelativeGameManager.h" />
     <ClInclude Include="clientgui\graphics\GameDrawer.h" />
     <ClInclude Include="clientgui\graphics\units\GraphicalSinguity.h" />
     <ClInclude Include="clientgui\graphics\units\GraphicalUnit.h" />
@@ -158,7 +160,8 @@
     <ClInclude Include="clientgui\graphics\canvas\SFMLCanvas.h" />
     <ClInclude Include="clientgui\graphics\canvas\CanvasTransactionGenerator.h" />
     <ClInclude Include="clientgui\networking\ServerReceiver.h" />
-    <ClInclude Include="clientgui\graphics\WindowManager.h" />
+    <ClInclude Include="clientgui\userControls\WindowInputs.h" />
+    <ClInclude Include="clientgui\WindowManager.h" />
     <ClInclude Include="clientgui\networking\ServerCommander.h" />
     <ClInclude Include="clientgui\userControls\UserControlState.h" />
   </ItemGroup>

@@ -19,7 +19,7 @@ namespace uw
     class UserControlState
     {
     public:
-        UserControlState(std::shared_ptr<GameManager> gameManager, std::shared_ptr<ServerCommander> serverCommander) :
+        UserControlState(std::shared_ptr<CameraRelativeGameManager> gameManager, std::shared_ptr<ServerCommander> serverCommander) :
             _gameManager(gameManager),
             _serverCommander(serverCommander),
             _leftMouseDownPosition(std::make_shared<Option<const Vector2D>>()),
