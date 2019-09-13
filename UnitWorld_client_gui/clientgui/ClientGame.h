@@ -2,7 +2,7 @@
 
 #include "clientgui/networking/ServerReceiver.h"
 
-#include "clientgui/graphics/WindowManager.h"
+#include "WindowManager.h"
 
 #include "shared/game/physics/PhysicsManager.h"
 #include "shared/game/GameManager.h"

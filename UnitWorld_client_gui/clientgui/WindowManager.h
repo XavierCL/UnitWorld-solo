@@ -1,7 +1,8 @@
 #pragma once
 
-#include "graphics/GameDrawer.h"
+#include "userControls/WindowInputs.h"
 
+#include "graphics/GameDrawer.h"
 #include "graphics/canvas/CanvasTransactionGenerator.h"
 
 #include "shared/game/GameManager.h"
@@ -20,7 +21,7 @@ namespace uw
             _gameDrawer(gameDrawer),
             _canvasTransactionGenerator(canvasTransactionGenerator),
             _window(window),
-            _userControlState(userControlState)
+            _windowInputs(windowInputs)
         {}
 
         void startSync()
@@ -65,12 +66,12 @@ namespace uw
                     if (event.mouseButton.button == sf::Mouse::Left)
                     {
                         Vector2D mousePosition(event.mouseButton.x, event.mouseButton.y);
-                        _userControlState->setUserLeftMouseDownPosition(mousePosition);
+                        _windowInputs->setUserLeftMouseDownPosition(mousePosition);
                     }
                     else if (event.mouseButton.button == sf::Mouse::Right)
                     {
                         Vector2D mousePosition(event.mouseButton.x, event.mouseButton.y);
-                        _userControlState->setUserRightMouseDownPosition(mousePosition);
+                        _windowInputs->setUserRightMouseDownPosition(mousePosition);
                     }
                 }
                 else if (event.type == sf::Event::MouseButtonReleased)
@@ -78,17 +79,16 @@ namespace uw
                     if (event.mouseButton.button == sf::Mouse::Left)
                     {
                         Vector2D mousePosition(event.mouseButton.x, event.mouseButton.y);
-                        _userControlState->setUserLeftMouseUpPosition(mousePosition);
+                        _windowInputs->setUserLeftMouseUpPosition(mousePosition);
                     }
                 }
                 else if (event.type == sf::Event::MouseMoved)
                 {
                     Vector2D mousePosition(event.mouseMove.x, event.mouseMove.y);
-                    _userControlState->setUserMousePosition(mousePosition);
+                    _windowInputs->setUserMousePosition(mousePosition);
                 }
             }
-            _camera->frameHappened();
-            _userControlState->frameHappened();
+            _windowInputs->frameHappened();
         }
 
         void loopGraphics()
@@ -103,6 +103,6 @@ namespace uw
         const std::shared_ptr<GameDrawer> _gameDrawer;
         const std::shared_ptr<CanvasTransactionGenerator> _canvasTransactionGenerator;
         const std::shared_ptr<sf::RenderWindow> _window;
-        const std::shared_ptr<UserControlState> _userControlState;
+        const std::shared_ptr<WindowInputs> _windowInputs;
     };
 }
