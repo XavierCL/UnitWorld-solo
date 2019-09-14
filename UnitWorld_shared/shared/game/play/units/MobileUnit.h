@@ -34,7 +34,7 @@ namespace uw
 
         Vector2D getMaximalAcceleration(const Vector2D& destination)
         {
-            Vector2D stopDelta = _speed.atModule(stopDistanceFromTarget() * 0.98);
+            Vector2D stopDelta = _speed.atModule(stopDistanceFromTarget() * 2);
             Vector2D expectedPosition(position() + stopDelta);
             return (destination - expectedPosition).maxAt(maximumAcceleration());
         }
