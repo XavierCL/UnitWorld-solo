@@ -46,7 +46,7 @@ namespace uw
                     const Circle spawnerCircle(_cameraRelativeGameManager->relativeCircleOf(spawner));
                     const double spawnerSelectionRadius = spawnerCircle.radius() * 1.0454545454545454545454545454545;
                     sf::CircleShape graphicalSpawner(spawnerSelectionRadius);
-                    graphicalSpawner.setPosition(round(spawnerCircle.center().x() - spawnerSelectionRadius), round(spawnerCircle.center().y() - spawnerSelectionRadius));
+                    graphicalSpawner.setPosition(spawnerCircle.center().x() - spawnerSelectionRadius, spawnerCircle.center().y() - spawnerSelectionRadius);
                     graphicalSpawner.setFillColor(sf::Color::White);
                     canvas->draw(graphicalSpawner);
                 });
@@ -71,7 +71,7 @@ namespace uw
                 const Circle spawnerCircle(_cameraRelativeGameManager->relativeCircleOf(spawner));
                 const double spawnerInnerRadius = spawnerCircle.radius() * 0.90909090909090909090909090909091;
                 sf::CircleShape graphicalSpawner(spawnerInnerRadius);
-                graphicalSpawner.setPosition(round(spawnerCircle.center().x() - spawnerInnerRadius), round(spawnerCircle.center().y() - spawnerInnerRadius));
+                graphicalSpawner.setPosition(spawnerCircle.center().x() - spawnerInnerRadius, spawnerCircle.center().y() - spawnerInnerRadius);
                 graphicalSpawner.setFillColor(spanwerOuterAndInnerColors.first);
                 graphicalSpawner.setOutlineThickness(spawnerCircle.radius() * 0.09090909090909090909090909090909);
                 graphicalSpawner.setOutlineColor(spanwerOuterAndInnerColors.second);
@@ -83,7 +83,7 @@ namespace uw
                 const double circleRadius(_cameraRelativeGameManager->absoluteLengthToRelative(2.0));
                 const Vector2D relativeLastMoveUnitPosition(_cameraRelativeGameManager->absolutePositionToRelative(lastMoveUnitPosition));
                 sf::CircleShape cursorDot(circleRadius);
-                cursorDot.setPosition(round(relativeLastMoveUnitPosition.x() - circleRadius), round(relativeLastMoveUnitPosition.y() - circleRadius));
+                cursorDot.setPosition(relativeLastMoveUnitPosition.x() - circleRadius, relativeLastMoveUnitPosition.y() - circleRadius);
                 cursorDot.setFillColor(sf::Color(255, 255, 255));
                 canvas->draw(cursorDot);
             });
@@ -95,7 +95,7 @@ namespace uw
                     Circle singuityCircle = _cameraRelativeGameManager->relativeCircleOf(singuity);
                     const double circleRadius(singuityCircle.radius() * 1.25);
                     sf::CircleShape selectedUnitAura(circleRadius);
-                    selectedUnitAura.setPosition(round(singuityCircle.center().x() - circleRadius), round(singuityCircle.center().y() - circleRadius));
+                    selectedUnitAura.setPosition(singuityCircle.center().x() - circleRadius, singuityCircle.center().y() - circleRadius);
                     selectedUnitAura.setFillColor(sf::Color(255, 255, 255));
                     canvas->draw(selectedUnitAura);
                 });

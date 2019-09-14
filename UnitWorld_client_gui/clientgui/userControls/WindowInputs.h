@@ -18,6 +18,7 @@ namespace uw
         void frameHappened()
         {
             _userControlState->frameHappened();
+            _camera->frameHappened();
         }
 
         void setUserMousePosition(const Vector2D& position)
