@@ -58,7 +58,7 @@ namespace uw
                 const double absoluteOutboundHeight = relativeLengthToAbsolute(_screenRelativeRectangle.size().y() / 2.0);
                 const Rectangle inbountAbsoluteCenter(Vector2D(absoluteOutboundWidth, absoluteOutboundHeight), Vector2D(_worldAbsoluteWidth - absoluteOutboundWidth, _worldAbsoluteHeight - absoluteOutboundHeight));
 
-                _centerAbsolutePosition = std::make_shared<Vector2D>(inbountAbsoluteCenter.closestPointTo(*_centerAbsolutePosition + distanceToMove));
+                _centerAbsolutePosition = std::make_shared<Vector2D>(inbountAbsoluteCenter.closestPointTo(*_centerAbsolutePosition + (distanceToMove / _absoluteScale)));
             }
         }
 
@@ -74,7 +74,7 @@ namespace uw
             const double absoluteOutboundHeight = relativeLengthToAbsolute(_screenRelativeRectangle.size().y() / 2.0);
             const Rectangle inbountAbsoluteCenter(Vector2D(absoluteOutboundWidth, absoluteOutboundHeight), Vector2D(_worldAbsoluteWidth - absoluteOutboundWidth, _worldAbsoluteHeight - absoluteOutboundHeight));
 
-            _centerAbsolutePosition = std::make_shared<Vector2D>(inbountAbsoluteCenter.closestPointTo(absoluteMousePosition - mousePositionRelativeToCenter / _absoluteScale));
+            _centerAbsolutePosition = std::make_shared<Vector2D>(inbountAbsoluteCenter.closestPointTo(absoluteMousePosition - (mousePositionRelativeToCenter / _absoluteScale)));
         }
 
         double absoluteLengthToRelative(const double& length)
