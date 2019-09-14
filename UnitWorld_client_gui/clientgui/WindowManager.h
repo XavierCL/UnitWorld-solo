@@ -90,7 +90,7 @@ namespace uw
                 else if (event.type == sf::Event::MouseWheelScrollEvent)
                 {
                     Vector2D mousePosition(event.mouseWheelScroll.x, event.mouseWheelScroll.y);
-                    float delta(event.mouseWheelScroll.delta);
+                    double delta(event.mouseWheelScroll.delta);
                     _windowInputs->setUserMouseWheelScroll(delta, mousePosition);
                 }
             }
