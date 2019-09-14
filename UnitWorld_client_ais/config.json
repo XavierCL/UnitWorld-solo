@@ -1,0 +1,18 @@
+{
+	"server ip": "127.0.0.1",
+	"server ip john local": "192.168.0.110",
+	"server ip local": "127.0.0.1",
+	"world-absolute-width": 5000.0,
+	"world-absolute-height": 5000.0,
+	"move-zone-width-ratio": 0.03,
+	"translation-pixel-per-frame": 30.0,
+	"scroll-ratio-per-tick": 0.2,
+	"server ip john": "147.253.89.52",
+    "server port": "52124",
+    "spawners": [
+        [{"x": 700.0, "y": 400}],
+        [{"x": 200.0, "y": 400.0, "singuities": 1}],
+        [{"x": 1200.0, "y": 400.0, "singuities": 1}],
+        [{"x": 700.0, "y": 600.0, "singuities": 1}]
+    ]
+}

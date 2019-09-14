@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clientAis\ais\Artificial.h" />
+    <ClInclude Include="clientAis\ais\xaviercl\gotoClosestSpawner\GotoClosestSpawner.h" />
     <ClInclude Include="clientAis\ais\xaviercl\xavierclAi1\XavierclAi1.h" />
   </ItemGroup>
   <ItemGroup>

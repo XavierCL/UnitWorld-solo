@@ -5,7 +5,9 @@
 #include "commons/Logger.hpp"
 
 #include "ais/Artificial.h"
+
 #include "ais/xaviercl/xavierclAi1/XavierclAi1.h"
+#include "ais/xaviercl/gotoClosestSpawner/GotoClosestSpawner.h"
 
 #include "clientShared/networking/ServerReceiver.h"
 
@@ -22,6 +24,10 @@ std::shared_ptr<Artificial> generateAI(const std::string& aiName)
     if (aiName == "xavierclAi1")
     {
         return std::make_shared<XavierclAi1>();
+    }
+    else if (aiName == "gotoClosestSpawner")
+    {
+        return std::make_shared<GotoClosestSpawner>();
     }
     else
     {
@@ -49,6 +55,7 @@ int main()
     const std::string aiName = configurationManager.aiName(DEFAULT_AI_NAME);
 
     const std::shared_ptr<Artificial> someAI = generateAI(aiName);
+
     ClientConnector(ConnectionInfo(serverIp, serverPort), [someAI, MS_PER_FRAME](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
 
         const auto gameManager(std::make_shared<GameManager>());
@@ -65,6 +72,8 @@ int main()
         serverReceiver->startAsync();
         physicsManager->startAsync();
 
+        Logger::info("Started game evaluation");
+
         while (connectionHandler->isOpen())
         {
             const auto startFrameTime = std::chrono::steady_clock::now();
@@ -79,7 +88,6 @@ int main()
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds((long)MS_PER_FRAME - frameTimeInMs));
             }
-            
         }
 
         serverReceiver->stop();
