@@ -3,7 +3,7 @@
 	"world-absolute-width": 2000.0,
 	"world-absolute-height": 1000.0,
 	"move-zone-width-ratio": 0.03,
-	"translation-pixel-per-frame": 5.0,
+	"translation-pixel-per-frame": 10.0,
 	"scroll-ratio-per-tick": 0.2,
 	"server ip john": "147.253.89.52",
     "server port": "52124",

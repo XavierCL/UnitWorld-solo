@@ -11,7 +11,7 @@ GraphicalSinguity::GraphicalSinguity(std::shared_ptr<Singuity> self, const Circl
 
     const auto innerSinguityRadius(selfShape.radius() * 0.75);
     auto circleShape = std::make_shared<sf::CircleShape>(innerSinguityRadius);
-    circleShape->setPosition(round(selfShape.center().x() - innerSinguityRadius), round(selfShape.center().y() - innerSinguityRadius));
+    circleShape->setPosition(selfShape.center().x() - innerSinguityRadius, selfShape.center().y() - innerSinguityRadius);
     circleShape->setFillColor(lifeColor);
     circleShape->setOutlineThickness(selfShape.radius() * 0.25);
     circleShape->setOutlineColor(color);
