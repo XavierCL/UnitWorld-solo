@@ -50,7 +50,17 @@ Vector2D Rectangle::size() const
     return Vector2D(_lowerRightCorner.x() - _upperLeftCorner.x(), _lowerRightCorner.y() - _upperLeftCorner.y());
 }
 
+double Rectangle::width() const
+{
+    return size().x;
+}
+
 Vector2D Rectangle::upperLeftCorner() const
 {
     return _upperLeftCorner;
+}
+
+Vector2D Rectangle::lowerRightCorner() const
+{
+    return _lowerRightCorner;
 }

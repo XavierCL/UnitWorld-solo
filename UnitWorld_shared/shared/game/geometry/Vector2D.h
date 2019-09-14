@@ -21,6 +21,7 @@ namespace uw
         Vector2D operator/(const double& scalar) const;
         Vector2D operator+(const Vector2D& other) const;
         Vector2D operator-(const Vector2D& other) const;
+        Vector2D operator-() const;
         bool operator==(const Vector2D& other) const;
         const double module() const;
         const double moduleSq() const;

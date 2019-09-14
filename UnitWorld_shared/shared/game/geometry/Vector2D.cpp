@@ -75,6 +75,11 @@ Vector2D Vector2D::operator-(const Vector2D& other) const
     return Vector2D(_x - other._x, _y - other._y);
 }
 
+Vector2D Vector2D::operator-() const
+{
+    return Vector2D(-_x, -_y);
+}
+
 bool Vector2D::operator==(const Vector2D& other) const
 {
     return _x == other._x && _y == other._y;
