@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shared/game/geometry/Vector2D.h"
+#include "shared/game/geometry/Circle.h"
 
 namespace uw
 {
@@ -10,6 +11,8 @@ namespace uw
         Rectangle(const Vector2D& corner1, const Vector2D& corner2);
 
         bool contains(const Vector2D& point) const;
+
+        bool intersectsWith(const Circle& circle) const;
 
         Rectangle smallerBy(const double& amount) const;
 
