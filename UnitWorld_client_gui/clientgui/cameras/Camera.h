@@ -20,7 +20,7 @@ namespace uw
             _scaleRatioPerTick(scaleRatioPerTick),
             _lastMousePosition(screenRelativeRectangle.center()),
             _centerAbsolutePosition(std::make_shared<Vector2D>(worldAbsoluteWidth / 2.0, worldAbsoluteHeight / 2.0)),
-            _absoluteScale(maximumAbsoluteScale(worldAbsoluteWidth, worldAbsoluteHeight, screenRelativeRectangle))
+            _absoluteScale(minimumAbsoluteScale(worldAbsoluteWidth, worldAbsoluteHeight, screenRelativeRectangle))
         {}
 
         void mouseMoved(const Vector2D& position)
@@ -67,11 +67,9 @@ namespace uw
         {
             const auto mouseAbsolutePositionRelativeToCenter = mousePosition - _screenRelativeRectangle.center();
             double newAbsoluteScale = _absoluteScale + _absoluteScale * scrollDelta * _scaleRatioPerTick;
-            _absoluteScale = std::max(std::min(newAbsoluteScale, maximumAbsoluteScale(_worldAbsoluteWidth, _worldAbsoluteHeight, _screenRelativeRectangle));
+            _absoluteScale = std::min(std::max(newAbsoluteScale, minimumAbsoluteScale(_worldAbsoluteWidth, _worldAbsoluteHeight, _screenRelativeRectangle)), maximumAbsoluteScale());
 
-            Vector2D newAbsolutCenter(*_centerAbsolutePosition + mouseAbsolutePositionRelativeToCenter.atModule(relativeLengthToAbsolute(mouseAbsolutePositionRelativeToCenter.module())));
-
-            newAbsoluteCenter = 
+            Vector2D newAbsoluteCenter(*_centerAbsolutePosition + mouseAbsolutePositionRelativeToCenter.atModule(relativeLengthToAbsolute(mouseAbsolutePositionRelativeToCenter.module())));
 
             _centerAbsolutePosition = std::make_shared<Vector2D>();
         }
@@ -99,17 +97,22 @@ namespace uw
         }
 
     private:
-        static double maximumAbsoluteScale(const double& worldAbsoluteWidth, const double& worldAbsoluteHeight, const Rectangle& screenRelativeRectangle)
+        static double minimumAbsoluteScale(const double& worldAbsoluteWidth, const double& worldAbsoluteHeight, const Rectangle& screenRelativeRectangle)
         {
             if (worldAbsoluteWidth / screenRelativeRectangle.size().x() < worldAbsoluteHeight / screenRelativeRectangle.size().y())
             {
-                return worldAbsoluteHeight / screenRelativeRectangle.size().y();
+                return screenRelativeRectangle.size().y() / worldAbsoluteHeight;
             }
             else
             {
-                return worldAbsoluteWidth / screenRelativeRectangle.size().x();
+                return screenRelativeRectangle.size().x() / worldAbsoluteWidth;
             }
         }
+
+		static double maximumAbsoluteScale()
+		{
+			return 20;
+		}
 
         const double _worldAbsoluteWidth;
         const double _worldAbsoluteHeight;
