@@ -30,7 +30,12 @@ namespace uw
 
         double absoluteLengthToRelative(const double& length)
         {
-            _camera->absoluteLengthToRelative(length);
+            return _camera->absoluteLengthToRelative(length);
+        }
+
+        Vector2D relativePositionToAbsolute(const Vector2D& position)
+        {
+            return _camera->relativePositionToAbsolute(position);
         }
 
     private:

@@ -8,6 +8,8 @@
 #include "shared/game/geometry/Rectangle.h"
 #include "shared/game/geometry/Circle.h"
 
+#include "shared/game/GameManager.h"
+
 #include "commons/Option.hpp"
 #include "commons/Guid.hpp"
 #include "commons/CollectionPipe.h"
@@ -19,7 +21,8 @@ namespace uw
     class UserControlState
     {
     public:
-        UserControlState(std::shared_ptr<CameraRelativeGameManager> cameraRelativeGameManager, std::shared_ptr<ServerCommander> serverCommander) :
+        UserControlState(std::shared_ptr<GameManager> gameManager, std::shared_ptr<CameraRelativeGameManager> cameraRelativeGameManager, std::shared_ptr<ServerCommander> serverCommander) :
+            _gameManager(gameManager),
             _cameraRelativeGameManager(cameraRelativeGameManager),
             _serverCommander(serverCommander),
             _leftMouseDownPosition(std::make_shared<Option<const Vector2D>>()),
@@ -53,9 +56,9 @@ namespace uw
                 _leftMouseDownPosition->foreach([this, position](const Vector2D& leftMouseDownPosition) {
                     const Rectangle selectionRectangle(leftMouseDownPosition, position);
 
-                    _selectedUnits = _cameraRelativeGameManager->currentPlayer().map<std::shared_ptr<std::vector<xg::Guid>>>([&selectionRectangle](std::shared_ptr<Player> player) {
-                        return player->singuities() | filter<std::shared_ptr<Singuity>>([&selectionRectangle](std::shared_ptr<Singuity> singuity) {
-                            const auto singuityRelativeCircle(cameraRelativeGameManager->relativeCircleOf(singuity));
+                    _selectedUnits = _gameManager->currentPlayer().map<std::shared_ptr<std::vector<xg::Guid>>>([&selectionRectangle, this](std::shared_ptr<Player> player) {
+                        return player->singuities() | filter<std::shared_ptr<Singuity>>([&selectionRectangle, this](std::shared_ptr<Singuity> singuity) {
+                            const auto singuityRelativeCircle(_cameraRelativeGameManager->relativeCircleOf(singuity));
                             return selectionRectangle.intersectsWith(singuityRelativeCircle);
                         }) | map<xg::Guid>([](std::shared_ptr<Singuity> singuity) { return singuity->id(); })
                         | toVector<xg::Guid>();
@@ -64,7 +67,7 @@ namespace uw
             });
 
             _lastSelectedSpawnerId->foreach([this](const xg::Guid& spawnerId) {
-                (&_cameraRelativeGameManager->completeGameState()->spawners() | first<std::shared_ptr<Spawner>>([&spawnerId](std::shared_ptr<Spawner> spawner) {
+                (&_gameManager->completeGameState()->spawners() | first<std::shared_ptr<Spawner>>([&spawnerId](std::shared_ptr<Spawner> spawner) {
                     return spawner->id() == spawnerId;
                 })).foreach([this](std::shared_ptr<Spawner> foundSpawner) {
                     if (!foundSpawner->hasSameAllegenceState(*_lastSelectedSpawnerAllegence))
@@ -86,7 +89,7 @@ namespace uw
 
         void setUserRightMouseDownPosition(const Vector2D& position)
         {
-            auto completeGameState = _cameraRelativeGameManager->completeGameState();
+            auto completeGameState = _gameManager->completeGameState();
             auto reverseSpawners = &completeGameState->spawners() | reverse<std::shared_ptr<Spawner>>();
 
             _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>();
@@ -97,7 +100,7 @@ namespace uw
             for (auto spawner : *reverseSpawners)
             {
                 const auto spawnerRelativeCircle(_cameraRelativeGameManager->relativeCircleOf(spawner));
-                auto currentPlayerId = _cameraRelativeGameManager->currentPlayer().map<xg::Guid>([](std::shared_ptr<Player> player) { return player->id(); });
+                auto currentPlayerId = _gameManager->currentPlayer().map<xg::Guid>([](std::shared_ptr<Player> player) { return player->id(); });
                 bool spawnerCanBeInterractedWith = currentPlayerId.map<bool>([spawner](const xg::Guid& id) { return spawner->canBeInteractedWithBy(id); }).getOrElse(false);
                 if (spawnerRelativeCircle.contains(position) && spawnerCanBeInterractedWith)
                 {
@@ -107,7 +110,7 @@ namespace uw
                     return;
                 }
             }
-            _serverCommander->moveUnitsToPosition(*_selectedUnits, position);
+            _serverCommander->moveUnitsToPosition(*_selectedUnits, _cameraRelativeGameManager->relativePositionToAbsolute(position));
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>(position);
         }
 
@@ -136,6 +139,7 @@ namespace uw
         }
 
     private:
+        const std::shared_ptr<GameManager> _gameManager;
         const std::shared_ptr<CameraRelativeGameManager> _cameraRelativeGameManager;
         const std::shared_ptr<ServerCommander> _serverCommander;
 

@@ -13,7 +13,12 @@ ConfigurationManager::ConfigurationManager(const std::string& fileName):
     _serverIp(Options::None<std::string>()),
     _serverPort(Options::None<std::string>()),
     _firstSpawners(),
-    _singuitiesBySpawner()
+    _singuitiesBySpawner(),
+    _worldAbsoluteWidth(),
+    _worldAbsoluteHeight(),
+    _sidePanelWidthRatio(),
+    _translationPixelPerFrame(),
+    _scrollRatioPerTick()
 {
     try
     {
@@ -58,6 +63,31 @@ ConfigurationManager::ConfigurationManager(const std::string& fileName):
                 }
             }
         }
+
+        if (jsonConfiguration.contains("world-absolute-width"))
+        {
+            _worldAbsoluteWidth = Options::Some(jsonConfiguration.at("world-absolute-width").get<double>());
+        }
+
+        if (jsonConfiguration.contains("world-absolute-height"))
+        {
+            _worldAbsoluteHeight = Options::Some(jsonConfiguration.at("world-absolute-height").get<double>());
+        }
+
+        if (jsonConfiguration.contains("move-zone-width-ratio"))
+        {
+            _sidePanelWidthRatio = Options::Some(jsonConfiguration.at("move-zone-width-ratio").get<double>());
+        }
+
+        if (jsonConfiguration.contains("translation-pixel-per-frame"))
+        {
+            _translationPixelPerFrame = Options::Some(jsonConfiguration.at("translation-pixel-per-frame").get<double>());
+        }
+
+        if (jsonConfiguration.contains("scroll-ratio-per-tick"))
+        {
+            _scrollRatioPerTick = Options::Some(jsonConfiguration.at("scroll-ratio-per-tick").get<double>());
+        }
     }
     catch (nlohmann::json::exception jsonError)
     {
@@ -87,4 +117,29 @@ std::vector<std::vector<Vector2D>> ConfigurationManager::firstSpawners() const
 std::vector<std::vector<size_t>> ConfigurationManager::singuitiesBySpawner() const
 {
     return _singuitiesBySpawner;
+}
+
+double ConfigurationManager::worldAbsoluteWidth(const double& defaultValue) const
+{
+    return _worldAbsoluteWidth.getOrElse(defaultValue);
+}
+
+double ConfigurationManager::worldAbsoluteHeight(const double& defaultValue) const
+{
+    return _worldAbsoluteHeight.getOrElse(defaultValue);
+}
+
+double ConfigurationManager::sidePanelWidthRatio(const double& defaultValue) const
+{
+    return _sidePanelWidthRatio.getOrElse(defaultValue);
+}
+
+double ConfigurationManager::translationPixelPerFrame(const double& defaultValue) const
+{
+    return _translationPixelPerFrame.getOrElse(defaultValue);
+}
+
+double ConfigurationManager::scrollRatioPerTick(const double& defaultValue) const
+{
+    return _scrollRatioPerTick.getOrElse(defaultValue);
 }

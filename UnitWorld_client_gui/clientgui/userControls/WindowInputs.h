@@ -43,7 +43,7 @@ namespace uw
 
         void setUserMouseWheelScroll(const double& delta, const Vector2D& mousePosition)
         {
-            _camera->mousScrolled(delta, mousePosition);
+            _camera->mouseScrolled(delta, mousePosition);
         }
 
     private:

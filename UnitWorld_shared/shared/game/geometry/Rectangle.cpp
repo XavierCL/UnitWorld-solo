@@ -63,7 +63,7 @@ Vector2D Rectangle::size() const
 
 double Rectangle::width() const
 {
-    return size().x;
+    return size().x();
 }
 
 Vector2D Rectangle::upperLeftCorner() const
