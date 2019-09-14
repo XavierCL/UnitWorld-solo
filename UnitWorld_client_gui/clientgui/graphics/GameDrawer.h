@@ -3,6 +3,8 @@
 #include "canvas/SFMLDrawingCanvas.h"
 #include "units/GraphicalSinguity.h"
 
+#include "clientgui/cameras/CameraRelativeGameManager.h"
+
 #include "clientgui/userControls/UserControlState.h"
 
 #include "shared/game/GameManager.h"
