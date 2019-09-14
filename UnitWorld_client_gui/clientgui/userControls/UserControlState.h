@@ -39,7 +39,7 @@ namespace uw
             _selectedUnits = std::make_shared<std::vector<xg::Guid>>();
         }
 
-        void setUserLeftMouseUpPosition(const Vector2D position)
+        void setUserLeftMouseUpPosition(const Vector2D& position)
         {
             _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>();
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>();
