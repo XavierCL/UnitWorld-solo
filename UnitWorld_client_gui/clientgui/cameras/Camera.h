@@ -54,12 +54,11 @@ namespace uw
 
                 distanceToMove.maxAt(_translationPixelPerFrame);
 
-                distanceToMove = Vector2D(
-                    std::max(std::min(distanceToMove.x(), relativePositionToAbsolute(Vector2D(_worldAbsoluteWidth, 0.0)).x() - _screenRelativeRectangle.lowerRightCorner().x()), _screenRelativeRectangle.upperLeftCorner().x() - relativePositionToAbsolute(Vector2D(0.0, 0.0)).x()),
-                    std::max(std::min(distanceToMove.y(), relativePositionToAbsolute(Vector2D(0.0, _worldAbsoluteHeight)).y() - _screenRelativeRectangle.lowerRightCorner().y()), _screenRelativeRectangle.upperLeftCorner().y() - relativePositionToAbsolute(Vector2D(0.0, 0.0)).y())
-                );
+                const double absoluteOutboundWidth = relativeLengthToAbsolute(_screenRelativeRectangle.size().x() / 2.0);
+                const double absoluteOutboundHeight = relativeLengthToAbsolute(_screenRelativeRectangle.size().y() / 2.0);
+                const Rectangle inbountAbsoluteCenter(Vector2D(absoluteOutboundWidth, absoluteOutboundHeight), Vector2D(_worldAbsoluteWidth - absoluteOutboundWidth, _worldAbsoluteHeight - absoluteOutboundHeight));
 
-                _centerAbsolutePosition = std::make_shared<Vector2D>(*_centerAbsolutePosition + distanceToMove.atModule(relativeLengthToAbsolute(distanceToMove.module())));
+                _centerAbsolutePosition = std::make_shared<Vector2D>(inbountAbsoluteCenter.closestPointTo(*_centerAbsolutePosition + distanceToMove));
             }
         }
 
