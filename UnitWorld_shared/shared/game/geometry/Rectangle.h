@@ -11,6 +11,10 @@ namespace uw
 
         bool contains(const Vector2D& point) const;
 
+        Rectangle smallerBy(const double& amount) const;
+
+        Vector2D center() const;
+
         Vector2D size() const;
 
         Vector2D upperLeftCorner() const;

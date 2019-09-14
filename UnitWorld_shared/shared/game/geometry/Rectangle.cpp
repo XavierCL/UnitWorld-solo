@@ -19,6 +19,32 @@ bool Rectangle::contains(const Vector2D& point) const
         _lowerRightCorner.y() >= point.y();
 }
 
+Rectangle Rectangle::smallerBy(const double& amount) const
+{
+    Vector2D newUpperLeftCorner = _upperLeftCorner + Vector2D(amount, amount);
+    Vector2D newLowerRightCorner = _lowerRightCorner - Vector2D(amount, amount);
+
+    if(newUpperLeftCorner.x() > newLowerRightCorner.x())
+    {
+        double cornerPositionX = (_upperLeftCorner.x() + _lowerRightCorner.x()) / 2.0;
+        newUpperLeftCorner = Vector2D(cornerPositionX, _upperLeftCorner.y());
+        newLowerRightCorner = Vector2D(cornerPositionX, _lowerRightCorner.y());
+    }
+    if (newUpperLeftCorner.y() > newLowerRightCorner.y())
+    {
+        double cornerPositionY = (_upperLeftCorner.y() + _lowerRightCorner.y()) / 2.0;
+        newUpperLeftCorner = Vector2D(newUpperLeftCorner.x(), cornerPositionY);
+        newLowerRightCorner = Vector2D(newLowerRightCorner.x(), cornerPositionY);
+    }
+
+    return Rectangle(newUpperLeftCorner, newLowerRightCorner);
+}
+
+Vector2D Rectangle::center() const
+{
+    return Vector2D((_upperLeftCorner.x() + _lowerRightCorner.x()) / 2.0, (_upperLeftCorner.y() + _lowerRightCorner.y()) / 2.0);
+}
+
 Vector2D Rectangle::size() const
 {
     return Vector2D(_lowerRightCorner.x() - _upperLeftCorner.x(), _lowerRightCorner.y() - _upperLeftCorner.y());
