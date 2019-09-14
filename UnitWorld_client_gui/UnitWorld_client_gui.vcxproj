@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="clientgui\cameras\CameraRelativeGameManager.cpp" />
     <ClCompile Include="clientgui\graphics\canvas\CanvasTransactionGenerator.cpp" />
     <ClCompile Include="clientgui\graphics\canvas\SFMLCanvas.cpp" />
     <ClCompile Include="clientgui\graphics\GameDrawer.cpp" />

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "shared/game/GameManager.h"
-
 #include "Camera.h"
+
+#include "shared/game/play/units/Singuity.h"
+#include "shared/game/play/spawners/Spawner.h"
 
 #include "shared/game/geometry/Circle.h"
 
@@ -19,12 +20,17 @@ namespace uw
 
         Circle relativeCircleOf(std::shared_ptr<Singuity> singuity)
         {
-            return Circle(_camera->absolutePositionToRelative(singuity.position, ABSOLUTE_SINGUITY_RADIUS)
+            return Circle(_camera->absolutePositionToRelative(singuity->position()), ABSOLUTE_SINGUITY_RADIUS);
         }
 
         Circle relativeCircleOf(std::shared_ptr<Spawner> spawner)
         {
-            return Circle(_camera->absolutePositionToRelative(position), ABSOLUTE_SPAWNER_RADIUS)
+            return Circle(_camera->absolutePositionToRelative(spawner->position()), ABSOLUTE_SPAWNER_RADIUS);
+        }
+
+        double absoluteLengthToRelative(const double& length)
+        {
+            _camera->absoluteLengthToRelative(length);
         }
 
     private:
