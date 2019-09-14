@@ -65,7 +65,14 @@ namespace uw
 
         void mouseScrolled(const double& scrollDelta, const Vector2D& mousePosition)
         {
-            const auto mousePositionRelativeToCenter = mousePosition - _screenRelativeRectangle.center();
+            const auto mouseAbsolutePositionRelativeToCenter = mousePosition - _screenRelativeRectangle.center();
+            double newAbsoluteScale = _absoluteScale + _absoluteScale * scrollDelta * _scaleRatioPerTick;
+            _absoluteScale = std::max(std::min(newAbsoluteScale, maximumAbsoluteScale(_worldAbsoluteWidth, _worldAbsoluteHeight, _screenRelativeRectangle));
+
+            Vector2D newAbsolutCenter(*_centerAbsolutePosition + mouseAbsolutePositionRelativeToCenter.atModule(relativeLengthToAbsolute(mouseAbsolutePositionRelativeToCenter.module())));
+
+            newAbsoluteCenter = 
+
             _centerAbsolutePosition = std::make_shared<Vector2D>();
         }
 
@@ -94,7 +101,7 @@ namespace uw
     private:
         static double maximumAbsoluteScale(const double& worldAbsoluteWidth, const double& worldAbsoluteHeight, const Rectangle& screenRelativeRectangle)
         {
-            if (worldAbsoluteWidth / worldAbsoluteHeight - screenRelativeRectangle.size().x() / screenRelativeRectangle.size().y() > 0.0)
+            if (worldAbsoluteWidth / screenRelativeRectangle.size().x() < worldAbsoluteHeight / screenRelativeRectangle.size().y())
             {
                 return worldAbsoluteHeight / screenRelativeRectangle.size().y();
             }
