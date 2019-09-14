@@ -26,5 +26,8 @@
     <ClInclude Include="clientAis\ais\Artificial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="clientAis\ais\xaviercl\gotoClosestSpawner\GotoClosestSpawner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
