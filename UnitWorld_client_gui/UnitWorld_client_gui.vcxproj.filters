@@ -33,6 +33,9 @@
     <ClCompile Include="clientgui\graphics\GameDrawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="clientgui\cameras\CameraRelativeGameManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clientgui\graphics\canvas\CanvasTransactionGenerator.h">
