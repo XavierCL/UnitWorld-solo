@@ -28,7 +28,7 @@ namespace uw
 
         void setUserLeftMouseUpPosition(const Vector2D& position)
         {
-            _userControlState->setUserMousePosition(position);
+            _userControlState->setUserLeftMouseUpPosition(position);
         }
 
         void setUserLeftMouseDownPosition(const Vector2D& position)

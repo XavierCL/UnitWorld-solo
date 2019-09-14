@@ -46,7 +46,7 @@ namespace uw
                     const Circle spawnerCircle(_cameraRelativeGameManager->relativeCircleOf(spawner));
                     const double spawnerSelectionRadius = spawnerCircle.radius() * 1.0454545454545454545454545454545;
                     sf::CircleShape graphicalSpawner(spawnerSelectionRadius);
-                    graphicalSpawner.setPosition(round(spawnerCircle.center().x() - spawnerCircle.radius()), round(spawnerCircle.center().y() - spawnerCircle.radius()));
+                    graphicalSpawner.setPosition(round(spawnerCircle.center().x() - spawnerSelectionRadius), round(spawnerCircle.center().y() - spawnerSelectionRadius));
                     graphicalSpawner.setFillColor(sf::Color::White);
                     canvas->draw(graphicalSpawner);
                 });
@@ -79,10 +79,11 @@ namespace uw
             });
             
             // Last move units position
-            _userControlState->getRelativeLastMoveUnitPosition().foreach([&canvas, this](const Vector2D& lastMoveUnitPosition) {
+            _userControlState->getAbsoluteLastMoveUnitPosition().foreach([&canvas, this](const Vector2D& lastMoveUnitPosition) {
                 const double circleRadius(_cameraRelativeGameManager->absoluteLengthToRelative(2.0));
+                const Vector2D relativeLastMoveUnitPosition(_cameraRelativeGameManager->absolutePositionToRelative(lastMoveUnitPosition));
                 sf::CircleShape cursorDot(circleRadius);
-                cursorDot.setPosition(round(lastMoveUnitPosition.x() - circleRadius), round(lastMoveUnitPosition.y() - circleRadius));
+                cursorDot.setPosition(round(relativeLastMoveUnitPosition.x() - circleRadius), round(relativeLastMoveUnitPosition.y() - circleRadius));
                 cursorDot.setFillColor(sf::Color(255, 255, 255));
                 canvas->draw(cursorDot);
             });
@@ -116,9 +117,9 @@ namespace uw
             }
 
             // User selection rectangle
-            _userControlState->getRelativeSelectionRectangle().foreach([&canvas](const Rectangle& userSelection) {
-                const auto userSelectionSize(userSelection.size());
-                const auto userSelectionLowerRight(userSelection.upperLeftCorner());
+            _userControlState->getAbsoluteSelectionRectangle().foreach([&canvas, this](const Rectangle& userSelection) {
+                const auto userSelectionSize(userSelection.size().atModule(_cameraRelativeGameManager->absoluteLengthToRelative(userSelection.size().module())));
+                const auto userSelectionLowerRight(_cameraRelativeGameManager->absolutePositionToRelative(userSelection.upperLeftCorner()));
                 sf::RectangleShape sfUserSelection(sf::Vector2f(userSelectionSize.x(), userSelectionSize.y()));
                 sfUserSelection.setPosition(userSelectionLowerRight.x(), userSelectionLowerRight.y());
                 sfUserSelection.setFillColor(sf::Color::Transparent);

@@ -38,11 +38,11 @@ int main()
     const std::string WINDOW_TITLE("Unit World client GUI");
     const std::string DEFAULT_SERVER_IP("127.0.0.1");
     const std::string DEFAULT_SERVER_PORT("52124");
-    const double DEFAULT_WORLD_ABSOLUTE_WIDTH(1000);
-    const double DEFAULT_WORLD_ABSOLUTE_HEIGHT(600);
+    const double DEFAULT_WORLD_ABSOLUTE_WIDTH(2000);
+    const double DEFAULT_WORLD_ABSOLUTE_HEIGHT(1200);
     const double DEFAULT_SIDE_PANEL_WIDTH_RATIO(0.03);
     const double DEFAULT_TRANSLATION_PIXEL_PER_FRAME(5.0);
-    const double DEFAULT_SCROLL_RATIO_PER_TICK(1.2);
+    const double DEFAULT_SCROLL_RATIO_PER_TICK(0.2);
 
     try
     {

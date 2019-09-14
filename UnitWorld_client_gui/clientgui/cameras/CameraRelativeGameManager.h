@@ -20,12 +20,12 @@ namespace uw
 
         Circle relativeCircleOf(std::shared_ptr<Singuity> singuity)
         {
-            return Circle(_camera->absolutePositionToRelative(singuity->position()), ABSOLUTE_SINGUITY_RADIUS);
+            return Circle(_camera->absolutePositionToRelative(singuity->position()), _camera->absoluteLengthToRelative(ABSOLUTE_SINGUITY_RADIUS));
         }
 
         Circle relativeCircleOf(std::shared_ptr<Spawner> spawner)
         {
-            return Circle(_camera->absolutePositionToRelative(spawner->position()), ABSOLUTE_SPAWNER_RADIUS);
+            return Circle(_camera->absolutePositionToRelative(spawner->position()), _camera->absoluteLengthToRelative(ABSOLUTE_SPAWNER_RADIUS));
         }
 
         double absoluteLengthToRelative(const double& length)
@@ -36,6 +36,11 @@ namespace uw
         Vector2D relativePositionToAbsolute(const Vector2D& position)
         {
             return _camera->relativePositionToAbsolute(position);
+        }
+
+        Vector2D absolutePositionToRelative(const Vector2D& position)
+        {
+            return _camera->absolutePositionToRelative(position);
         }
 
     private:

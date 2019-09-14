@@ -1,6 +1,5 @@
 {
-	"server ip local": "127.0.0.1",
-    "server ip": "147.253.89.52",
+	"server ip": "127.0.0.1",
 	"server ip john": "147.253.89.52",
     "server port": "52124",
     "spawners": [
