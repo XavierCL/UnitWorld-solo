@@ -55,6 +55,16 @@ void Vector2D::operator+=(const Vector2D& other)
     _y += other._y;
 }
 
+Vector2D Vector2D::operator*(const double& scalar) const
+{
+    return Vector2D(_x * scalar, _y * scalar);
+}
+
+Vector2D Vector2D::operator/(const double& scalar) const
+{
+    return Vector2D(_x / scalar, _y / scalar);
+}
+
 Vector2D Vector2D::operator+(const Vector2D& other) const
 {
     return Vector2D(_x + other._x, _y + other._y);
