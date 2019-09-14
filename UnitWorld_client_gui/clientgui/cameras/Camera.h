@@ -23,7 +23,7 @@ namespace uw
             _absoluteScale(minimumAbsoluteScale(worldAbsoluteWidth, worldAbsoluteHeight, screenRelativeRectangle))
         {}
 
-        void mouseMoved(const Vector2D& position)
+        void mouseMovedTo(const Vector2D& position)
         {
             _lastMousePosition = position;
         }

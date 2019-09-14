@@ -29,7 +29,7 @@ namespace uw
 
     private:
 
-        static double sq(const double& value) const
+        static double sq(const double& value)
         {
             return value * value;
         }

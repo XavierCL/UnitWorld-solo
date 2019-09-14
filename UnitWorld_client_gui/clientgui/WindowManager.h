@@ -87,7 +87,7 @@ namespace uw
                     Vector2D mousePosition(event.mouseMove.x, event.mouseMove.y);
                     _windowInputs->setUserMousePosition(mousePosition);
                 }
-                else if (event.type == sf::Event::MouseWheelScrollEvent)
+                else if (event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
                 {
                     Vector2D mousePosition(event.mouseWheelScroll.x, event.mouseWheelScroll.y);
                     double delta(event.mouseWheelScroll.delta);
