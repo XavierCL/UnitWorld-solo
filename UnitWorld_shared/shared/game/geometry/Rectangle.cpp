@@ -19,6 +19,17 @@ bool Rectangle::contains(const Vector2D& point) const
         _lowerRightCorner.y() >= point.y();
 }
 
+bool Rectangle::intersectsWith(const Circle& circle) const
+{
+    const auto circleCenter = circle.center();
+    const Vector2D rectanglePointClosestToCircle(
+        std::max(std::min(_lowerRightCorner.x(), circleCenter.x()), _upperLeftCorner.x()),
+        std::max(std::min(_lowerRightCorner.y(), circleCenter.y()), _upperLeftCorner.y())
+    );
+
+    return circle.contains(rectanglePointClosestToCircle);
+}
+
 Rectangle Rectangle::smallerBy(const double& amount) const
 {
     Vector2D newUpperLeftCorner = _upperLeftCorner + Vector2D(amount, amount);
