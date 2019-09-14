@@ -1,6 +1,6 @@
 #pragma once
 
-#include "clientgui/networking/ServerReceiver.h"
+#include "clientShared/networking/ServerReceiver.h"
 
 #include "WindowManager.h"
 

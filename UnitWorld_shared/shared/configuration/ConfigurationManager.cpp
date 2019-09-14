@@ -18,7 +18,8 @@ ConfigurationManager::ConfigurationManager(const std::string& fileName):
     _worldAbsoluteHeight(),
     _sidePanelWidthRatio(),
     _translationPixelPerFrame(),
-    _scrollRatioPerTick()
+    _scrollRatioPerTick(),
+    _aiName()
 {
     try
     {
@@ -88,6 +89,11 @@ ConfigurationManager::ConfigurationManager(const std::string& fileName):
         {
             _scrollRatioPerTick = Options::Some(jsonConfiguration.at("scroll-ratio-per-tick").get<double>());
         }
+
+        if (jsonConfiguration.contains("ai-name"))
+        {
+            _aiName = Options::Some(jsonConfiguration.at("ai-name").get<std::string>());
+        }
     }
     catch (nlohmann::json::exception jsonError)
     {
@@ -142,4 +148,9 @@ double ConfigurationManager::translationPixelPerFrame(const double& defaultValue
 double ConfigurationManager::scrollRatioPerTick(const double& defaultValue) const
 {
     return _scrollRatioPerTick.getOrElse(defaultValue);
+}
+
+std::string ConfigurationManager::aiName(const std::string& defaultValue) const
+{
+    return _aiName.getOrElse(defaultValue);
 }
