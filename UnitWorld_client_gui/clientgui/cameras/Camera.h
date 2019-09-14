@@ -65,13 +65,17 @@ namespace uw
 
         void mouseScrolled(const double& scrollDelta, const Vector2D& mousePosition)
         {
-            const auto mouseAbsolutePositionRelativeToCenter = mousePosition - _screenRelativeRectangle.center();
+            const auto mousePositionRelativeToCenter = mousePosition - _screenRelativeRectangle.center();
+            const auto absoluteMousePosition = relativePositionToAbsolute(mousePosition);
+
             double newAbsoluteScale = _absoluteScale + _absoluteScale * scrollDelta * _scaleRatioPerTick;
             _absoluteScale = std::min(std::max(newAbsoluteScale, minimumAbsoluteScale(_worldAbsoluteWidth, _worldAbsoluteHeight, _screenRelativeRectangle)), maximumAbsoluteScale());
 
-            Vector2D newAbsoluteCenter(*_centerAbsolutePosition + mouseAbsolutePositionRelativeToCenter.atModule(relativeLengthToAbsolute(mouseAbsolutePositionRelativeToCenter.module())));
+            const double absoluteOutboundWidth = relativeLengthToAbsolute(_screenRelativeRectangle.size().x() / 2.0);
+            const double absoluteOutboundHeight = relativeLengthToAbsolute(_screenRelativeRectangle.size().y() / 2.0);
+            const Rectangle inbountAbsoluteCenter(Vector2D(absoluteOutboundWidth, absoluteOutboundHeight), Vector2D(_worldAbsoluteWidth - absoluteOutboundWidth, _worldAbsoluteHeight - absoluteOutboundHeight));
 
-            _centerAbsolutePosition = std::make_shared<Vector2D>();
+            _centerAbsolutePosition = std::make_shared<Vector2D>(inbountAbsoluteCenter.closestPointTo(absoluteMousePosition - mousePositionRelativeToCenter / _absoluteScale));
         }
 
         double absoluteLengthToRelative(const double& length)
@@ -99,7 +103,7 @@ namespace uw
     private:
         static double minimumAbsoluteScale(const double& worldAbsoluteWidth, const double& worldAbsoluteHeight, const Rectangle& screenRelativeRectangle)
         {
-            if (worldAbsoluteWidth / screenRelativeRectangle.size().x() < worldAbsoluteHeight / screenRelativeRectangle.size().y())
+            if (worldAbsoluteWidth / screenRelativeRectangle.size().x() > worldAbsoluteHeight / screenRelativeRectangle.size().y())
             {
                 return screenRelativeRectangle.size().y() / worldAbsoluteHeight;
             }
