@@ -21,6 +21,7 @@ using namespace uw;
 
 std::shared_ptr<Artificial> generateAI(const std::string& aiName)
 {
+    Logger::info("Using Ai with name: " + aiName);
     if (aiName == "xavierclAi1")
     {
         return std::make_shared<XavierclAi1>();
@@ -31,6 +32,7 @@ std::shared_ptr<Artificial> generateAI(const std::string& aiName)
     }
     else
     {
+        Logger::error("Could not find ai with name: " + aiName + ". Default ai will be used");
         return std::make_shared<XavierclAi1>();
     }
 }
