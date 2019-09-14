@@ -41,9 +41,9 @@ namespace uw
             _userControlState->setUserRightMouseDownPosition(position);
         }
 
-        void setUserMouseWheelScroll(const float& delta, const Vector2D& mousePosition)
+        void setUserMouseWheelScroll(const double& delta, const Vector2D& mousePosition)
         {
-            _camera->mouseTicked(delta, mousePosition);
+            _camera->mousScrolled(delta, mousePosition);
         }
 
     private:
