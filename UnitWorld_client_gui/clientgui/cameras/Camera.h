@@ -10,11 +10,11 @@ namespace uw
     class Camera
     {
     public:
-        Camera(const double& worldAbsoluteWidth, const double& worldAbsoluteHeight, const Rectangle& screenRelativeRectangle, const double& sidePanelWidth, const double& translationPixelPerFrame, const double& scaleRatioPerTick):
+        Camera(const double& worldAbsoluteWidth, const double& worldAbsoluteHeight, const Rectangle& screenRelativeRectangle, const double& sidePanelWidthRatio, const double& translationPixelPerFrame, const double& scaleRatioPerTick):
             _worldAbsoluteWidth(worldAbsoluteWidth),
             _worldAbsoluteHeight(worldAbsoluteHeight),
             _screenRelativeRectangle(screenRelativeRectangle),
-            _mouseSafeZone(screenRelativeRectangle.smallerBy(sidePanelWidth)),
+            _mouseSafeZone(screenRelativeRectangle.smallerBy(sidePanelWidthRatio)),
             _translationPixelPerFrame(translationPixelPerFrame),
             _scaleRatioPerTick(scaleRatioPerTick),
             _lastMousePosition(screenRelativeRectangle.center())
@@ -22,25 +22,40 @@ namespace uw
 
         void mouseMoved(const Vector2D& position)
         {
-
+            _lastMousePosition = position;
         }
 
-        void frameHappened();
+        void frameHappened()
+        {
+            if (!_mouseSafeZone.contains(_lastMousePosition))
+            {
+                if()
+            }
+        }
 
-        void mouseTickedUp();
-
-        void mouseTickedDown();
+        void mouseScrolled(const double& scrollDelta, const Vector2D& mousePosition);
 
         double absoluteLengthToRelative(const double& length)
         {
             return length * _absoluteScale;
         }
 
-        double relativeLengthToAbsolute();
+        double relativeLengthToAbsolute(const double& length)
+        {
+            return length / _absoluteScale;
+        } 
 
-        Vector2D absolutePositionToRelative();
+        Vector2D absolutePositionToRelative(const Vector2D& absolutePosition)
+        {
+            Vector2D relativePositionWithoutScale = absolutePosition - *_centerAbsolutePosition;
+            return relativePositionWithoutScale * _absoluteScale;
+        }
 
-        Vector2D relativePositionToAbsolute();
+        Vector2D relativePositionToAbsolute(const Vector2D& relativePosition)
+        {
+            Vector2D relativePositionWithAbsoluteScale = relativePosition / _absoluteScale;
+            return relativePositionWithAbsoluteScale + *_centerAbsolutePosition;
+        }
 
     private:
         const double _worldAbsoluteWidth;
@@ -48,6 +63,7 @@ namespace uw
         const Rectangle _screenRelativeRectangle;
         const double _translationPixelPerFrame;
         const double _scaleRatioPerTick;
+        const Rectangle _mouseSafeZone;
 
         Vector2D _lastMousePosition;
 
