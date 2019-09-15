@@ -19,7 +19,7 @@ namespace uw
             _msPerFrame(1000 / PHISICS_FRAME_PER_SECOND),
             _isRunning(true),
             _nextPlayers(nullptr),
-            _nextAddPlayer(nullptr)
+            _nextAddedPlayer(nullptr)
         {}
 
         void stop()
@@ -34,9 +34,9 @@ namespace uw
             _physicsThread = std::thread([this] { loopPhysics(); });
         }
 
-        void setNextPlayer(std::shared_ptr<Player> newPlayer)
+        void setNextAddedPlayer(std::shared_ptr<Player> newPlayer)
         {
-            _nextAddPlayer.store(new Player(*newPlayer));
+            _nextAddedPlayer.store(new Player(*newPlayer));
         }
 
         void setNextPlayers(immer::vector<std::shared_ptr<Player>> nextPlayers)
@@ -109,7 +109,7 @@ namespace uw
 
         void processPhysics()
         {
-            const auto newPlayer = _nextAddPlayer.exchange(nullptr);
+            const auto newPlayer = _nextAddedPlayer.exchange(nullptr);
             if (newPlayer)
             {
                 _players = _players.push_back(std::shared_ptr<Player>(newPlayer));
@@ -166,7 +166,7 @@ namespace uw
 
         const unsigned int _msPerFrame;
         std::thread _physicsThread;
-        std::atomic<Player*> _nextAddPlayer;
+        std::atomic<Player*> _nextAddedPlayer;
         std::mutex _nextCommandsMutex;
         std::vector<std::shared_ptr<MoveMobileUnitsToPosition>> _nextCommands;
         std::atomic<immer::vector<std::shared_ptr<Player>>*> _nextPlayers;
