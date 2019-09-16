@@ -12,7 +12,9 @@ namespace uw
     public:
         WindowInputs(std::shared_ptr<UserControlState> userControlState, std::shared_ptr<Camera> camera)
         : _userControlState(userControlState),
-        _camera(camera)
+        _camera(camera),
+		_isLeftControlKeyPressed(false),
+		_isLeftShiftKeyPressed(false)
         {}
 
         void frameHappened()
@@ -47,8 +49,42 @@ namespace uw
             _camera->mouseScrolled(delta, mousePosition);
         }
 
+		void userPressedLeftControl()
+		{
+			_isLeftControlKeyPressed = true;
+		}
+
+		void userReleasedLeftControl()
+		{
+			_isLeftControlKeyPressed = false;
+		}
+
+		void userPressedLeftShift()
+		{
+			_isLeftShiftKeyPressed = true;
+		}
+
+		void userReleasedLeftShift()
+		{
+			_isLeftShiftKeyPressed = false;
+		}
+
+		void userPressedNumber(const int& numberKey)
+		{
+			if (_isLeftControlKeyPressed)
+			{
+				_userControlState->addSelectedUnitsToUnitGroup(numberKey);
+			}
+			else
+			{
+				_userControlState->setSelectedUnitToUnitGroup(numberKey);
+			}
+		}
+
     private:
         const std::shared_ptr<UserControlState> _userControlState;
         const std::shared_ptr<Camera> _camera;
+		bool _isLeftControlKeyPressed;
+		bool _isLeftShiftKeyPressed;
     };
 }

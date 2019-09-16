@@ -26,7 +26,7 @@ namespace uw
             _messageSerializer(messageSerializer)
         {}
 
-        void moveUnitsToPosition(const std::vector<xg::Guid>& singuityIds, const Vector2D& destination)
+        void moveUnitsToPosition(const std::unordered_set<xg::Guid>& singuityIds, const Vector2D& destination)
         {
             const auto communicatedDestination(_physicsCommunicationAssembler->physicsVector2DToCommunicated(destination));
 
@@ -42,7 +42,7 @@ namespace uw
             }
         }
 
-        void moveUnitsToSpawner(const std::vector<xg::Guid>& singuityIds, const xg::Guid& spawnerId)
+        void moveUnitsToSpawner(const std::unordered_set<xg::Guid>& singuityIds, const xg::Guid& spawnerId)
         {
             const auto message(std::make_shared<MoveMobileUnitsToSpawnerMessage>(singuityIds, spawnerId));
 
