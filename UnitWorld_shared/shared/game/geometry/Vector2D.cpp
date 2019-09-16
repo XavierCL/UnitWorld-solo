@@ -116,11 +116,3 @@ Vector2D uw::Vector2D::atModule(const double & module) const
         return Vector2D(_x / modifier, _y / modifier);
     }
 }
-
-Vector2D Vector2D::divide(const double& divided, const double& max) const
-{
-    return Vector2D(
-        _x == 0 ? 0.0 : fmax(fmin(divided / _x, max), -max),
-        _y == 0 ? 0.0 : fmax(fmin(divided / _y, max), -max)
-    );
-}

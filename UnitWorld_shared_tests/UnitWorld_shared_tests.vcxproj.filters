@@ -24,5 +24,8 @@
     <ClCompile Include="game\geometry\Vector2DTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="game\physics\collisions\KdtreeCollisionDetectorTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

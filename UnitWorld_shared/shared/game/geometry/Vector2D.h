@@ -27,8 +27,6 @@ namespace uw
         const double moduleSq() const;
         Vector2D maxAt(const double& maxModule) const;
         Vector2D atModule(const double& module) const;
-
-        Vector2D divide(const double& divided, const double& max) const;
     private:
 
         double _x;

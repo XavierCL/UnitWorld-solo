@@ -47,8 +47,7 @@ void Player::addSinguity(std::shared_ptr<Singuity> newSinguity)
 {
     _singuities->emplace_back(newSinguity);
     
-    auto addSinguityCallbacks = _singuityAddedCallbacks;
-    for (const auto& callback : addSinguityCallbacks)
+    for (const auto& callback : _singuityAddedCallbacks)
     {
         callback.second(newSinguity);
     }
@@ -66,10 +65,10 @@ std::shared_ptr<std::vector<std::shared_ptr<Singuity>>> Player::singuities() con
 
 void Player::addSinguityAddedCallback(const xg::Guid& callbackId, const std::function<void(std::shared_ptr<Singuity>)>& callback)
 {
-    _singuityAddedCallbacks = _singuityAddedCallbacks.insert(std::make_pair(callbackId, callback));
+    _singuityAddedCallbacks.insert(std::make_pair(callbackId, callback));
 }
 
 void Player::removeSinguityAddedCallback(const xg::Guid& callbackId)
 {
-    _singuityAddedCallbacks = _singuityAddedCallbacks.erase(callbackId);
+    _singuityAddedCallbacks.erase(callbackId);
 }

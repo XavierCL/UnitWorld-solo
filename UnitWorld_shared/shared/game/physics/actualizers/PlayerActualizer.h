@@ -19,8 +19,6 @@ namespace uw
             });
         }
 
-        PlayerActualizer(const PlayerActualizer& playerActualizer) = delete;
-
         ~PlayerActualizer()
         {
             _player->removeSinguityAddedCallback(singuityAddedCallbackId());
@@ -58,13 +56,13 @@ namespace uw
 
         static std::vector<SinguityActualizer> initializeSinguityActualizers(std::shared_ptr<Player> player)
         {
-            std::shared_ptr<std::vector<SinguityActualizer>> actualizers =
-                player->singuities()
-                | map<SinguityActualizer>([](std::shared_ptr<Singuity> singuity) {
-                    return SinguityActualizer(singuity);
-                }) | toVector<SinguityActualizer>();
-
-            return *actualizers;
+            std::vector<SinguityActualizer> singuityActualizers;
+            singuityActualizers.reserve(player->singuities()->size());
+            for (const auto& singuity : *player->singuities())
+            {
+                singuityActualizers.emplace_back(singuity);
+            }
+            return singuityActualizers;
         }
 
         static xg::Guid singuityAddedCallbackId()

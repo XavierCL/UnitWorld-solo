@@ -66,7 +66,26 @@ namespace uw
             });
 
             closestThing.foreach([this](std::shared_ptr<UnitWithHealthPoint> thing) {
-                _repulsionForce = (_singuity->position() - thing->position()).divide(0.005, 10.0);
+                const double minDistance = 4;
+                const double maxDistance = 30;
+                const double maxRepulsionForce = _singuity->maximumAcceleration() * 0.2;
+
+                Vector2D repulsionDistance(_singuity->position() - thing->position());
+
+                if (repulsionDistance.moduleSq() <= minDistance * minDistance)
+                {
+                    _repulsionForce = repulsionDistance.atModule(maxRepulsionForce);
+                }
+                else if (repulsionDistance.moduleSq() >= maxDistance * maxDistance)
+                {
+                    _repulsionForce = Vector2D(0.0, 0.0);
+                }
+                else
+                {
+                    const double a = -1.0 / (maxDistance - minDistance);
+                    const double b = maxDistance / (maxDistance - minDistance);
+                    _repulsionForce = repulsionDistance.atModule(maxRepulsionForce * (repulsionDistance.module() * a + b));
+                }
             });
         }
 
@@ -126,7 +145,7 @@ namespace uw
                 return _singuity->getSlowBreakingAcceleration();
             });
 
-            acceleration += _repulsionForce.maxAt(_singuity->maximumAcceleration());
+            acceleration += _repulsionForce;
             acceleration = acceleration.maxAt(_singuity->maximumAcceleration());
 
             _singuity->actualizeAcceleration(acceleration);
