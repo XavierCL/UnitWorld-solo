@@ -15,6 +15,7 @@
 #include "commons/CollectionPipe.h"
 
 #include <vector>
+#include <clientgui\networking\ServerCommander.h>
 
 namespace uw
 {
@@ -28,9 +29,10 @@ namespace uw
             _leftMouseDownPosition(std::make_shared<Option<const Vector2D>>()),
             _lastMousePosition(std::make_shared<Option<const Vector2D>>()),
             _lastMoveUnitPosition(std::make_shared<Option<const Vector2D>>()),
-            _selectedUnits(std::make_shared<std::vector<xg::Guid>>()),
+            _selectedUnits(std::make_shared<std::unordered_set<xg::Guid>>()),
             _lastSelectedSpawnerId(std::make_shared<Option<const xg::Guid>>()),
-            _lastSelectedSpawnerAllegence(std::make_shared<Option<SpawnerAllegence>>())
+            _lastSelectedSpawnerAllegence(std::make_shared<Option<SpawnerAllegence>>()),
+			_unitGroups(std::shared_ptr<std::vector<std::unordered_set<xg::Guid>>>())
         {}
 
         void setUserLeftMouseDownPosition(const Vector2D& position)
@@ -39,7 +41,7 @@ namespace uw
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>();
             _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
             _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();
-            _selectedUnits = std::make_shared<std::vector<xg::Guid>>();
+            _selectedUnits = std::make_shared<std::unordered_set<xg::Guid>>();
         }
 
         void setUserLeftMouseUpPosition(const Vector2D& position)
@@ -56,13 +58,13 @@ namespace uw
                 _leftMouseDownPosition->foreach([this, position](const Vector2D& leftMouseDownPosition) {
                     const Rectangle selectionRectangle(_cameraRelativeGameManager->absolutePositionToRelative(leftMouseDownPosition), _cameraRelativeGameManager->absolutePositionToRelative(position));
 
-                    _selectedUnits = _gameManager->currentPlayer().map<std::shared_ptr<std::vector<xg::Guid>>>([&selectionRectangle, this](std::shared_ptr<Player> player) {
+                    _selectedUnits = _gameManager->currentPlayer().map<std::shared_ptr<std::unordered_set<xg::Guid>>>([&selectionRectangle, this](std::shared_ptr<Player> player) {
                         return player->singuities() | filter<std::shared_ptr<Singuity>>([&selectionRectangle, this](std::shared_ptr<Singuity> singuity) {
                             const auto singuityRelativeCircle(_cameraRelativeGameManager->relativeCircleOf(singuity));
                             return selectionRectangle.intersectsWith(singuityRelativeCircle);
                         }) | map<xg::Guid>([](std::shared_ptr<Singuity> singuity) { return singuity->id(); })
                         | toVector<xg::Guid>();
-                    }).getOrElse(std::make_shared<std::vector<xg::Guid>>());
+                    }).getOrElse(std::make_shared<std::unordered_set<xg::Guid>>());
                 });
             });
 
@@ -124,7 +126,7 @@ namespace uw
             });
         }
 
-        std::vector<xg::Guid> getSelectedUnits() const
+        std::unordered_set<xg::Guid> getSelectedUnits() const
         {
             return *_selectedUnits;
         }
@@ -139,6 +141,21 @@ namespace uw
             return *_lastSelectedSpawnerId;
         }
 
+		void addSelectedUnitsToUnitGroup(const int& unitGroupID)
+		{
+			_selectedUnits | forEach([this, unitGroupID](const auto& _selectedUnit) {
+				_unitGroups->insert(unitGroupID, _selectedUnit);
+				});
+		}
+
+		void setSelectedUnitToUnitGroup(const int& unitGroupID)
+		{
+			_selectedUnits->clear();
+			_unitGroups->at(unitGroupID) | forEach([this](const auto& unitToInsert) {
+				_selectedUnits->insert(unitToInsert);
+			});
+		}
+
     private:
         const std::shared_ptr<GameManager> _gameManager;
         const std::shared_ptr<CameraRelativeGameManager> _cameraRelativeGameManager;
@@ -150,6 +167,7 @@ namespace uw
         std::shared_ptr<Option<const xg::Guid>> _lastSelectedSpawnerId;
         std::shared_ptr<Option<SpawnerAllegence>> _lastSelectedSpawnerAllegence;
 
-        std::shared_ptr<std::vector<xg::Guid>> _selectedUnits;
+        std::shared_ptr<std::unordered_set<xg::Guid>> _selectedUnits;
+		std::shared_ptr<std::vector<std::unordered_set<xg::Guid>>> _unitGroups;
     };
 }
