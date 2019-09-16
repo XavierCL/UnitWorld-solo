@@ -8,11 +8,13 @@
 	"translation-pixel-per-frame": 30.0,
 	"scroll-ratio-per-tick": 0.2,
 	"server ip john": "147.253.89.52",
-    "server port": "52124",
-	"aiName": "gotoClosestSpawner",
+    "server port": "62124",
+	"ai-name": "gotoClosestSpawner",
     "spawners": [
-        [{"x": 700.0, "y": 400}],
-        [{"x": 200.0, "y": 400.0, "singuities": 1}],
+        [{"x": 700.0, "y": 400},
+		 {"x": 250.0, "y": 300},
+		 {"x": 1150.0, "y": 500}],
+        [{"x": 200.0, "y": 400.0, "singuities": 100}],
         [{"x": 1200.0, "y": 400.0, "singuities": 1}]
     ]
 }

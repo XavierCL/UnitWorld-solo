@@ -20,15 +20,29 @@ namespace uw
                 else if (length == 2)
                 {
                     bool isXComparison = depth % 2 == 0;
-                    std::sort(points, points + length, isXComparison ? KdtreeNode::xDepthSortComparison : KdtreeNode::yDepthSortComparison);
-
-                    _current = &points[1];
-                    _lowests = Options::Some(KdtreeNode(points, 1, depth + 1));
+                    if (isXComparison && points[0].position().x() <= points[1].position().y() || !isXComparison && points[0].position().y() <= points[1].position().y())
+                    {
+                        _current = &points[1];
+                        _lowests = Options::Some(KdtreeNode(points, 1, depth + 1));
+                    }
+                    else
+                    {
+                        _current = &points[0];
+                        _lowests = Options::Some(KdtreeNode(points + 1, 1, depth + 1));
+                    }
                 }
                 else
                 {
                     bool isXComparison = depth % 2 == 0;
-                    std::sort(points, points + length, isXComparison ? KdtreeNode::xDepthSortComparison : KdtreeNode::yDepthSortComparison);
+
+                    if (isXComparison)
+                    {
+                        placeNthElement(points, length, length / 2, KdtreeNode::xDepthFirstSmallerThanSecond);
+                    }
+                    else
+                    {
+                        placeNthElement(points, length, length / 2, KdtreeNode::yDepthFirstSmallerThanSecond);
+                    }
 
                     size_t median = length / 2;
                     _current = &points[median];
@@ -49,8 +63,8 @@ namespace uw
                     || (!isXComparison && _current->position().y() <= target.position().y())))
                 {
                     currentBest = bestCollidable(target, currentBest, _greatests.getOrThrow().getClosest(target, depth + 1, currentBest));
-                    if (!currentBest || (isXComparison && currentBest->position().distanceSq(target.position()) < sq(target.position().x() - _current->position().x()))
-                        || (!isXComparison && currentBest->position().distanceSq(target.position()) < sq(target.position().y() - _current->position().y())))
+                    if (!currentBest || (isXComparison && currentBest->position().distanceSq(target.position()) > sq(target.position().x() - _current->position().x()))
+                        || (!isXComparison && currentBest->position().distanceSq(target.position()) > sq(target.position().y() - _current->position().y())))
                     {
                         currentBest = bestCollidable(target, currentBest, _lowests.getOrThrow().getClosest(target, depth + 1, currentBest));
                     }
@@ -58,8 +72,8 @@ namespace uw
                 else if (_lowests.isDefined())
                 {
                     currentBest = bestCollidable(target, currentBest, _lowests.getOrThrow().getClosest(target, depth + 1, currentBest));
-                    if (_greatests.isDefined() && (!currentBest || (isXComparison && currentBest->position().distanceSq(target.position()) >= sq(_current->position().x() - target.position().x()))
-                        || (!isXComparison && currentBest->position().distanceSq(target.position()) >= sq(_current->position().y() - target.position().y()))))
+                    if (_greatests.isDefined() && (!currentBest || (isXComparison && currentBest->position().distanceSq(target.position()) > sq(_current->position().x() - target.position().x()))
+                        || (!isXComparison && currentBest->position().distanceSq(target.position()) > sq(_current->position().y() - target.position().y()))))
                     {
                         currentBest = bestCollidable(target, currentBest, _greatests.getOrThrow().getClosest(target, depth + 1, currentBest));
                     }
@@ -86,14 +100,42 @@ namespace uw
                 return v * v;
             }
 
-            static bool xDepthSortComparison(const CollidablePoint& first, const CollidablePoint& second)
+            static bool xDepthFirstSmallerThanSecond(const CollidablePoint& first, const CollidablePoint& second)
             {
                 return first.position().x() < second.position().x();
             }
 
-            static bool yDepthSortComparison(const CollidablePoint& first, const CollidablePoint& second)
+            static bool yDepthFirstSmallerThanSecond(const CollidablePoint& first, const CollidablePoint& second)
             {
                 return first.position().y() < second.position().y();
+            }
+
+            template <typename Point, typename FirstSmallerThanSecond>
+            static void placeNthElement(Point* points, const size_t& length, const size_t& target, const FirstSmallerThanSecond& firstSmallerThanSecond)
+            {
+                std::swap(points[target], points[length - 1]);
+
+                size_t selectionIndex = 0;
+                size_t placementIndex = 0;
+                while (selectionIndex < length - 1)
+                {
+                    if (firstSmallerThanSecond(points[selectionIndex], points[length - 1]))
+                    {
+                        std::swap(points[selectionIndex], points[placementIndex]);
+                        ++placementIndex;
+                    }
+                    ++selectionIndex;
+                }
+                std::swap(points[length - 1], points[placementIndex]);
+
+                if (placementIndex > target)
+                {
+                    placeNthElement(points, placementIndex, target, firstSmallerThanSecond);
+                }
+                else if (placementIndex < target)
+                {
+                    placeNthElement(points + placementIndex + 1, length - (placementIndex + 1), target - (placementIndex + 1), firstSmallerThanSecond);
+                }
             }
 
             CollidablePoint* _current;
