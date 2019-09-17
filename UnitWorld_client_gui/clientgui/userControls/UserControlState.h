@@ -32,7 +32,8 @@ namespace uw
             _selectedUnits(std::make_shared<std::unordered_set<xg::Guid>>()),
             _lastSelectedSpawnerId(std::make_shared<Option<const xg::Guid>>()),
             _lastSelectedSpawnerAllegence(std::make_shared<Option<SpawnerAllegence>>()),
-			_unitGroups(std::shared_ptr<std::vector<std::unordered_set<xg::Guid>>>())
+            _unitGroups(std::vector<std::unordered_set<xg::Guid>>()),
+            _isLeftShiftKeyPressed(false)
         {}
 
         void setUserLeftMouseDownPosition(const Vector2D& position)
@@ -58,13 +59,22 @@ namespace uw
                 _leftMouseDownPosition->foreach([this, position](const Vector2D& leftMouseDownPosition) {
                     const Rectangle selectionRectangle(_cameraRelativeGameManager->absolutePositionToRelative(leftMouseDownPosition), _cameraRelativeGameManager->absolutePositionToRelative(position));
 
-                    _selectedUnits = _gameManager->currentPlayer().map<std::shared_ptr<std::unordered_set<xg::Guid>>>([&selectionRectangle, this](std::shared_ptr<Player> player) {
+                    const auto  currentFrameSelectedUnits = _gameManager->currentPlayer().map<std::shared_ptr<std::unordered_set<xg::Guid>>>([&selectionRectangle, this](std::shared_ptr<Player> player) {
                         return player->singuities() | filter<std::shared_ptr<Singuity>>([&selectionRectangle, this](std::shared_ptr<Singuity> singuity) {
                             const auto singuityRelativeCircle(_cameraRelativeGameManager->relativeCircleOf(singuity));
                             return selectionRectangle.intersectsWith(singuityRelativeCircle);
                         }) | map<xg::Guid>([](std::shared_ptr<Singuity> singuity) { return singuity->id(); })
-                        | toVector<xg::Guid>();
+                        | toUnorderedSet<xg::Guid>();
                     }).getOrElse(std::make_shared<std::unordered_set<xg::Guid>>());
+                    if (_isLeftShiftKeyPressed)
+                    {
+                        currentFrameSelectedUnits->insert(_selectedUnits->begin(), _selectedUnits->end());
+                        _selectedUnits = currentFrameSelectedUnits;
+                    }
+                    else
+                    {
+                        _selectedUnits = currentFrameSelectedUnits;
+                    }
                 });
             });
 
@@ -141,20 +151,36 @@ namespace uw
             return *_lastSelectedSpawnerId;
         }
 
-		void addSelectedUnitsToUnitGroup(const int& unitGroupID)
+		void addSelectedUnitsToUnitGroup(const int& unitGroupNumber)
 		{
-			_selectedUnits | forEach([this, unitGroupID](const auto& _selectedUnit) {
-				_unitGroups->insert(unitGroupID, _selectedUnit);
-				});
+            const auto sharedSelectedUnitsCopy = _selectedUnits;
+            _unitGroups[unitGroupNumber] = *sharedSelectedUnitsCopy;
 		}
 
-		void setSelectedUnitToUnitGroup(const int& unitGroupID)
+		void setSelectedUnitToUnitGroup(const int& unitGroupNumber)
 		{
-			_selectedUnits->clear();
-			_unitGroups->at(unitGroupID) | forEach([this](const auto& unitToInsert) {
-				_selectedUnits->insert(unitToInsert);
-			});
-		}
+            if (_isLeftShiftKeyPressed)
+            {
+                const auto sharedSelectedUnits = std::make_shared<std::unordered_set<xg::Guid>>(_unitGroups[unitGroupNumber]);
+                sharedSelectedUnits->insert(_selectedUnits->begin(), _selectedUnits->end());
+                _selectedUnits = sharedSelectedUnits;
+
+            }
+            else
+            {
+                _selectedUnits = std::make_shared<std::unordered_set<xg::Guid>>(_unitGroups[unitGroupNumber]);
+            }
+        }
+
+        void userPressedLeftShift()
+        {
+            _isLeftShiftKeyPressed = true;
+        }
+
+        void userReleasedLeftShift()
+        {
+            _isLeftShiftKeyPressed = false;
+        }
 
     private:
         const std::shared_ptr<GameManager> _gameManager;
@@ -168,6 +194,8 @@ namespace uw
         std::shared_ptr<Option<SpawnerAllegence>> _lastSelectedSpawnerAllegence;
 
         std::shared_ptr<std::unordered_set<xg::Guid>> _selectedUnits;
-		std::shared_ptr<std::vector<std::unordered_set<xg::Guid>>> _unitGroups;
+        std::vector<std::unordered_set<xg::Guid>> _unitGroups;
+
+        bool _isLeftShiftKeyPressed;
     };
 }
