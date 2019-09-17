@@ -30,7 +30,7 @@ namespace uw
         {
             const auto communicatedDestination(_physicsCommunicationAssembler->physicsVector2DToCommunicated(destination));
 
-            const auto message(std::make_shared<MoveMobileUnitsToPositionMessage>(singuityIds, communicatedDestination));
+            const auto message(std::make_shared<MoveMobileUnitsToPositionMessage>(std::vector<xg::Guid>(singuityIds.begin(), singuityIds.end()), communicatedDestination));
 
             try
             {
@@ -44,7 +44,7 @@ namespace uw
 
         void moveUnitsToSpawner(const std::unordered_set<xg::Guid>& singuityIds, const xg::Guid& spawnerId)
         {
-            const auto message(std::make_shared<MoveMobileUnitsToSpawnerMessage>(singuityIds, spawnerId));
+            const auto message(std::make_shared<MoveMobileUnitsToSpawnerMessage>(std::vector<xg::Guid>(singuityIds.begin(), singuityIds.end()), spawnerId));
 
             try
             {
