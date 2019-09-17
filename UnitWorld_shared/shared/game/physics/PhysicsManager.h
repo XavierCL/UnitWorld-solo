@@ -92,17 +92,15 @@ namespace uw
                     }
                 }
 
-                auto playerIdBySinguityId = &workingPlayers
-                    | flatMap<std::pair<xg::Guid, xg::Guid>>([](auto player) {
-                    return player->singuities()
-                        | map<std::pair<xg::Guid, xg::Guid>>([player](auto singuity) {
-                        return std::make_pair(singuity->id(), player->id());
-                    }) | toVector<std::pair<xg::Guid, xg::Guid>>();
-                }) | toUnorderedMap<xg::Guid, xg::Guid>([](auto playerIdAndSinguityId) {
-                    return playerIdAndSinguityId.first;
-                }, [](auto playerIdAndSinguityId) {
-                    return playerIdAndSinguityId.second;
-                });
+                std::unordered_map<xg::Guid, xg::Guid> playerIdBySinguityId;
+                playerIdBySinguityId.reserve(collidablePointsByPlayerId.size());
+                for (const auto& player : workingPlayers)
+                {
+                    for (const auto& singuity : *player->singuities())
+                    {
+                        playerIdBySinguityId[singuity->id()] = player->id();
+                    }
+                }
 
                 for (auto player : workingPlayers)
                 {

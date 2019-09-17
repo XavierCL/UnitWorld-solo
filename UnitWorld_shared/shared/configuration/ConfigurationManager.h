@@ -27,6 +27,7 @@ namespace uw
         double sidePanelWidthRatio(const double& defaultValue) const;
         double translationPixelPerFrame(const double& defaultValue) const;
         double scrollRatioPerTick(const double& defaultValue) const;
+        std::string aiName(const std::string& defaultValue) const;
 
 
     private:
@@ -40,5 +41,6 @@ namespace uw
         Option<double> _sidePanelWidthRatio;
         Option<double> _translationPixelPerFrame;
         Option<double> _scrollRatioPerTick;
+        Option<std::string> _aiName;
     };
 }

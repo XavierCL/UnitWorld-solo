@@ -13,9 +13,9 @@ namespace uw
     public:
         CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedSinguityDestination>& destination, const double& healthPoint, const unsigned long long& lastShootTimestamp);
 
-        std::string toJson() const;
+        nlohmann::json toJson() const;
 
-        static CommunicatedSinguity fromJson(const std::string& jsonData);
+        static CommunicatedSinguity fromJson(const nlohmann::json& jsonData);
 
         xg::Guid singuityId() const;
         xg::Guid playerId() const;
@@ -23,7 +23,6 @@ namespace uw
         CommunicatedVector2D position() const;
         CommunicatedVector2D speed() const;
         Option<CommunicatedSinguityDestination> destination() const;
-        bool isBreakingForDestination() const;
         double healthPoint() const;
         unsigned long long lastShootTimestamp() const;
 

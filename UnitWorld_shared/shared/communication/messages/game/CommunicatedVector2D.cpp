@@ -9,20 +9,18 @@ CommunicatedVector2D::CommunicatedVector2D(const double& xPosition, const double
     _y(yPosition)
 {}
 
-std::string CommunicatedVector2D::toJson() const
+nlohmann::json CommunicatedVector2D::toJson() const
 {
     nlohmann::json jsonData = {
         {"x", _x},
         {"y", _y}
     };
 
-    return jsonData.dump();
+    return jsonData;
 }
 
-CommunicatedVector2D CommunicatedVector2D::fromJson(const std::string& jsonData)
+CommunicatedVector2D CommunicatedVector2D::fromJson(const nlohmann::json& parsedJson)
 {
-    nlohmann::json parsedJson = nlohmann::json::parse(jsonData);
-
     return CommunicatedVector2D(parsedJson.at("x").get<double>(), parsedJson.at("y").get<double>());
 }
 

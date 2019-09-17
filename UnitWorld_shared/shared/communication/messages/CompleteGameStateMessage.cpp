@@ -16,7 +16,7 @@ std::shared_ptr<CompleteGameStateMessage> CompleteGameStateMessage::fromJson(con
     nlohmann::json parsedData = nlohmann::json::parse(json);
 
     return std::make_shared<CompleteGameStateMessage>(
-        CommunicatedCompleteGameState::fromJson(parsedData.at("complete-game-state").dump()),
+        CommunicatedCompleteGameState::fromJson(parsedData.at("complete-game-state")),
         xg::Guid(parsedData.at("currentPlayerId").get<std::string>())
     );
 }
@@ -29,7 +29,7 @@ MessageType CompleteGameStateMessage::messageType() const
 std::string CompleteGameStateMessage::toJsonData() const
 {
     nlohmann::json jsonData = {
-        {"complete-game-state", nlohmann::json::parse(_completeGameState.toJson())},
+        {"complete-game-state", _completeGameState.toJson()},
         {"currentPlayerId", _currentPlayerId.str()}
     };
 

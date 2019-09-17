@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
+
 #include <string>
 
 namespace uw
@@ -9,9 +11,9 @@ namespace uw
     public:
         CommunicatedVector2D(const double& xPosition, const double& yPosition);
 
-        std::string toJson() const;
+        nlohmann::json toJson() const;
 
-        static CommunicatedVector2D fromJson(const std::string& jsonData);
+        static CommunicatedVector2D fromJson(const nlohmann::json& jsonData);
 
         double x() const;
         double y() const;

@@ -113,9 +113,9 @@ namespace UnitWorld_shared_tests
             Vector2D testSpeed(4, 0);
             Vector2D expectedSpeed(3, 0);
 
-            testSpeed.maxAt(3);
+            Vector2D actualSpeed = testSpeed.maxAt(3);
 
-            Assert::AreEqual(expectedSpeed, testSpeed);
+            Assert::AreEqual(expectedSpeed, actualSpeed);
         }
 
         TEST_METHOD(maxAt_shouldShortenAYDimensionedSpeedToTheGivenModule)
@@ -123,9 +123,9 @@ namespace UnitWorld_shared_tests
             Vector2D testSpeed(0, -4);
             Vector2D expectedSpeed(0, -3);
 
-            testSpeed.maxAt(3);
+            Vector2D actualSpeed = testSpeed.maxAt(3);
 
-            Assert::AreEqual(expectedSpeed, testSpeed);
+            Assert::AreEqual(expectedSpeed, actualSpeed);
         }
 
         TEST_METHOD(maxAt_shouldShortenABiDimensionedSpeedToTheGivenModule)
@@ -134,9 +134,9 @@ namespace UnitWorld_shared_tests
             Vector2D expectedSpeed(-3, -4);
 
             // 3^2 + 4^2 = 5^2
-            testSpeed.maxAt(5);
+            Vector2D actualSpeed = testSpeed.maxAt(5);
 
-            Assert::AreEqual(expectedSpeed, testSpeed);
+            Assert::AreEqual(expectedSpeed, actualSpeed);
         }
     };
 }

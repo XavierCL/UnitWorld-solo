@@ -14,9 +14,9 @@ namespace uw
             _destination(destination)
         {}
 
-        std::string toJson() const;
+        nlohmann::json toJson() const;
 
-        static CommunicatedSinguityDestination fromJson(const std::string& jsonData);
+        static CommunicatedSinguityDestination fromJson(const nlohmann::json& jsonData);
 
         std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> destination() const
         {
