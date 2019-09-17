@@ -14,14 +14,14 @@ CommunicatedSinguity::CommunicatedSinguity(const xg::Guid& singuityId, const xg:
     _lastShootTimestamp(lastShootTimestamp)
 {}
 
-std::string CommunicatedSinguity::toJson() const
+nlohmann::json CommunicatedSinguity::toJson() const
 {
     const auto singuityId = _singuityId.str();
     const auto playerId = _playerId.str();
-    const auto position = nlohmann::json::parse(_position.toJson());
-    const auto speed = nlohmann::json::parse(_speed.toJson());
+    const auto position = _position.toJson();
+    const auto speed = _speed.toJson();
     const auto destination = _destination
-        .map<nlohmann::json>([](const CommunicatedSinguityDestination& destination) { return nlohmann::json::parse(destination.toJson()); })
+        .map<nlohmann::json>([](const CommunicatedSinguityDestination& destination) { return destination.toJson(); })
         .getOrElse(nlohmann::json("none"));
 
     nlohmann::json jsonData = {
@@ -34,21 +34,19 @@ std::string CommunicatedSinguity::toJson() const
         {"last-shoot-time", _lastShootTimestamp}
     };
 
-    return jsonData.dump();
+    return jsonData;
 }
 
-CommunicatedSinguity CommunicatedSinguity::fromJson(const std::string& jsonData)
+CommunicatedSinguity CommunicatedSinguity::fromJson(const nlohmann::json& parsedJson)
 {
-    nlohmann::json parsedJson = nlohmann::json::parse(jsonData);
-
-    const auto destinationJson = parsedJson.at("destination").dump();
+    const auto destinationJson = parsedJson.at("destination");
 
     return CommunicatedSinguity(
         xg::Guid(parsedJson.at("id").get<std::string>()),
         xg::Guid(parsedJson.at("playerId").get<std::string>()),
-        CommunicatedVector2D::fromJson(parsedJson.at("position").dump()),
-        CommunicatedVector2D::fromJson(parsedJson.at("speed").dump()),
-        destinationJson == "\"none\""
+        CommunicatedVector2D::fromJson(parsedJson.at("position")),
+        CommunicatedVector2D::fromJson(parsedJson.at("speed")),
+        destinationJson.is_string() && destinationJson.get<std::string>() == "\"none\""
             ? Options::None<CommunicatedSinguityDestination>()
             : Options::Some(CommunicatedSinguityDestination::fromJson(destinationJson)),
         parsedJson.at("health-points").get<double>(),

@@ -7,7 +7,12 @@ using namespace uw;
 Vector2D::Vector2D(const double& x, const double& y) :
     _x(x),
     _y(y)
-{}
+{
+    if (isnan(_x) || isnan(_y))
+    {
+        int temp1 = 0;
+    }
+}
 
 double& Vector2D::x()
 {
@@ -113,6 +118,10 @@ Vector2D uw::Vector2D::atModule(const double & module) const
     else
     {
         const auto modifier = sqrt((_x * _x + _y * _y) / (module * module));
+        if (modifier == 0)
+        {
+            return *this;
+        }
         return Vector2D(_x / modifier, _y / modifier);
     }
 }

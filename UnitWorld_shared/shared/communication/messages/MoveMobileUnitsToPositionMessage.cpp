@@ -38,7 +38,7 @@ std::string MoveMobileUnitsToPositionMessage::toJsonData() const
         singuityStringIds.emplace_back(singuityId.str());
     }
 
-    nlohmann::json parsedDestination(nlohmann::json::parse(_destination.toJson()));
+    nlohmann::json parsedDestination(_destination.toJson());
 
     nlohmann::json returnedJson({
         {"mobile-units-id", singuityStringIds},
