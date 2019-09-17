@@ -18,7 +18,7 @@ nlohmann::json CommunicatedSpawner::toJson() const
         {"total-spawned-count", _totalSpawnedCount}
     };
 
-    return jsonData.dump();
+    return jsonData;
 }
 
 CommunicatedSpawner CommunicatedSpawner::fromJson(const nlohmann::json& parsedJson)
@@ -28,7 +28,7 @@ CommunicatedSpawner CommunicatedSpawner::fromJson(const nlohmann::json& parsedJs
     return CommunicatedSpawner(
         xg::Guid(parsedJson.at("id").get<std::string>()),
         CommunicatedVector2D::fromJson(parsedJson.at("position")),
-        parsedAllegence.is_string()
+        parsedAllegence.is_string() && parsedAllegence.get<std::string>() == "none"
             ? Options::None<CommunicatedSpawnerAllegence>()
             : Options::Some(CommunicatedSpawnerAllegence::fromJson(parsedAllegence)),
         parsedJson.at("last-spawn-timestamp").get<unsigned long long>(),

@@ -21,7 +21,7 @@ std::shared_ptr<MoveMobileUnitsToPositionMessage> MoveMobileUnitsToPositionMessa
 
     return std::make_shared<MoveMobileUnitsToPositionMessage>(
         std::move(singuityIds),
-        CommunicatedVector2D::fromJson(parsedData.at("destination-position").dump())
+        CommunicatedVector2D::fromJson(parsedData.at("destination-position"))
     );
 }
 

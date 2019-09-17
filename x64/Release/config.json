@@ -8,7 +8,7 @@
 	"translation-pixel-per-frame": 30.0,
 	"scroll-ratio-per-tick": 0.2,
 	"server ip john": "147.253.89.52",
-    "server port": "62124",
+    "server port": "52124",
 	"ai-name": "gotoClosestSpawner",
     "spawners": [
         [{"x": 700.0, "y": 400},
