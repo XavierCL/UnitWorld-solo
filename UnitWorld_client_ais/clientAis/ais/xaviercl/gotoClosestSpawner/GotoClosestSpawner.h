@@ -33,7 +33,7 @@ namespace uw
 
                 // we don't want to assign a destination to a spawner that's already going to the right destination
                 Option<xg::Guid> currentFrameSpawnerDestination;
-                std::vector<xg::Guid> movingSinguityIds;
+                std::unordered_set<xg::Guid> movingSinguityIds;
                 currentPlayer->singuities() | forEach([&currentFrameSpawnerDestination, &movingSinguityIds, &collisionDetector](const std::shared_ptr<Singuity> singuity) {
                     const auto closestSpawnerIdOpt = collisionDetector->getClosest(CollidablePoint(singuity->id(), singuity->position()));
 
@@ -41,11 +41,11 @@ namespace uw
                         if (currentFrameSpawnerDestination.isEmpty())
                         {
                             currentFrameSpawnerDestination = Options::Some(closestSpawnerId);
-                            movingSinguityIds.push_back(singuity->id());
+                            movingSinguityIds.insert(singuity->id());
                         }
                         else if (currentFrameSpawnerDestination == Options::Some(closestSpawnerId))
                         {
-                            movingSinguityIds.push_back(singuity->id());
+                            movingSinguityIds.insert(singuity->id());
                         }
                     });
                 });

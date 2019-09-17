@@ -15,7 +15,6 @@
 #include "commons/CollectionPipe.h"
 
 #include <vector>
-#include <clientgui\networking\ServerCommander.h>
 
 namespace uw
 {
@@ -32,7 +31,7 @@ namespace uw
             _selectedUnits(std::make_shared<std::unordered_set<xg::Guid>>()),
             _lastSelectedSpawnerId(std::make_shared<Option<const xg::Guid>>()),
             _lastSelectedSpawnerAllegence(std::make_shared<Option<SpawnerAllegence>>()),
-            _unitGroups(std::vector<std::unordered_set<xg::Guid>>()),
+            _unitGroups(std::vector<std::unordered_set<xg::Guid>>(10)),
             _isLeftShiftKeyPressed(false)
         {}
 
@@ -42,7 +41,10 @@ namespace uw
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>();
             _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
             _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();
-            _selectedUnits = std::make_shared<std::unordered_set<xg::Guid>>();
+            if (!_isLeftShiftKeyPressed)
+            {
+                _selectedUnits = std::make_shared<std::unordered_set<xg::Guid>>();
+            }
         }
 
         void setUserLeftMouseUpPosition(const Vector2D& position)
@@ -180,6 +182,18 @@ namespace uw
         void userReleasedLeftShift()
         {
             _isLeftShiftKeyPressed = false;
+        }
+
+        void selectAllUnits()
+        {
+            _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>();
+            _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
+            _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();
+            _selectedUnits = _gameManager->currentPlayer().map<std::shared_ptr<std::unordered_set<xg::Guid>>>([](std::shared_ptr<Player> player) {
+                return player->singuities()
+                    | map<xg::Guid>([](std::shared_ptr<Singuity> singuity) { return singuity->id(); })
+                    | toUnorderedSet<xg::Guid>();
+            }).getOrElse(std::make_shared<std::unordered_set<xg::Guid>>());
         }
 
     private:

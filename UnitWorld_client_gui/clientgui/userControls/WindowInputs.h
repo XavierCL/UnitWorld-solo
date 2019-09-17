@@ -80,6 +80,11 @@ namespace uw
 			}
 		}
 
+        void userPressedAKey()
+        {
+            _userControlState->selectAllUnits();
+        }
+
     private:
         const std::shared_ptr<UserControlState> _userControlState;
         const std::shared_ptr<Camera> _camera;
