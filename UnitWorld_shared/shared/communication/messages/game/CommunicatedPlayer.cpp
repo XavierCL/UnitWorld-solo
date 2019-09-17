@@ -8,19 +8,17 @@ CommunicatedPlayer::CommunicatedPlayer(const xg::Guid& playerId) :
     _playerId(playerId)
 {}
 
-std::string CommunicatedPlayer::toJson() const
+nlohmann::json CommunicatedPlayer::toJson() const
 {
     nlohmann::json jsonData = {
         {"id", _playerId.str()}
     };
 
-    return jsonData.dump();
+    return jsonData;
 }
 
-CommunicatedPlayer CommunicatedPlayer::fromJson(std::string jsonData)
-{
-    nlohmann::json parsedJson = nlohmann::json::parse(jsonData);
-    
+CommunicatedPlayer CommunicatedPlayer::fromJson(const nlohmann::json& parsedJson)
+{   
     return CommunicatedPlayer(xg::Guid(parsedJson.at("id").get<std::string>()));
 }
 

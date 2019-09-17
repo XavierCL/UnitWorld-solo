@@ -15,9 +15,9 @@ namespace uw
             _spawnerAllegence(spawnerAllegence)
         {}
 
-        std::string toJson() const;
+        nlohmann::json toJson() const;
 
-        static CommunicatedSpawnerDestination fromJson(const std::string& jsonData);
+        static CommunicatedSpawnerDestination fromJson(const nlohmann::json& jsonData);
 
         xg::Guid spawnerId() const
         {

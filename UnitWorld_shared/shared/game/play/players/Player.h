@@ -33,6 +33,6 @@ namespace uw
 
         std::shared_ptr<std::vector<std::shared_ptr<Singuity>>> _singuities;
 
-        immer::map<xg::Guid, std::function<void(std::shared_ptr<Singuity>)>> _singuityAddedCallbacks;
+        std::unordered_map<xg::Guid, std::function<void(std::shared_ptr<Singuity>)>> _singuityAddedCallbacks;
     };
 }

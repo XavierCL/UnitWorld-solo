@@ -6,28 +6,26 @@
 
 using namespace uw;
 
-std::string CommunicatedSinguityDestination::toJson() const
+nlohmann::json CommunicatedSinguityDestination::toJson() const
 {
     return std::visit(overloaded{
         [](const CommunicatedVector2D& point) {
-            return nlohmann::json {{"point", nlohmann::json::parse(point.toJson())}};
+            return nlohmann::json {{"point", point.toJson()}};
         },
         [](const CommunicatedSpawnerDestination& spawnerDestination) {
-            return nlohmann::json {{"spawner", nlohmann::json::parse(spawnerDestination.toJson())}};
+            return nlohmann::json {{"spawner", spawnerDestination.toJson()}};
         }
-    }, _destination).dump();
+    }, _destination);
 }
 
-CommunicatedSinguityDestination CommunicatedSinguityDestination::fromJson(const std::string& jsonData)
+CommunicatedSinguityDestination CommunicatedSinguityDestination::fromJson(const nlohmann::json& parsedData)
 {
-    nlohmann::json parsedData = nlohmann::json::parse(jsonData);
-
     if (parsedData.contains("point"))
     {
-        return CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> {CommunicatedVector2D::fromJson(parsedData.at("point").dump())});
+        return CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> {CommunicatedVector2D::fromJson(parsedData.at("point"))});
     }
     else
     {
-        return CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> {CommunicatedSpawnerDestination::fromJson(parsedData.at("spawner").dump())});
+        return CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> {CommunicatedSpawnerDestination::fromJson(parsedData.at("spawner"))});
     }
 }
