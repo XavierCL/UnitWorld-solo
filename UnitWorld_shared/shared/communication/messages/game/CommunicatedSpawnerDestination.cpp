@@ -18,8 +18,8 @@ nlohmann::json CommunicatedSpawnerDestination::toJson() const
 
 CommunicatedSpawnerDestination CommunicatedSpawnerDestination::fromJson(const nlohmann::json& parsedJsonData)
 {
-    std::string jsonAllegence = parsedJsonData.at("spawner-allegence").dump();
-    Option<CommunicatedSpawnerAllegence> communicatedSpawnerAllegence = jsonAllegence == "\"none\""
+    nlohmann::json jsonAllegence = parsedJsonData.at("spawner-allegence");
+    Option<CommunicatedSpawnerAllegence> communicatedSpawnerAllegence = jsonAllegence.is_string() && jsonAllegence.get<std::string>() == "none"
         ? Options::None<CommunicatedSpawnerAllegence>()
         : Options::Some(CommunicatedSpawnerAllegence::fromJson(jsonAllegence));
 

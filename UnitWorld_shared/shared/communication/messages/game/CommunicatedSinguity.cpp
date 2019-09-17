@@ -46,7 +46,7 @@ CommunicatedSinguity CommunicatedSinguity::fromJson(const nlohmann::json& parsed
         xg::Guid(parsedJson.at("playerId").get<std::string>()),
         CommunicatedVector2D::fromJson(parsedJson.at("position")),
         CommunicatedVector2D::fromJson(parsedJson.at("speed")),
-        destinationJson.is_string() && destinationJson.get<std::string>() == "\"none\""
+        destinationJson.is_string() && destinationJson.get<std::string>() == "none"
             ? Options::None<CommunicatedSinguityDestination>()
             : Options::Some(CommunicatedSinguityDestination::fromJson(destinationJson)),
         parsedJson.at("health-points").get<double>(),
