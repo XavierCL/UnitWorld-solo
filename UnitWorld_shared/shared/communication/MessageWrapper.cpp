@@ -1,9 +1,9 @@
 #include "MessageWrapper.h"
 
-#include "CompleteGameStateMessage.h"
-#include "InvalidMessage.h"
-
-#include "MessageType.h"
+#include "messages/CompleteGameStateMessage.h"
+#include "messages/InvalidMessage.h"
+#include "messages/MoveMobileUnitsToPositionMessage.h"
+#include "messages/MessageType.h"
 
 #include <nlohmann/json.hpp>
 
@@ -14,6 +14,7 @@ namespace uw
     NLOHMANN_JSON_SERIALIZE_ENUM(MessageType, {
         {InvalidMessageType, nullptr},
         {CompleteGameStateMessageType, "complete-game-state"},
+        {MoveMobileUnitsToPositionMessageType, "move-units-to-position"},
     });
 
     const std::string MessageWrapper::MESSAGE_TYPE_JSON_ATTRIBUTE = "type";
@@ -50,6 +51,11 @@ unsigned long long MessageWrapper::timestamp() const
     return _timestamp;
 }
 
+MessageType MessageWrapper::messageType() const
+{
+    return _innerMessage->messageType();
+}
+
 std::string MessageWrapper::wrapMessageToJson(const std::shared_ptr<const Message> message, const unsigned long long& timestamp)
 {
     nlohmann::json jsonMessage = {
@@ -70,6 +76,10 @@ std::shared_ptr<const Message> MessageWrapper::jsonToMessage(const std::string& 
     {
         const auto messageData = parsedJson.at(MESSAGE_DATA_JSON_ATTRIBUTE).dump();
         return std::make_shared<const CompleteGameStateMessage>(messageData);
+    }
+    else if (messageType == MessageType::MoveMobileUnitsToPositionMessageType)
+    {
+        return std::make_shared<const MoveMobileUnitsToPositionMessage>(messageData);
     }
     else
     {

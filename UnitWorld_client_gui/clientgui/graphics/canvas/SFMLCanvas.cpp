@@ -4,9 +4,7 @@ using namespace uw;
 
 SFMLCanvas::SFMLCanvas(std::shared_ptr<sf::RenderWindow> canvas) :
     _windowCanvas(canvas)
-{
-    _windowCanvas->setActive();
-}
+{}
 
 void SFMLCanvas::draw(const sf::Drawable& drawable, const sf::RenderStates& states)
 {

@@ -1,6 +1,8 @@
 #ifndef OPTION_H
 #define OPTION_H
 
+#include <exception>
+
 template <typename _Type>
 class Option
 {
@@ -18,9 +20,19 @@ public:
         : _inner(inner ? new _Type(*inner) : nullptr)
     {}
 
+    Option(const _Type*&& inner)
+        : _inner(inner)
+    {}
+
     Option(const Option<_Type>& copy)
         : _inner(newFrom(copy))
     {}
+
+    Option(Option<_Type>&& moved)
+        : _inner(moved._inner)
+    {
+        moved._inner = nullptr;
+    }
 
     ~Option()
     {
@@ -37,6 +49,17 @@ public:
         return *this;
     }
 
+    Option<_Type>& operator=(Option<_Type>&& moved)
+    {
+        if (&moved != this)
+        {
+            remove();
+            _inner = moved._inner;
+            moved._inner = nullptr;
+        }
+        return *this;
+    }
+
     const bool isDefined() const
     {
         return _inner != nullptr;
@@ -45,6 +68,18 @@ public:
     virtual const bool isEmpty() const
     {
         return _inner == nullptr;
+    }
+
+    const _Type& getOrThrow() const
+    {
+        if (isDefined())
+        {
+            return *_inner;
+        }
+        else
+        {
+            throw std::logic_error("Tried to access an empty option");
+        }
     }
 
     const _Type& getOrElse(const _Type& defaultValue) const
@@ -173,6 +208,21 @@ private:
     }
 
     const _Type* _inner;
+};
+
+struct Options
+{
+    template <typename Type>
+    static Option<Type> Some(const Type& inner)
+    {
+        return Option<Type>(inner);
+    }
+
+    template<typename Type>
+    static Option<Type> None()
+    {
+        return Option<Type>();
+    }
 };
 
 #endif

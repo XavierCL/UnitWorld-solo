@@ -39,13 +39,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="commons\CollectionPipe.h" />
     <ClInclude Include="commons\FastMath.hpp" />
     <ClInclude Include="commons\FixedUnorderedMap.hpp" />
     <ClInclude Include="commons\Guid.hpp" />
     <ClInclude Include="commons\Hash.hpp" />
     <ClInclude Include="commons\Logger.hpp" />
+    <ClInclude Include="commons\MemoryExtension.h" />
     <ClInclude Include="commons\Option.hpp" />
     <ClInclude Include="commons\RandomEngineGenerator.h" />
+    <ClInclude Include="commons\Stream.h" />
     <ClInclude Include="commons\StringsHelper.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

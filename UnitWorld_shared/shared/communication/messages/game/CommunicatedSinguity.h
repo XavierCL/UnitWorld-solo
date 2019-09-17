@@ -16,6 +16,7 @@ namespace uw
 
         static CommunicatedSinguity fromJson(const std::string& jsonData);
 
+        xg::Guid singuityId() const;
         xg::Guid playerId() const;
 
         CommunicatedVector2D position() const;

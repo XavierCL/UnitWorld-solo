@@ -11,10 +11,20 @@ Rectangle::Rectangle(const Vector2D& corner1,
     _lowerRightCorner(max(corner1.x(), corner2.x()), max(corner1.y(), corner2.y()))
 {}
 
-const bool Rectangle::contains(const Vector2D& point) const
+bool Rectangle::contains(const Vector2D& point) const
 {
     return _upperLeftCorner.x() <= point.x() &&
         _upperLeftCorner.y() <= point.y() &&
         _lowerRightCorner.x() >= point.x() &&
         _lowerRightCorner.y() >= point.y();
+}
+
+Vector2D Rectangle::size() const
+{
+    return Vector2D(_lowerRightCorner.x() - _upperLeftCorner.x(), _lowerRightCorner.y() - _upperLeftCorner.y());
+}
+
+Vector2D Rectangle::upperLeftCorner() const
+{
+    return _upperLeftCorner;
 }

@@ -15,15 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="server\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ServerGame.cpp">
+    <ClCompile Include="server\networking\ClientsGameSender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ServerGame.h">
+    <ClInclude Include="server\ServerGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server\networking\PlayerClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server\networking\ClientsReceiver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server\networking\ClientsGameSender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server\game\GameReceiver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

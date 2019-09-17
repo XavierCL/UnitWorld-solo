@@ -3,6 +3,8 @@
 #include "canvas/SFMLDrawingCanvas.h"
 #include "units/GraphicalSinguity.h"
 
+#include "clientgui/userControls/UserControlState.h"
+
 #include "shared/game/GameManager.h"
 
 namespace uw
@@ -10,20 +12,61 @@ namespace uw
     class GameDrawer
     {
     public:
-        GameDrawer(std::shared_ptr<GameManager> gameManager):
-            _gameManager(gameManager)
+        GameDrawer(std::shared_ptr<GameManager> gameManager, std::shared_ptr<UserControlState> userControlState):
+            _gameManager(gameManager),
+            _userControlState(userControlState)
         {}
 
         void draw(std::shared_ptr<SFMLDrawingCanvas> canvas)
         {
-            for (auto singuity : _gameManager->singuities())
+            const auto localSinguities = std::make_shared<immer::vector<std::shared_ptr<const Singuity>>>(_gameManager->singuities())
+                | toUnorderedMap<xg::Guid, std::shared_ptr<const Singuity>>([](const std::shared_ptr<const Singuity>& singuity) {
+                    return singuity->id();
+                });
+
+            // Last move units position
+            _userControlState->getLastMoveUnitPosition().foreach([&canvas](const Vector2D& lastMoveUnitPosition) {
+                const int circleRadius(2.0);
+                sf::CircleShape cursorDot(circleRadius);
+                cursorDot.setPosition(round(lastMoveUnitPosition.x() - circleRadius), round(lastMoveUnitPosition.y() - circleRadius));
+                cursorDot.setFillColor(sf::Color(255, 255, 255));
+                canvas->draw(cursorDot);
+            });
+
+            // Selected unit white aura
+            for (const auto selectedUnitId : _userControlState->getSelectedUnits())
+            {
+                (localSinguities | find<std::shared_ptr<const Singuity>>(selectedUnitId)).foreach([&canvas](const std::shared_ptr<const Singuity>& singuity) {
+                    const int circleRadius(5.0);
+                    sf::CircleShape selectedUnitAura(circleRadius);
+                    selectedUnitAura.setPosition(round(singuity->position().x() - circleRadius), round(singuity->position().y() - circleRadius));
+                    selectedUnitAura.setFillColor(sf::Color(255, 255, 255));
+                    canvas->draw(selectedUnitAura);
+                });
+            }
+
+            // Units
+            const auto localSinguityValues = localSinguities | mapValues<std::shared_ptr<const Singuity>>();
+            for (auto singuity : *localSinguityValues)
             {
                 canvas->draw(*(GraphicalSinguity(*singuity).drawable()));
             }
+
+            // User selection rectangle
+            _userControlState->getSelectionRectangle().foreach([&canvas](const Rectangle& userSelection) {
+                const auto userSelectionSize(userSelection.size());
+                const auto userSelectionLowerRight(userSelection.upperLeftCorner());
+                sf::RectangleShape sfUserSelection(sf::Vector2f(userSelectionSize.x(), userSelectionSize.y()));
+                sfUserSelection.setPosition(userSelectionLowerRight.x(), userSelectionLowerRight.y());
+                sfUserSelection.setFillColor(sf::Color::Transparent);
+                sfUserSelection.setOutlineThickness(1);
+                canvas->draw(sfUserSelection);
+            });
         }
 
     private:
 
         const std::shared_ptr<GameManager> _gameManager;
+        const std::shared_ptr<UserControlState> _userControlState;
     };
 }

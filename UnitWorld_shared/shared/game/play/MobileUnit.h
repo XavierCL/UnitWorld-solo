@@ -18,8 +18,9 @@ namespace uw
         Vector2D speed() const;
 
     protected:
-        MobileUnit(const MobileUnit& copy);
+        MobileUnit(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<Vector2D>& destination);
         MobileUnit(const Vector2D& position, const Vector2D& speed, const Option<Vector2D>& destination);
+        MobileUnit(const MobileUnit& copy);
 
     private:
         void setMaximalAcceleration(const Vector2D& destination);
