@@ -117,7 +117,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=_WIN32_WINNT_WINXP</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>.;..\UnitWorld_shared;..\UnitWorld_client_shared;..\Communications;..\Commons;..\dependencies\immer\0.6.2\include;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\UnitWorld_shared;..\UnitWorld_client_shared;..\Communications;..\Commons;..\dependencies\immer\0.6.2\include;..\dependencies\asio\1.12.2\include;..\dependencies\nlohmann-json\3.6.1\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -136,7 +136,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=_WIN32_WINNT_WINXP</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>.;..\UnitWorld_shared;..\UnitWorld_client_shared;..\Communications;..\Commons;..\dependencies\immer\0.6.2\include;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\UnitWorld_shared;..\UnitWorld_client_shared;..\Communications;..\Commons;..\dependencies\immer\0.6.2\include;..\dependencies\asio\1.12.2\include;..\dependencies\nlohmann-json\3.6.1\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -153,7 +153,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=_WIN32_WINNT_WINXP</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>.;..\UnitWorld_shared;..\UnitWorld_client_shared;..\Communications;..\Commons;..\dependencies\immer\0.6.2\include;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\UnitWorld_shared;..\UnitWorld_client_shared;..\Communications;..\Commons;..\dependencies\immer\0.6.2\include;..\dependencies\asio\1.12.2\include;..\dependencies\nlohmann-json\3.6.1\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -172,7 +172,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);ASIO_STANDALONE;_WINSOCK_DEPRECATED_NO_WARNINGS;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=_WIN32_WINNT_WINXP</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>.;..\UnitWorld_shared;..\UnitWorld_client_shared;..\Communications;..\Commons;..\dependencies\immer\0.6.2\include;..\dependencies\asio\1.12.2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\UnitWorld_shared;..\UnitWorld_client_shared;..\Communications;..\Commons;..\dependencies\immer\0.6.2\include;..\dependencies\asio\1.12.2\include;..\dependencies\nlohmann-json\3.6.1\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

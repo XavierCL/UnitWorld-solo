@@ -43,9 +43,9 @@ namespace uw
             return _totalSpawnedCount;
         }
 
-        std::string toJson() const;
+        nlohmann::json toJson() const;
 
-        static CommunicatedSpawner fromJson(const std::string& jsonData);
+        static CommunicatedSpawner fromJson(const nlohmann::json& jsonData);
 
     private:
         const xg::Guid _id;

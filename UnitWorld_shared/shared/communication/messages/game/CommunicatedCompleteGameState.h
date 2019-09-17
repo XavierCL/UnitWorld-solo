@@ -4,6 +4,8 @@
 #include "CommunicatedSinguity.h"
 #include "CommunicatedSpawner.h"
 
+#include <nlohmann/json.hpp>
+
 #include <vector>
 
 namespace uw
@@ -13,7 +15,7 @@ namespace uw
     public:
         CommunicatedCompleteGameState(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const std::vector<CommunicatedSpawner>& spawners);
 
-        std::string toJson() const;
+        nlohmann::json toJson() const;
 
         const std::vector<CommunicatedSpawner>& spawners() const
         {
@@ -30,7 +32,7 @@ namespace uw
             return _singuities;
         }
 
-        static CommunicatedCompleteGameState fromJson(const std::string& jsonData);
+        static CommunicatedCompleteGameState fromJson(const nlohmann::json& jsonData);
 
     private:
 

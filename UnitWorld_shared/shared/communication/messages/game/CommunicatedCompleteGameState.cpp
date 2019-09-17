@@ -10,24 +10,24 @@ CommunicatedCompleteGameState::CommunicatedCompleteGameState(const std::vector<C
     _spawners(spawners)
 {}
 
-std::string CommunicatedCompleteGameState::toJson() const
+nlohmann::json CommunicatedCompleteGameState::toJson() const
 {
     std::vector<nlohmann::json> jsonPlayers;
     for (const auto& player : _players)
     {
-        jsonPlayers.emplace_back(nlohmann::json::parse(player.toJson()));
+        jsonPlayers.emplace_back(player.toJson());
     }
 
     std::vector<nlohmann::json> jsonSinguities;
     for (const auto& singuity : _singuities)
     {
-        jsonSinguities.emplace_back(nlohmann::json::parse(singuity.toJson()));
+        jsonSinguities.emplace_back(singuity.toJson());
     }
 
     std::vector<nlohmann::json> jsonSpawners;
     for (const auto& spawner : _spawners)
     {
-        jsonSpawners.emplace_back(nlohmann::json::parse(spawner.toJson()));
+        jsonSpawners.emplace_back(spawner.toJson());
     }
 
     nlohmann::json jsonData = {
@@ -36,29 +36,27 @@ std::string CommunicatedCompleteGameState::toJson() const
         {"spawners", jsonSpawners}
     };
 
-    return jsonData.dump();
+    return jsonData;
 }
 
-CommunicatedCompleteGameState CommunicatedCompleteGameState::fromJson(const std::string& jsonData)
+CommunicatedCompleteGameState CommunicatedCompleteGameState::fromJson(const nlohmann::json& parsedJson)
 {
-    nlohmann::json parsedJson(nlohmann::json::parse(jsonData));
-
     std::vector<CommunicatedPlayer> players;
     for (const auto& parsedPlayer : parsedJson.at("players"))
     {
-        players.emplace_back(CommunicatedPlayer::fromJson(parsedPlayer.dump()));
+        players.emplace_back(CommunicatedPlayer::fromJson(parsedPlayer));
     }
 
     std::vector<CommunicatedSinguity> singuities;
     for (const auto& parsedSinguity : parsedJson.at("singuities"))
     {
-        singuities.emplace_back(CommunicatedSinguity::fromJson(parsedSinguity.dump()));
+        singuities.emplace_back(CommunicatedSinguity::fromJson(parsedSinguity));
     }
 
     std::vector<CommunicatedSpawner> spawners;
     for (const auto& parsedSpawner : parsedJson.at("spawners"))
     {
-        spawners.emplace_back(CommunicatedSpawner::fromJson(parsedSpawner.dump()));
+        spawners.emplace_back(CommunicatedSpawner::fromJson(parsedSpawner));
     }
 
     return CommunicatedCompleteGameState(players, singuities, spawners);
