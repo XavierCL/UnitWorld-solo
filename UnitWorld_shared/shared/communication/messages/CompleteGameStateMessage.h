@@ -25,6 +25,9 @@ namespace uw
 
     private:
 
+        const static std::string CompleteGameStateMessage::COMPLETE_GAME_STATE_LABEL;
+        const static std::string CompleteGameStateMessage::CURRENT_PLAYER_ID_LABEL;
+
         const CommunicatedCompleteGameState _completeGameState;
         const xg::Guid _currentPlayerId;
     };

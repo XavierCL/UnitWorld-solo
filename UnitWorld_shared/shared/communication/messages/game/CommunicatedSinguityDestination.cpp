@@ -10,10 +10,10 @@ nlohmann::json CommunicatedSinguityDestination::toJson() const
 {
     return std::visit(overloaded{
         [](const CommunicatedVector2D& point) {
-            return nlohmann::json {{"point", point.toJson()}};
+            return nlohmann::json {{POINT_LABEL, point.toJson()}};
         },
         [](const CommunicatedSpawnerDestination& spawnerDestination) {
-            return nlohmann::json {{"spawner", spawnerDestination.toJson()}};
+            return nlohmann::json {{SPAWNER_LABEL, spawnerDestination.toJson()}};
         }
     }, _destination);
 }
@@ -29,3 +29,6 @@ CommunicatedSinguityDestination CommunicatedSinguityDestination::fromJson(const 
         return CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> {CommunicatedSpawnerDestination::fromJson(parsedData.at("spawner"))});
     }
 }
+
+const std::string CommunicatedSinguityDestination::POINT_LABEL = "p";
+const std::string CommunicatedSinguityDestination::SPAWNER_LABEL = "s";

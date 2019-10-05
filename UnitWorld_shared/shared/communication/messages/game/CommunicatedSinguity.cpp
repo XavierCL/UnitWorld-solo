@@ -22,16 +22,16 @@ nlohmann::json CommunicatedSinguity::toJson() const
     const auto speed = _speed.toJson();
     const auto destination = _destination
         .map<nlohmann::json>([](const CommunicatedSinguityDestination& destination) { return destination.toJson(); })
-        .getOrElse(nlohmann::json("none"));
+        .getOrElse(nlohmann::json(NO_DESTINATION_VALUE));
 
     nlohmann::json jsonData = {
-        {"id", singuityId},
-        {"playerId", playerId},
-        {"position", position},
-        {"speed", speed},
-        {"destination", destination},
-        {"health-points", _healthPoint},
-        {"last-shoot-time", _lastShootTimestamp}
+        {SINGUITY_ID_LABEL, singuityId},
+        {PLAYER_ID_LABEL, playerId},
+        {POSITION_LABEL, position},
+        {SPEED_LABEL, speed},
+        {DESTINATION_LABEL, destination},
+        {HEALTH_POINTS_LABEL, _healthPoint},
+        {LAST_SHOOT_TIME_LABEL, _lastShootTimestamp}
     };
 
     return jsonData;
@@ -39,18 +39,18 @@ nlohmann::json CommunicatedSinguity::toJson() const
 
 CommunicatedSinguity CommunicatedSinguity::fromJson(const nlohmann::json& parsedJson)
 {
-    const auto destinationJson = parsedJson.at("destination");
+    const auto destinationJson = parsedJson.at(DESTINATION_LABEL);
 
     return CommunicatedSinguity(
-        xg::Guid(parsedJson.at("id").get<std::string>()),
-        xg::Guid(parsedJson.at("playerId").get<std::string>()),
-        CommunicatedVector2D::fromJson(parsedJson.at("position")),
-        CommunicatedVector2D::fromJson(parsedJson.at("speed")),
-        destinationJson.is_string() && destinationJson.get<std::string>() == "none"
+        xg::Guid(parsedJson.at(SINGUITY_ID_LABEL).get<std::string>()),
+        xg::Guid(parsedJson.at(PLAYER_ID_LABEL).get<std::string>()),
+        CommunicatedVector2D::fromJson(parsedJson.at(POSITION_LABEL)),
+        CommunicatedVector2D::fromJson(parsedJson.at(SPEED_LABEL)),
+        destinationJson.is_string() && destinationJson.get<std::string>() == NO_DESTINATION_VALUE
             ? Options::None<CommunicatedSinguityDestination>()
             : Options::Some(CommunicatedSinguityDestination::fromJson(destinationJson)),
-        parsedJson.at("health-points").get<double>(),
-        parsedJson.at("last-shoot-time").get<unsigned long long>()
+        parsedJson.at(HEALTH_POINTS_LABEL).get<double>(),
+        parsedJson.at(LAST_SHOOT_TIME_LABEL).get<unsigned long long>()
     );
 }
 
@@ -88,3 +88,12 @@ unsigned long long CommunicatedSinguity::lastShootTimestamp() const
 {
     return _lastShootTimestamp;
 }
+
+const std::string CommunicatedSinguity::NO_DESTINATION_VALUE = "n";
+const std::string CommunicatedSinguity::SINGUITY_ID_LABEL = "i";
+const std::string CommunicatedSinguity::PLAYER_ID_LABEL = "p";
+const std::string CommunicatedSinguity::POSITION_LABEL = "o";
+const std::string CommunicatedSinguity::SPEED_LABEL = "s";
+const std::string CommunicatedSinguity::DESTINATION_LABEL = "d";
+const std::string CommunicatedSinguity::HEALTH_POINTS_LABEL = "h";
+const std::string CommunicatedSinguity::LAST_SHOOT_TIME_LABEL = "l";

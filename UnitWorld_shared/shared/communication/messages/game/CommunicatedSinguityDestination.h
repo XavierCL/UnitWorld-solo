@@ -24,6 +24,10 @@ namespace uw
         }
 
     private:
+
+        const static std::string CommunicatedSinguityDestination::POINT_LABEL;
+        const static std::string CommunicatedSinguityDestination::SPAWNER_LABEL;
+
         std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> _destination;
     };
 }
