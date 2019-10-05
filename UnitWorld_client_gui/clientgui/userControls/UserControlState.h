@@ -84,11 +84,13 @@ namespace uw
                 (&_gameManager->completeGameState()->spawners() | first<std::shared_ptr<Spawner>>([&spawnerId](std::shared_ptr<Spawner> spawner) {
                     return spawner->id() == spawnerId;
                 })).foreach([this](std::shared_ptr<Spawner> foundSpawner) {
-                    if (!foundSpawner->hasSameAllegenceState(*_lastSelectedSpawnerAllegence))
-                    {
-                        _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
-                        _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();
-                    }
+                    _gameManager->currentPlayer().foreach([this, &foundSpawner](const std::shared_ptr<Player>& currentPlayer) {
+                        if (!foundSpawner->hasSameAllegenceState(*_lastSelectedSpawnerAllegence, currentPlayer->id()))
+                        {
+                            _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
+                            _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();
+                        }
+                    });
                 }).orExecute([this]() {
                     _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
                     _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();

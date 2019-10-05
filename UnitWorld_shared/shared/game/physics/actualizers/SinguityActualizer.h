@@ -14,11 +14,12 @@ namespace uw
     class SinguityActualizer
     {
     public:
-        SinguityActualizer(std::shared_ptr<Singuity> singuity):
-            _singuity(singuity)
+        SinguityActualizer(std::shared_ptr<Singuity> singuity, const xg::Guid& playerId):
+            _singuity(singuity),
+            _playerId(playerId)
         {}
 
-        void updateShootingAndRepulsionForce(const xg::Guid& playerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
+        void updateCollisions(const xg::Guid& playerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
         {
             Option<std::shared_ptr<UnitWithHealthPoint>> closestThing;
             Option<std::shared_ptr<UnitWithHealthPoint>> closestEnemy;
@@ -61,11 +62,35 @@ namespace uw
                 });
             }
 
+            _closestEnemyId = closestEnemy.map<xg::Guid>([](std::shared_ptr<UnitWithHealthPoint> enemy) {
+                return enemy->id();
+            });
+
+            _closestThingId = closestThing.map<xg::Guid>([](std::shared_ptr<UnitWithHealthPoint> thing) {
+                return thing->id();
+            });
+        }
+
+        void shootEnemy(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
+        {
+            auto closestEnemy = _closestEnemyId.flatMap<std::shared_ptr<UnitWithHealthPoint>>([shootablesById](const xg::Guid& closestEnemyId) {
+                return shootablesById | find<std::shared_ptr<UnitWithHealthPoint>>(closestEnemyId);
+            });
+
             closestEnemy.foreach([this, &frameTimestamp](std::shared_ptr<UnitWithHealthPoint> enemy) {
                 _singuity->shootIfCan(enemy, frameTimestamp);
             });
+        }
 
-            closestThing.foreach([this](std::shared_ptr<UnitWithHealthPoint> thing) {
+        void actualize(const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
+        {
+            auto closestThing = _closestThingId.flatMap<std::shared_ptr<UnitWithHealthPoint>>([shootablesById](const xg::Guid& closestThingId) {
+                return shootablesById | find<std::shared_ptr<UnitWithHealthPoint>>(closestThingId);
+            });
+
+            Vector2D repulsionForce;
+            closestThing.foreach([this, &repulsionForce](std::shared_ptr<UnitWithHealthPoint> thing) {
+
                 const double minDistance = 4;
                 const double maxDistance = 30;
                 const double maxRepulsionForce = _singuity->maximumAcceleration() * 0.2;
@@ -74,24 +99,22 @@ namespace uw
 
                 if (repulsionDistance.moduleSq() <= minDistance * minDistance)
                 {
-                    _repulsionForce = repulsionDistance.atModule(maxRepulsionForce);
+                    repulsionForce = repulsionDistance.atModule(maxRepulsionForce);
                 }
                 else if (repulsionDistance.moduleSq() >= maxDistance * maxDistance)
                 {
-                    _repulsionForce = Vector2D(0.0, 0.0);
+                    repulsionForce = Vector2D(0.0, 0.0);
                 }
                 else
                 {
                     const double a = -1.0 / (maxDistance - minDistance);
                     const double b = maxDistance / (maxDistance - minDistance);
-                    _repulsionForce = repulsionDistance.atModule(maxRepulsionForce * (repulsionDistance.module() * a + b));
+                    repulsionForce = repulsionDistance.atModule(maxRepulsionForce * (repulsionDistance.module() * a + b));
                 }
-            });
-        }
 
-        void actualize(const xg::Guid& playerId, const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById)
-        {
-            Vector2D acceleration = _singuity->destination().flatMap<Vector2D>([this, &playerId, &spawnersById](const std::variant<Vector2D, SpawnerDestination>& destination) {
+            });
+
+            Vector2D acceleration = _singuity->destination().flatMap<Vector2D>([this, &spawnersById](const std::variant<Vector2D, SpawnerDestination>& destination) {
                 return std::visit(overloaded{
                     [this](const Vector2D& point) {
                         bool willBreakForDestination = (_singuity->position() + _singuity->speed().atModule(_singuity->stopDistanceFromTargetSq())).distanceSq(point) < 100;
@@ -114,18 +137,18 @@ namespace uw
                         {
                             return Options::Some(_singuity->getMaximalAcceleration(point));
                         }
-                    }, [this, &playerId, &spawnersById](const SpawnerDestination spawnerDestination) {
-                        return (&spawnersById | find<std::shared_ptr<Spawner>>(spawnerDestination.spawnerId())).map<Vector2D>([this, &playerId, &spawnerDestination](std::shared_ptr<Spawner> spawner) {
-                            if (spawner->hasSameAllegenceState(spawnerDestination.spawnerAllegence()))
+                    }, [this, &spawnersById](const SpawnerDestination spawnerDestination) {
+                        return (&spawnersById | find<std::shared_ptr<Spawner>>(spawnerDestination.spawnerId())).map<Vector2D>([this, &spawnerDestination](std::shared_ptr<Spawner> spawner) {
+                            if (spawner->hasSameAllegenceState(spawnerDestination.spawnerAllegence(), _playerId))
                             {
-                                if (spawner->canBeReguvenatedBy(playerId) && Circle(spawner->position(), 8).contains(_singuity->position()))
+                                if (spawner->canBeReguvenatedBy(_playerId) && Circle(spawner->position(), 8).contains(_singuity->position()))
                                 {
-                                    spawner->reguvenate(playerId, _singuity);
+                                    spawner->reguvenate(_playerId, _singuity);
                                     return Vector2D();
                                 }
-                                else if (spawner->canBeAttackedBy(playerId) && Circle(spawner->position(), 8).contains(_singuity->position()))
+                                else if (spawner->canBeAttackedBy(_playerId) && Circle(spawner->position(), 8).contains(_singuity->position()))
                                 {
-                                    spawner->attackedBy(playerId, _singuity);
+                                    spawner->attackedBy(_playerId, _singuity);
                                     return Vector2D();
                                 }
                                 else
@@ -145,8 +168,8 @@ namespace uw
                 return _singuity->getSlowBreakingAcceleration();
             });
 
-            acceleration += _repulsionForce;
             acceleration = acceleration.maxAt(_singuity->maximumAcceleration());
+            acceleration += repulsionForce;
 
             _singuity->actualizeAcceleration(acceleration);
         }
@@ -163,7 +186,8 @@ namespace uw
         }
 
         const std::shared_ptr<Singuity> _singuity;
-
-        Vector2D _repulsionForce;
+        const xg::Guid _playerId;
+        Option<xg::Guid> _closestEnemyId;
+        Option<xg::Guid> _closestThingId;
     };
 }

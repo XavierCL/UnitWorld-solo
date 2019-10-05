@@ -112,7 +112,7 @@ namespace uw
                 }
             }
 
-            return CompleteGameState(std::move(spawners), std::vector<std::shared_ptr<Player>> {});
+            return CompleteGameState(std::move(spawners), std::vector<std::shared_ptr<Player>> {}, 0);
         }
 
         const std::shared_ptr<GameManager> _gameManager;
