@@ -36,9 +36,9 @@ namespace uw
 
     private:
 
-        const static std::string CommunicatedSpawnerAllegence::IS_CLAIMED_LABEL;
-        const static std::string CommunicatedSpawnerAllegence::HEALTH_POINTS_LABEL;
-        const static std::string CommunicatedSpawnerAllegence::PLAYER_ID_LABEL;
+        const static std::string IS_CLAIMED_LABEL;
+        const static std::string HEALTH_POINTS_LABEL;
+        const static std::string PLAYER_ID_LABEL;
 
         const bool _isClaimed;
         const double _healthPoint;

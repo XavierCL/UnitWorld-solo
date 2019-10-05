@@ -28,14 +28,14 @@ namespace uw
 
     private:
 
-        const static std::string CommunicatedSinguity::NO_DESTINATION_VALUE;
-        const static std::string CommunicatedSinguity::SINGUITY_ID_LABEL;
-        const static std::string CommunicatedSinguity::PLAYER_ID_LABEL;
-        const static std::string CommunicatedSinguity::POSITION_LABEL;
-        const static std::string CommunicatedSinguity::SPEED_LABEL;
-        const static std::string CommunicatedSinguity::DESTINATION_LABEL;
-        const static std::string CommunicatedSinguity::HEALTH_POINTS_LABEL;
-        const static std::string CommunicatedSinguity::LAST_SHOOT_TIME_LABEL;
+        const static std::string NO_DESTINATION_VALUE;
+        const static std::string SINGUITY_ID_LABEL;
+        const static std::string PLAYER_ID_LABEL;
+        const static std::string POSITION_LABEL;
+        const static std::string SPEED_LABEL;
+        const static std::string DESTINATION_LABEL;
+        const static std::string HEALTH_POINTS_LABEL;
+        const static std::string LAST_SHOOT_TIME_LABEL;
 
         const xg::Guid _singuityId;
         const xg::Guid _playerId;
