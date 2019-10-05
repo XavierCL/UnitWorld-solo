@@ -59,11 +59,13 @@ namespace uw
         void addPlayer(std::shared_ptr<Player> player)
         {
             _players.push_back(player);
+            _version = xg::newGuid();
         }
 
         void addSpawners(const std::vector<std::shared_ptr<Spawner>>& spawners)
         {
             _spawners.insert(_spawners.end(), spawners.begin(), spawners.end());
+            _version = xg::newGuid();
         }
 
         unsigned long long frameCount() const
@@ -74,6 +76,7 @@ namespace uw
         void incrementFrameCount()
         {
             ++_frameCount;
+            _version = xg::newGuid();
         }
 
         xg::Guid version() const

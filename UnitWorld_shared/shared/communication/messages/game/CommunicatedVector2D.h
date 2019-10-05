@@ -20,6 +20,9 @@ namespace uw
 
     private:
 
+        const static std::string X_LABEL;
+        const static std::string Y_LABEL;
+
         const double _x;
         const double _y;
     };

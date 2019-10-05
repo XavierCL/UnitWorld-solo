@@ -28,6 +28,9 @@ namespace uw
 
     private:
 
+        const static std::string MoveMobileUnitsToPositionMessage::MOBILE_UNITS_ID_LABEL;
+        const static std::string MoveMobileUnitsToPositionMessage::DESTINATION_POSITION_LABEL;
+
         const std::vector<xg::Guid> _singuityIds;
         const CommunicatedVector2D _destination;
     };

@@ -35,6 +35,11 @@ namespace uw
         static CommunicatedSpawnerAllegence fromJson(const nlohmann::json& jsonData);
 
     private:
+
+        const static std::string CommunicatedSpawnerAllegence::IS_CLAIMED_LABEL;
+        const static std::string CommunicatedSpawnerAllegence::HEALTH_POINTS_LABEL;
+        const static std::string CommunicatedSpawnerAllegence::PLAYER_ID_LABEL;
+
         const bool _isClaimed;
         const double _healthPoint;
         const xg::Guid _playerId;

@@ -10,7 +10,7 @@ namespace uw
     class CommunicatedSpawner
     {
     public:
-        CommunicatedSpawner(const xg::Guid& id, const CommunicatedVector2D& position, const Option<CommunicatedSpawnerAllegence>& allegence, const unsigned long long& lastSpawnTimestamp, const unsigned long long totalSpawnedCount):
+        CommunicatedSpawner(const xg::Guid& id, const CommunicatedVector2D& position, const Option<CommunicatedSpawnerAllegence>& allegence, const unsigned long long& lastSpawnTimestamp, const unsigned long long totalSpawnedCount) :
             _id(id),
             _position(position),
             _allegence(allegence),
@@ -48,6 +48,14 @@ namespace uw
         static CommunicatedSpawner fromJson(const nlohmann::json& jsonData);
 
     private:
+
+        const static std::string CommunicatedSpawner::NO_ALLEGENCE_VALUE;
+        const static std::string CommunicatedSpawner::SPAWNER_ID_LABEL;
+        const static std::string CommunicatedSpawner::POSITION_LABEL;
+        const static std::string CommunicatedSpawner::ALLEGENCE_LABEL;
+        const static std::string CommunicatedSpawner::LAST_SPAWN_TIMESTAMP_LABEL;
+        const static std::string CommunicatedSpawner::TOTAL_SPAWNED_COUNT_LABEL;
+
         const xg::Guid _id;
         const CommunicatedVector2D _position;
         const Option<CommunicatedSpawnerAllegence> _allegence;
