@@ -25,8 +25,8 @@ namespace uw
 
     private:
 
-        const static std::string MoveMobileUnitsToSpawnerMessage::MOBILE_UNITS_ID_LABEL;
-        const static std::string MoveMobileUnitsToSpawnerMessage::SPAWNER_ID_LABEL;
+        const static std::string MOBILE_UNITS_ID_LABEL;
+        const static std::string SPAWNER_ID_LABEL;
 
         const std::vector<xg::Guid> _singuityIds;
         const xg::Guid _spawnerId;

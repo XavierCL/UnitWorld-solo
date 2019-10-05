@@ -49,12 +49,12 @@ namespace uw
 
     private:
 
-        const static std::string CommunicatedSpawner::NO_ALLEGENCE_VALUE;
-        const static std::string CommunicatedSpawner::SPAWNER_ID_LABEL;
-        const static std::string CommunicatedSpawner::POSITION_LABEL;
-        const static std::string CommunicatedSpawner::ALLEGENCE_LABEL;
-        const static std::string CommunicatedSpawner::LAST_SPAWN_TIMESTAMP_LABEL;
-        const static std::string CommunicatedSpawner::TOTAL_SPAWNED_COUNT_LABEL;
+        const static std::string NO_ALLEGENCE_VALUE;
+        const static std::string SPAWNER_ID_LABEL;
+        const static std::string POSITION_LABEL;
+        const static std::string ALLEGENCE_LABEL;
+        const static std::string LAST_SPAWN_TIMESTAMP_LABEL;
+        const static std::string TOTAL_SPAWNED_COUNT_LABEL;
 
         const xg::Guid _id;
         const CommunicatedVector2D _position;
