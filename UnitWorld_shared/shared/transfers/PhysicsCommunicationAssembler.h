@@ -31,7 +31,7 @@ namespace uw
                 | map<CommunicatedSpawner>([this](std::shared_ptr<Spawner> spawner) { return physicsSpawnerToCommunicated(spawner); })
                 | toVector<CommunicatedSpawner>();
 
-            return CommunicatedCompleteGameState(*communicatedPlayers, *communicatedSinguities, *communicatedSpawners);
+            return CommunicatedCompleteGameState(*communicatedPlayers, *communicatedSinguities, *communicatedSpawners, completeGameState->frameCount());
         }
 
         CompleteGameState communicatedCompleteGameStateToPhysics(CommunicatedCompleteGameState&& completeGameState) const
@@ -51,7 +51,7 @@ namespace uw
                     return communicatedPlayerToPhysics(player, *communicatedSinguities);
                 }) | toVector<std::shared_ptr<Player>>();
 
-            return CompleteGameState(std::move(*spawners), std::move(*players));
+            return CompleteGameState(std::move(*spawners), std::move(*players), completeGameState.frameCount());
         }
 
         CommunicatedVector2D physicsVector2DToCommunicated(const Vector2D& vector2D) const

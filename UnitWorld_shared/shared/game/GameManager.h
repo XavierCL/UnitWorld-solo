@@ -105,6 +105,16 @@ namespace uw
             _somePlayerInputCallback.erase(callbackId);
         }
 
+        void setNextIndependentCompleteGameState(std::shared_ptr<const CompleteGameState> completeGameState)
+        {
+            _independentCompleteGameState = completeGameState;
+        }
+
+        std::shared_ptr<const CompleteGameState> independentCompleteGameState() const
+        {
+            return _independentCompleteGameState;
+        }
+
         std::shared_ptr<const CompleteGameState> completeGameState() const
         {
             return _completeGameState;
@@ -113,14 +123,14 @@ namespace uw
         Option<std::shared_ptr<Player>> currentPlayer() const
         {
             return _currentPlayerId.map<std::shared_ptr<Player>>([this](const xg::Guid& playerId) {
-                auto completeGameState(completeGameState());
+                auto completeGameState(_completeGameState);
                 return &completeGameState->players() | first<std::shared_ptr<Player>>([&playerId](std::shared_ptr<Player> player) {
                     return player->id() == playerId;
                 });
             });
         }
 
-        void processCompleteGameStatePhysics(const std::function<void(std::shared_ptr<CompleteGameState>)>& processPhysics)
+        void processCompleteGameStatePhysics(const std::function<void(std::shared_ptr<CompleteGameState>, bool)>& processPhysics)
         {
             auto workingGameState(std::make_shared<CompleteGameState>(*_completeGameState));
 
@@ -141,6 +151,7 @@ namespace uw
             if (truthCompleteGameState)
             {
                 workingGameState.reset(truthCompleteGameState);
+                _independentCompleteGameState = std::make_shared<const CompleteGameState>(*truthCompleteGameState);
             }
 
             const auto truthNextCurrentPlayerId = _nextCurrentPlayerId.exchange(nullptr);
@@ -163,7 +174,7 @@ namespace uw
                 command->execute(workingGameState);
             }
 
-            processPhysics(workingGameState);
+            processPhysics(workingGameState, truthCompleteGameState);
 
             _completeGameState = workingGameState;
 
@@ -191,6 +202,7 @@ namespace uw
 
         Option<xg::Guid> _currentPlayerId;
         std::shared_ptr<const CompleteGameState> _completeGameState;
+        std::shared_ptr<const CompleteGameState> _independentCompleteGameState;
 
         std::mutex _somePlayerInputCallbackMutex;
         std::unordered_map<xg::Guid, std::function<void(std::shared_ptr<const CompleteGameState>)>> _somePlayerInputCallback;

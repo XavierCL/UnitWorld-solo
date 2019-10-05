@@ -39,10 +39,17 @@ namespace uw
             return SpawnerAllegence(_isClaimed, _healthPoint + healthPoint, _allegedPlayerId);
         }
 
-        bool hasSameState(const SpawnerAllegence& allegence, const double& maxHealthPoint) const
+        bool hasSameState(const SpawnerAllegence& allegence, const xg::Guid& currentPlayerId, const double& maxHealthPoint) const
         {
-            return _isClaimed == allegence._isClaimed
-                && (_healthPoint == maxHealthPoint) == (allegence._healthPoint == maxHealthPoint);
+            if (currentPlayerId == _allegedPlayerId || allegence._allegedPlayerId == currentPlayerId)
+            {
+                return _isClaimed == allegence._isClaimed
+                    && (_healthPoint == maxHealthPoint) == (allegence._healthPoint == maxHealthPoint);
+            }
+            else
+            {
+                return _isClaimed == allegence._isClaimed;
+            }
         }
 
     private:

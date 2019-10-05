@@ -15,7 +15,7 @@ namespace uw
             _singuityActualizers(initializeSinguityActualizers(player))
         {
             _player->addSinguityAddedCallback(singuityAddedCallbackId(), [this](std::shared_ptr<Singuity> singuity) {
-                _singuityActualizers.emplace_back(SinguityActualizer(singuity));
+                _singuityActualizers.emplace_back(SinguityActualizer(singuity, _player->id()));
             });
         }
 
@@ -24,22 +24,30 @@ namespace uw
             _player->removeSinguityAddedCallback(singuityAddedCallbackId());
         }
 
-        void updateShootingAndRepulsionForces(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
+        void updateCollisions(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
         {
             for (auto& singuityActualizer : _singuityActualizers)
             {
-                singuityActualizer.updateShootingAndRepulsionForce(_player->id(), collisionDetectorsByPlayerId, shootablesById, frameTimestamp);
+                singuityActualizer.updateCollisions(_player->id(), collisionDetectorsByPlayerId, shootablesById);
             }
         }
 
-        void removeSinguitiesAndUpdateTheirPhysics(const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById)
+        void shootEnemies(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
+        {
+            for (auto& singuityActualizer : _singuityActualizers)
+            {
+                singuityActualizer.shootEnemy(shootablesById, frameTimestamp);
+            }
+        }
+
+        void removeSinguitiesAndUpdateTheirPhysics(const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
         {
             auto aliveSinguities(std::make_shared<std::vector<std::shared_ptr<Singuity>>>());
             for (auto& singuityActualizer : _singuityActualizers)
             {
                 if (!singuityActualizer.singuity()->isDead())
                 {
-                    singuityActualizer.actualize(_player->id(), spawnersById);
+                    singuityActualizer.actualize(spawnersById, shootablesById);
 
                     // Singuities can kill themselves
                     if (!singuityActualizer.singuity()->isDead())
@@ -60,7 +68,7 @@ namespace uw
             singuityActualizers.reserve(player->singuities()->size());
             for (const auto& singuity : *player->singuities())
             {
-                singuityActualizers.emplace_back(singuity);
+                singuityActualizers.emplace_back(singuity, player->id());
             }
             return singuityActualizers;
         }

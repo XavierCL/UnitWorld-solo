@@ -58,7 +58,7 @@ namespace uw
                     receivedCommunication = playerClient.client()->receive();
                     failureCount = 0;
                 }
-                catch (std::exception error)
+                catch (std::exception& error)
                 {
                     Logger::error("Error while receiving from client: " + std::string(error.what()));
                     ++failureCount;
