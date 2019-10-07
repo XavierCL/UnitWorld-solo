@@ -41,44 +41,40 @@ namespace uw
                     });
                 }
 
-                auto spawnerCollisionDetector = getCollisionDetectorForSpawners(completeGameState->spawners());
+                auto enemySpawnerCollisionDetector = getCollisionDetectorForSpawners(*(&completeGameState->spawners()
+                    | filter<std::shared_ptr<Spawner>>([currentPlayer](const std::shared_ptr<Spawner> spawner) { return spawner->canBeInteractedWithBy(currentPlayer->id()); })
+                    | toVector<std::shared_ptr<Spawner>>()));
 
                 std::unordered_map<xg::Guid, std::unordered_set<xg::Guid>> closeSinguitiesBySpawnerId;
                 for (const auto closeSinguity : *currentPlayer->singuities())
                 {
-                    Option<xg::Guid> closestSpawner = spawnerCollisionDetector->getClosest(CollidablePoint(closeSinguity->id(), closeSinguity->position()));
+                    Option<xg::Guid> closestSpawner = enemySpawnerCollisionDetector->getClosest(CollidablePoint(closeSinguity->id(), closeSinguity->position()));
                     closestSpawner.foreach([&closeSinguitiesBySpawnerId, closeSinguity](const xg::Guid& spawnerId) {
                         closeSinguitiesBySpawnerId[spawnerId].emplace(closeSinguity->id());
                     });
                 }
 
-                std::shared_ptr<CollisionDetector> enemyCollisionDetector = getCollisionDetectorForSpawners(*(&completeGameState->spawners()
-                    | filter<std::shared_ptr<Spawner>>([currentPlayer](const std::shared_ptr<Spawner> spawner) { return spawner->canBeInteractedWithBy(currentPlayer->id()); })
-                    | toVector<std::shared_ptr<Spawner>>()));
-
                 std::unordered_set<xg::Guid> singuitiesWentAttacking;
 
-                for (const auto satelliteSpawner : satelliteSpawners)
+                for (const auto spawner : completeGameState->spawners())
                 {
-                    const auto& closeSinguities = closeSinguitiesBySpawnerId[satelliteSpawner->id()];
+                    const auto& closeSinguities = closeSinguitiesBySpawnerId[spawner->id()];
                     if (closeSinguities.size() >= 100)
                     {
-                        const auto closestEnemySpawner = enemyCollisionDetector->getClosest(CollidablePoint(satelliteSpawner->id(), satelliteSpawner->position()));
-                        closestEnemySpawner.foreach([serverCommander, &closeSinguities, &singuitiesWentAttacking](const xg::Guid& enemySpawnerId) {
-                            singuitiesWentAttacking.insert(closeSinguities.begin(), closeSinguities.end());
-                            serverCommander->moveUnitsToSpawner(closeSinguities, enemySpawnerId);
-                        });
+                        singuitiesWentAttacking.insert(closeSinguities.begin(), closeSinguities.end());
+                        serverCommander->moveUnitsToSpawner(closeSinguities, spawner->id());
                     }
                 }
 
                 for (const auto destination : movingSinguitiesBySpawnerId)
                 {
                     auto singuitiesGoingForDestination = destination.second;
-                    singuitiesGoingForDestination.erase(singuitiesWentAttacking.begin(), singuitiesWentAttacking.end());
-
                     if (singuitiesGoingForDestination.size() > 0)
                     {
-                        serverCommander->moveUnitsToSpawner(singuitiesGoingForDestination, destination.first);
+                        (spawnersById | find<std::shared_ptr<Spawner>>(destination.first)).foreach([&singuitiesGoingForDestination, &singuitiesWentAttacking, serverCommander](const std::shared_ptr<Spawner> closeSpawner) {
+                            singuitiesGoingForDestination.erase(singuitiesWentAttacking.begin(), singuitiesWentAttacking.end());
+                            serverCommander->moveUnitsToPosition(singuitiesGoingForDestination, closeSpawner->position());
+                        });
                     }
                 }
             });
