@@ -72,7 +72,10 @@ namespace uw
                     if (singuitiesGoingForDestination.size() > 0)
                     {
                         (spawnersById | find<std::shared_ptr<Spawner>>(destination.first)).foreach([&singuitiesGoingForDestination, &singuitiesWentAttacking, serverCommander](const std::shared_ptr<Spawner> closeSpawner) {
-                            singuitiesGoingForDestination.erase(singuitiesWentAttacking.begin(), singuitiesWentAttacking.end());
+                            for (const auto singuityWentAttacking : singuitiesWentAttacking)
+                            {
+                                singuitiesGoingForDestination.erase(singuityWentAttacking);
+                            }
                             serverCommander->moveUnitsToPosition(singuitiesGoingForDestination, closeSpawner->position());
                         });
                     }
