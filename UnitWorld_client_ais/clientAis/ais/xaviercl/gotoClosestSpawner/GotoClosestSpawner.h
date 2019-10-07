@@ -32,27 +32,31 @@ namespace uw
                 collisionDetector->updateAllCollidablePoints(*collidableSpawners);
 
                 // we don't want to assign a destination to a spawner that's already going to the right destination
-                Option<xg::Guid> currentFrameSpawnerDestination;
-                std::unordered_set<xg::Guid> movingSinguityIds;
-                currentPlayer->singuities() | forEach([&currentFrameSpawnerDestination, &movingSinguityIds, &collisionDetector](const std::shared_ptr<Singuity> singuity) {
+                std::unordered_map<xg::Guid, std::unordered_set<xg::Guid>> destinations;
+                currentPlayer->singuities() | forEach([&destinations, &collisionDetector](const std::shared_ptr<Singuity> singuity) {
                     const auto closestSpawnerIdOpt = collisionDetector->getClosest(CollidablePoint(singuity->id(), singuity->position()));
 
-                    closestSpawnerIdOpt.foreach([&currentFrameSpawnerDestination, &movingSinguityIds, &singuity](const xg::Guid closestSpawnerId) {
-                        if (currentFrameSpawnerDestination.isEmpty())
+                    closestSpawnerIdOpt.foreach([&destinations, &singuity](const xg::Guid closestSpawnerId) {
+
+                        bool singuityDestinationIsAlreadySpawner = singuity->destination()
+                            .map<bool>([&closestSpawnerId](const auto destination) {
+                                return std::visit(overloaded{
+                                    [&closestSpawnerId](const SpawnerDestination& spawnerDestination) { return spawnerDestination.spawnerId() == closestSpawnerId; },
+                                    [](const Vector2D& positionDestination) { return false; }
+                                }, destination);
+                            }).getOrElse(false);
+
+                        if (!singuityDestinationIsAlreadySpawner)
                         {
-                            currentFrameSpawnerDestination = Options::Some(closestSpawnerId);
-                            movingSinguityIds.insert(singuity->id());
-                        }
-                        else if (currentFrameSpawnerDestination == Options::Some(closestSpawnerId))
-                        {
-                            movingSinguityIds.insert(singuity->id());
+                            destinations[closestSpawnerId].emplace(singuity->id());
                         }
                     });
                 });
 
-                currentFrameSpawnerDestination.foreach([&movingSinguityIds, serverCommander](const xg::Guid& spawnerDestination) {
-                    serverCommander->moveUnitsToSpawner(movingSinguityIds, spawnerDestination);
-                });
+                for (const auto destination : destinations)
+                {
+                    serverCommander->moveUnitsToSpawner(destination.second, destination.first);
+                }
             });
         }
 

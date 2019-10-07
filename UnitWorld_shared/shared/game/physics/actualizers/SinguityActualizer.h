@@ -74,7 +74,7 @@ namespace uw
         void shootEnemy(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
         {
             auto closestEnemy = _closestEnemyId.flatMap<std::shared_ptr<UnitWithHealthPoint>>([shootablesById](const xg::Guid& closestEnemyId) {
-                return shootablesById | find<std::shared_ptr<UnitWithHealthPoint>>(closestEnemyId);
+                return shootablesById | findSafe<std::shared_ptr<UnitWithHealthPoint>>(closestEnemyId);
             });
 
             closestEnemy.foreach([this, &frameTimestamp](std::shared_ptr<UnitWithHealthPoint> enemy) {
@@ -85,7 +85,7 @@ namespace uw
         void actualize(const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
         {
             auto closestThing = _closestThingId.flatMap<std::shared_ptr<UnitWithHealthPoint>>([shootablesById](const xg::Guid& closestThingId) {
-                return shootablesById | find<std::shared_ptr<UnitWithHealthPoint>>(closestThingId);
+                return shootablesById | findSafe<std::shared_ptr<UnitWithHealthPoint>>(closestThingId);
             });
 
             Vector2D repulsionForce;

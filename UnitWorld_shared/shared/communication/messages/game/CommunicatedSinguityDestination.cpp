@@ -20,13 +20,13 @@ nlohmann::json CommunicatedSinguityDestination::toJson() const
 
 CommunicatedSinguityDestination CommunicatedSinguityDestination::fromJson(const nlohmann::json& parsedData)
 {
-    if (parsedData.contains("point"))
+    if (parsedData.contains(POINT_LABEL))
     {
-        return CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> {CommunicatedVector2D::fromJson(parsedData.at("point"))});
+        return CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> {CommunicatedVector2D::fromJson(parsedData.at(POINT_LABEL))});
     }
     else
     {
-        return CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> {CommunicatedSpawnerDestination::fromJson(parsedData.at("spawner"))});
+        return CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> {CommunicatedSpawnerDestination::fromJson(parsedData.at(SPAWNER_LABEL))});
     }
 }
 

@@ -36,7 +36,6 @@ namespace uw
 
         void startAsync()
         {
-            auto initialMap(generateInitialMap());
             _gameManager->setNextCompleteGameState(generateInitialMap());
 
             _physicsManager->startAsync();
