@@ -75,6 +75,13 @@ namespace uw
                 .getOrElse(false);
         }
 
+        bool isClaimedBy(const xg::Guid& playerId) const
+        {
+            return _allegence
+                .map<bool>([&playerId](const SpawnerAllegence& allegence) {return allegence.isClaimed() && allegence.allegedPlayerId() == playerId; })
+                .getOrElse(false);
+        }
+
         virtual void loseHealthPoint(const double& healthPoint) override
         {
             _allegence = _allegence.map<SpawnerAllegence>([this, &healthPoint](const SpawnerAllegence& allegence) {
