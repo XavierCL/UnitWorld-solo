@@ -58,7 +58,7 @@ namespace uw
 
         void processPhysics()
         {
-            _gameManager->processCompleteGameStatePhysics([this](std::shared_ptr<CompleteGameState> completeGameState, const bool& gameRefreshed) {
+            _gameManager->processCompleteGameStatePhysics([this](std::shared_ptr<CompleteGameState> completeGameState, const bool gameRefreshed) {
                 const unsigned long long frameTimestamp = std::chrono::steady_clock::now().time_since_epoch().count();
 
                 auto& workingPlayers = completeGameState->players();
@@ -69,6 +69,13 @@ namespace uw
                     | toUnorderedMap<xg::Guid, std::shared_ptr<Player>>([](auto player) {
                     return player->id();
                 });
+
+                if (gameRefreshed || !_completeGameStateActualizer)
+                {
+                    _completeGameStateActualizer = std::make_shared<CompleteGameStateActualizer>(completeGameState);
+                }
+
+                _completeGameStateActualizer->spawnAll(*playersById, frameTimestamp);
 
                 std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>> spawnersById =
                     &workingSpawners
@@ -94,14 +101,7 @@ namespace uw
                     }
                 }
 
-                if (gameRefreshed || !_completeGameStateActualizer)
-                {
-                    _completeGameStateActualizer = std::make_shared<CompleteGameStateActualizer>(completeGameState);
-                }
-
-                _completeGameStateActualizer->spawnAll(*playersById, frameTimestamp);
-
-                if (completeGameState->frameCount() % _collisionsFrameInterval == 0 || gameRefreshed)
+                if (completeGameState->frameCount() % _collisionsFrameInterval == 0)
                 {
                     // Computing the collisions
 
@@ -131,7 +131,7 @@ namespace uw
 
                 if (completeGameState->frameCount() % _collisionsFrameInterval == 0)
                 {
-                    _gameManager->setNextIndependentCompleteGameState(completeGameState);
+                    _gameManager->setNextIndependentCompleteGameState(std::make_shared<const CompleteGameState>(*completeGameState));
                 }
             });
         }

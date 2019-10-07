@@ -2,7 +2,7 @@
 
 using namespace uw;
 
-const unsigned int ClientsGameSender::MINIMAL_COMPLETE_STATE_PER_MINUTE(12);
+const unsigned int ClientsGameSender::MINIMAL_COMPLETE_STATE_PER_MINUTE(20);
 
 const unsigned int ClientsGameSender::MAXIMAL_COMPLETE_STATE_PER_SECOND(4);
 

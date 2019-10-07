@@ -50,7 +50,7 @@ int main()
     const std::string DEFAULT_SERVER_IP("127.0.0.1");
     const std::string DEFAULT_SERVER_PORT("52124");
     const std::string DEFAULT_AI_NAME("xavierclAi1");
-    const double MS_PER_FRAME(33.33333);
+    const double MS_PER_FRAME(100);
 
     const std::string serverIp = configurationManager.serverIpOrDefault(DEFAULT_SERVER_IP);
     const std::string serverPort = configurationManager.serverPortOrDefault(DEFAULT_SERVER_PORT);

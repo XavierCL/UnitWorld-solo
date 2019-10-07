@@ -21,11 +21,14 @@ namespace uw
     {
     public:
         GameManager() :
+            _localCompleteGameState(std::make_shared<CompleteGameState>(CompleteGameState::empty())),
             _completeGameState(std::make_shared<CompleteGameState>(CompleteGameState::empty())),
+            _independentCompleteGameState(std::make_shared<CompleteGameState>(CompleteGameState::empty())),
             _nextCompleteGameState(nullptr),
             _nextCurrentPlayerId(nullptr),
             _nextAddPlayer(nullptr),
-            _nextAddSpawners(nullptr)
+            _nextAddSpawners(nullptr),
+            _independentGameWasAltered(false)
         {}
 
         void setNextPlayer(std::shared_ptr<Player> newPlayer, const std::vector<std::shared_ptr<Spawner>>& spawners)
@@ -91,7 +94,7 @@ namespace uw
             _nextCommands.push_back(nextCommand);
         }
 
-        void addPlayerInputCallback(const xg::Guid& callbackId, const std::function<void(std::shared_ptr<const CompleteGameState>)>& callback)
+        void addPlayerInputCallback(const xg::Guid& callbackId, const std::function<void()>& callback)
         {
             std::lock_guard<std::mutex> lockCallbacks(_somePlayerInputCallbackMutex);
 
@@ -105,9 +108,58 @@ namespace uw
             _somePlayerInputCallback.erase(callbackId);
         }
 
+        void addNewIndependentGameStateCallback(const xg::Guid& callbackId, const std::function<void()>& callback)
+        {
+            std::lock_guard<std::mutex> lockCallbacks(_somePlayerInputCallbackMutex);
+
+            _someNewIndependantGameStateCallback[callbackId] = callback;
+        }
+
+        void removeNewIndependentGameStateCallback(const xg::Guid& callbackId)
+        {
+            std::lock_guard<std::mutex> lockCallbacks(_somePlayerInputCallbackMutex);
+
+            _someNewIndependantGameStateCallback.erase(callbackId);
+        }
+
+        void addDependentGameStateChangedCallback(const xg::Guid& callbackId, const std::function<void()>& callback)
+        {
+            std::lock_guard<std::mutex> lockCallbacks(_somePlayerInputCallbackMutex);
+
+            _dependentGameStateChangedCallback[callbackId] = callback;
+        }
+
+        void removeDependentGameStateChangedCallback(const xg::Guid& callbackId)
+        {
+            std::lock_guard<std::mutex> lockCallbacks(_somePlayerInputCallbackMutex);
+
+            _dependentGameStateChangedCallback.erase(callbackId);
+        }
+
         void setNextIndependentCompleteGameState(std::shared_ptr<const CompleteGameState> completeGameState)
         {
             _independentCompleteGameState = completeGameState;
+
+            if (_independentGameWasAltered)
+            {
+                _independentGameWasAltered = false;
+
+                std::lock_guard<std::mutex> lockCallback(_somePlayerInputCallbackMutex);
+
+                for (const auto callback : _somePlayerInputCallback)
+                {
+                    callback.second();
+                }
+            }
+            else
+            {
+                std::lock_guard<std::mutex> lockCallback(_somePlayerInputCallbackMutex);
+
+                for (const auto callback : _someNewIndependantGameStateCallback)
+                {
+                    callback.second();
+                }
+            }
         }
 
         std::shared_ptr<const CompleteGameState> independentCompleteGameState() const
@@ -130,34 +182,38 @@ namespace uw
             });
         }
 
-        void processCompleteGameStatePhysics(const std::function<void(std::shared_ptr<CompleteGameState>, bool)>& processPhysics)
+        void processCompleteGameStatePhysics(const std::function<void(std::shared_ptr<CompleteGameState>, const bool)>& processPhysics)
         {
-            auto workingGameState(std::make_shared<CompleteGameState>(*_completeGameState));
+            bool gameAltered = false;
 
             auto newPlayer = _nextAddPlayer.exchange(nullptr);
             if (newPlayer)
             {
-                workingGameState->addPlayer(std::shared_ptr<Player>(newPlayer));
+                _localCompleteGameState->addPlayer(std::shared_ptr<Player>(newPlayer));
+                gameAltered = true;
             }
 
             auto newSpawners = _nextAddSpawners.exchange(nullptr);
             if (newSpawners)
             {
-                workingGameState->addSpawners(*newSpawners);
+                _localCompleteGameState->addSpawners(*newSpawners);
                 delete newSpawners;
+                gameAltered = true;
             }
 
             const auto truthCompleteGameState = _nextCompleteGameState.exchange(nullptr);
             if (truthCompleteGameState)
             {
-                workingGameState.reset(truthCompleteGameState);
+                _localCompleteGameState.reset(truthCompleteGameState);
                 _independentCompleteGameState = std::make_shared<const CompleteGameState>(*truthCompleteGameState);
+                gameAltered = true;
             }
 
             const auto truthNextCurrentPlayerId = _nextCurrentPlayerId.exchange(nullptr);
             if (truthNextCurrentPlayerId)
             {
                 _currentPlayerId = Option<xg::Guid>(truthNextCurrentPlayerId);
+                gameAltered = true;
             }
 
             std::vector<std::shared_ptr<GameCommand>> localCommands;
@@ -171,20 +227,21 @@ namespace uw
 
             for (const auto command : localCommands)
             {
-                command->execute(workingGameState);
+                command->execute(_localCompleteGameState);
             }
 
-            processPhysics(workingGameState, truthCompleteGameState);
+            _independentGameWasAltered = _independentGameWasAltered || gameAltered || !localCommands.empty();
 
-            _completeGameState = workingGameState;
+            processPhysics(_localCompleteGameState, gameAltered);
 
-            if (!localCommands.empty() || newPlayer || truthCompleteGameState)
+            _completeGameState = std::make_shared<const CompleteGameState>(*_localCompleteGameState);
+
             {
                 std::lock_guard<std::mutex> lockCallback(_somePlayerInputCallbackMutex);
 
-                for (const auto callback : _somePlayerInputCallback)
+                for (const auto callback : _dependentGameStateChangedCallback)
                 {
-                    callback.second(_completeGameState);
+                    callback.second();
                 }
             }
         }
@@ -195,16 +252,20 @@ namespace uw
 
         std::atomic<Player*> _nextAddPlayer;
         std::atomic<std::vector<std::shared_ptr<Spawner>>*> _nextAddSpawners;
+        bool _independentGameWasAltered;
         std::mutex _nextCommandsMutex;
         std::vector<std::shared_ptr<GameCommand>> _nextCommands;
         std::atomic<CompleteGameState*> _nextCompleteGameState;
         std::atomic<xg::Guid*> _nextCurrentPlayerId;
 
         Option<xg::Guid> _currentPlayerId;
+        std::shared_ptr<CompleteGameState> _localCompleteGameState;
         std::shared_ptr<const CompleteGameState> _completeGameState;
         std::shared_ptr<const CompleteGameState> _independentCompleteGameState;
 
         std::mutex _somePlayerInputCallbackMutex;
-        std::unordered_map<xg::Guid, std::function<void(std::shared_ptr<const CompleteGameState>)>> _somePlayerInputCallback;
+        std::unordered_map<xg::Guid, std::function<void()>> _somePlayerInputCallback;
+        std::unordered_map<xg::Guid, std::function<void()>> _someNewIndependantGameStateCallback;
+        std::unordered_map<xg::Guid, std::function<void()>> _dependentGameStateChangedCallback;
     };
 }

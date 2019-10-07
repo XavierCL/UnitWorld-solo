@@ -47,7 +47,8 @@ namespace uw
 
         void startAsync()
         {
-            _gameManager->addPlayerInputCallback(PLAYER_INPUT_GAME_MANAGER_CALLBACK_ID, std::bind(&ClientsGameSender::onGameManagerHasPlayerInput, this, std::placeholders::_1));
+            _gameManager->addPlayerInputCallback(PLAYER_INPUT_GAME_MANAGER_CALLBACK_ID, std::bind(&ClientsGameSender::onGameManagerHasPlayerInput, this));
+            _gameManager->addNewIndependentGameStateCallback(PLAYER_INPUT_GAME_MANAGER_CALLBACK_ID, std::bind(&ClientsGameSender::onGameManagerHasNewGameState, this));
 
             _senderThread = std::thread([this] { loopSendCompleteState(); });
         }
@@ -55,6 +56,7 @@ namespace uw
         void stop()
         {
             _gameManager->removePlayerInputCallback(PLAYER_INPUT_GAME_MANAGER_CALLBACK_ID);
+            _gameManager->removeNewIndependentGameStateCallback(PLAYER_INPUT_GAME_MANAGER_CALLBACK_ID);
 
             {
                 auto wakerLock = std::unique_lock<std::mutex>(_sendCompleteGameStateMutex);
@@ -67,10 +69,16 @@ namespace uw
 
     private:
 
-        void onGameManagerHasPlayerInput(std::shared_ptr<const CompleteGameState> completeGameState)
+        void onGameManagerHasPlayerInput()
         {
             auto wakerLock = std::unique_lock<std::mutex>(_sendCompleteGameStateMutex);
             _hasStateChanged = true;
+            _completeStateWaker.notify_one();
+        }
+
+        void onGameManagerHasNewGameState()
+        {
+            auto wakerLock = std::unique_lock<std::mutex>(_sendCompleteGameStateMutex);
             _completeStateWaker.notify_one();
         }
 
@@ -96,7 +104,7 @@ namespace uw
                 }
                 else
                 {
-                    _completeStateWaker.wait_for(wakerLock, std::chrono::milliseconds(msRemainingUntilNextFrame));
+                    _completeStateWaker.wait(wakerLock);
                 }
             }
         }
