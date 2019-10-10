@@ -8,7 +8,7 @@
 	"scroll-ratio-per-tick": 0.2,
 	"server ip john": "147.253.89.52",
     "server port": "52124",
-	"ai-name": "packAi",
+	"ai-name": "strongholdAi",
     "spawners": [
         [{"x": 1000.0, "y": 600.0},
 		 {"x": 450.0, "y": 700},
@@ -28,8 +28,6 @@
 		 {"x": 2300.0, "y": 2700},
 		 {"x": 2500.0, "y": 2500.0}],
         [{"x": 400.0, "y": 400.0, "singuities": 100}],
-        [{"x": 4600.0, "y": 4600.0, "singuities": 100}],
-		[{"x": 400.0, "y": 4600.0, "singuities": 100}],
-		[{"x": 4600.0, "y": 400.0, "singuities": 100}]
+        [{"x": 4600.0, "y": 4600.0, "singuities": 100}]
     ]
 }

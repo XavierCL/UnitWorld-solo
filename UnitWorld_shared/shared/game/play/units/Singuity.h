@@ -21,6 +21,16 @@ namespace uw
         double maximumAcceleration() const override;
         double maximumHealthPoint() const override;
 
+        double reguvenatingHealth() const
+        {
+            return 20.0;
+        }
+
+        double spawnerAttackHealth() const
+        {
+            return 20.0;
+        }
+
     private:
         unsigned long long shootTimelag() const override;
         double firePower() const override;

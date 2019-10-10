@@ -141,9 +141,9 @@ namespace uw
         {
             if (canBeReguvenatedBy(playerId))
             {
-                double gainedHealthPoint = healthPoint() + 20.0 > maximumHealthPoint()
+                double gainedHealthPoint = healthPoint() + reguvenator->reguvenatingHealth() > maximumHealthPoint()
                     ? maximumHealthPoint() - healthPoint()
-                    : 20.0;
+                    : reguvenator->reguvenatingHealth();
                 UnitWithHealthPoint::gainHealthPoint(gainedHealthPoint);
                 _allegence = _allegence.map<SpawnerAllegence>([&gainedHealthPoint](const SpawnerAllegence& oldAllegence) {
                     return oldAllegence.gainHealthPoint(gainedHealthPoint);
@@ -158,9 +158,9 @@ namespace uw
         {
             if (canBeAttackedBy(playerId))
             {
-                double lostHealthPoint = healthPoint() - 20.0 < 0.0
+                double lostHealthPoint = healthPoint() - attacker->spawnerAttackHealth() < 0.0
                     ? healthPoint()
-                    : 20.0;
+                    : attacker->spawnerAttackHealth();
                 UnitWithHealthPoint::loseHealthPoint(lostHealthPoint);
                 _allegence = _allegence.map<SpawnerAllegence>([&lostHealthPoint](const SpawnerAllegence& oldAllegence) {
                     return oldAllegence.loseHealthPoint(lostHealthPoint);

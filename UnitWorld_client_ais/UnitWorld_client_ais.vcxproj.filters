@@ -29,7 +29,10 @@
     <ClInclude Include="clientAis\ais\xaviercl\gotoClosestSpawner\GotoClosestSpawner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="clientAis\ais\xaviercl\packAi\packAi.h">
+    <ClInclude Include="clientAis\ais\xaviercl\packAi\PackAi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientAis\ais\xaviercl\strongholdAi\StrongholdAi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
