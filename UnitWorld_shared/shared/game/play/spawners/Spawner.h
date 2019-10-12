@@ -15,13 +15,13 @@ namespace uw
     class Spawner: virtual public UnitWithHealthPoint
     {
     public:
-        Spawner(const xg::Guid& id, const Vector2D& initialPosition, Option<SpawnerAllegence> allegence, const unsigned long long& lastSpawnTimestamp, const unsigned long long& totalSpawnedCount) :
+        Spawner(const xg::Guid& id, const Vector2D& initialPosition, Option<SpawnerAllegence> allegence, const unsigned long long& lastSpawnFameCount, const unsigned long long& totalSpawnedCount) :
             Unit(id, initialPosition),
             UnitWithHealthPoint(id, initialPosition, allegence.map<double>([](const SpawnerAllegence& spawnerAllegence) {
                 return spawnerAllegence.healthPoint();
             }).getOrElse(0.0)),
             _allegence(allegence),
-            _lastSpawnTimestamp(lastSpawnTimestamp),
+            _lastSpawnFrameCount(lastSpawnFameCount),
             _totalSpawnedCount(totalSpawnedCount)
         {}
 
@@ -29,7 +29,7 @@ namespace uw
             Unit(initialPosition),
             UnitWithHealthPoint(initialPosition, maximumHealthPoint()),
             _allegence(Options::Some(SpawnerAllegence(true, maximumHealthPoint(), playerId))),
-            _lastSpawnTimestamp(0),
+            _lastSpawnFrameCount(0),
             _totalSpawnedCount(0)
         {}
 
@@ -37,7 +37,7 @@ namespace uw
             Unit(initialPosition),
             UnitWithHealthPoint(initialPosition, 0),
             _allegence(Options::None<SpawnerAllegence>()),
-            _lastSpawnTimestamp(0),
+            _lastSpawnFrameCount(0),
             _totalSpawnedCount(0)
         {}
 
@@ -47,7 +47,7 @@ namespace uw
             return spawnerAllegence.healthPoint();
         }).getOrElse(0.0)),
             _allegence(copy._allegence),
-            _lastSpawnTimestamp(copy._lastSpawnTimestamp),
+            _lastSpawnFrameCount(copy._lastSpawnFrameCount),
             _totalSpawnedCount(copy._totalSpawnedCount)
         {}
 
@@ -56,12 +56,12 @@ namespace uw
             return _allegence;
         }
 
-        void spawnIfCan(const std::function<void(xg::Guid, std::shared_ptr<Singuity>)>& spawned, const double& frameTimestamp)
+        void spawnIfCan(const std::function<void(xg::Guid, std::shared_ptr<Singuity>)>& spawned, const double& frameCount)
         {
-            _allegence.foreach([this, &spawned, &frameTimestamp](const SpawnerAllegence& allegence) {
-                if (allegence.isClaimed() && _lastSpawnTimestamp + spawnTimeLag() <= frameTimestamp)
+            _allegence.foreach([this, &spawned, &frameCount](const SpawnerAllegence& allegence) {
+                if (allegence.isClaimed() && _lastSpawnFrameCount + spawnFrameLag() <= frameCount)
                 {
-                    _lastSpawnTimestamp = frameTimestamp;
+                    _lastSpawnFrameCount = frameCount;
                     ++_totalSpawnedCount;
                     spawned(allegence.allegedPlayerId(), std::make_shared<Singuity>(Singuity::spawn(position(), UNIT_SPAWN_DIRECTION[_totalSpawnedCount % UNIT_SPAWN_DIRECTION.size()])));
                 }
@@ -174,9 +174,9 @@ namespace uw
             return 2000.0;
         }
 
-        unsigned long long lastSpawnTimestamp() const
+        unsigned long long lastSpawnFrameCount() const
         {
-            return _lastSpawnTimestamp;
+            return _lastSpawnFrameCount;
         }
 
         unsigned long long totalSpawnedCount() const
@@ -187,13 +187,13 @@ namespace uw
     private:
         static std::vector<Vector2D> UNIT_SPAWN_DIRECTION;
 
-        static unsigned long long spawnTimeLag()
+        static unsigned long long spawnFrameLag()
         {
-            return 1000000000;
+            return 30;
         }
 
         Option<SpawnerAllegence> _allegence;
-        unsigned long long _lastSpawnTimestamp;
+        unsigned long long _lastSpawnFrameCount;
         unsigned long long _totalSpawnedCount;
     };
 }

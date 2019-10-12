@@ -10,11 +10,11 @@ namespace uw
     class CommunicatedSpawner
     {
     public:
-        CommunicatedSpawner(const xg::Guid& id, const CommunicatedVector2D& position, const Option<CommunicatedSpawnerAllegence>& allegence, const unsigned long long& lastSpawnTimestamp, const unsigned long long totalSpawnedCount) :
+        CommunicatedSpawner(const xg::Guid& id, const CommunicatedVector2D& position, const Option<CommunicatedSpawnerAllegence>& allegence, const unsigned long long& lastSpawnFrameCount, const unsigned long long totalSpawnedCount) :
             _id(id),
             _position(position),
             _allegence(allegence),
-            _lastSpawnTimestamp(lastSpawnTimestamp),
+            _lastSpawnFrameCount(lastSpawnFrameCount),
             _totalSpawnedCount(totalSpawnedCount)
         {}
 
@@ -33,9 +33,9 @@ namespace uw
             return _allegence;
         }
 
-        unsigned long long lastSpawnTimestamp() const
+        unsigned long long lastSpawnFrameCount() const
         {
-            return _lastSpawnTimestamp;
+            return _lastSpawnFrameCount;
         }
 
         unsigned long long totalSpawnedCount() const
@@ -53,13 +53,13 @@ namespace uw
         const static std::string SPAWNER_ID_LABEL;
         const static std::string POSITION_LABEL;
         const static std::string ALLEGENCE_LABEL;
-        const static std::string LAST_SPAWN_TIMESTAMP_LABEL;
+        const static std::string LAST_SPAWN_FRAME_COUNT_LABEL;
         const static std::string TOTAL_SPAWNED_COUNT_LABEL;
 
         const xg::Guid _id;
         const CommunicatedVector2D _position;
         const Option<CommunicatedSpawnerAllegence> _allegence;
-        const unsigned long long _lastSpawnTimestamp;
+        const unsigned long long _lastSpawnFrameCount;
         const unsigned long long _totalSpawnedCount;
     };
 }

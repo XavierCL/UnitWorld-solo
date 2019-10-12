@@ -59,7 +59,6 @@ namespace uw
         void processPhysics()
         {
             _gameManager->processCompleteGameStatePhysics([this](std::shared_ptr<CompleteGameState> completeGameState, const bool gameRefreshed) {
-                const unsigned long long frameTimestamp = std::chrono::steady_clock::now().time_since_epoch().count();
 
                 auto& workingPlayers = completeGameState->players();
                 auto& workingSpawners = completeGameState->spawners();
@@ -75,7 +74,7 @@ namespace uw
                     _completeGameStateActualizer = std::make_shared<CompleteGameStateActualizer>(completeGameState);
                 }
 
-                _completeGameStateActualizer->spawnAll(*playersById, frameTimestamp);
+                _completeGameStateActualizer->spawnAll(*playersById, completeGameState->frameCount());
 
                 std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>> spawnersById =
                     &workingSpawners
@@ -123,7 +122,7 @@ namespace uw
                     _completeGameStateActualizer->updateCollisions(_collisionDetectorsByPlayerId, shootablesById);
                 }
 
-                _completeGameStateActualizer->shootEnemies(shootablesById, frameTimestamp);
+                _completeGameStateActualizer->shootEnemies(shootablesById, completeGameState->frameCount());
                 _completeGameStateActualizer->updatePhysics(*spawnersById, shootablesById);
                 _completeGameStateActualizer->updateSpawnerAllegences();
 
