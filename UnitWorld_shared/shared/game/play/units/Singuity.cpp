@@ -42,7 +42,7 @@ double Singuity::spawnSpeed()
 
 double Singuity::maximumSpeed() const
 {
-    return 0.8;
+    return 0.5;
 }
 
 double Singuity::maximumAcceleration() const
