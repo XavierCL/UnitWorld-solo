@@ -1,6 +1,7 @@
 #pragma once
 
 #include "commons/Guid.hpp"
+#include "commons/Option.hpp"
 
 namespace uw
 {

@@ -10,7 +10,7 @@ namespace uw
     class CommunicatedSinguityDestination
     {
     public:
-        CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> destination) :
+        CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination, xg::Guid> destination) :
             _destination(destination)
         {}
 
@@ -18,7 +18,7 @@ namespace uw
 
         static CommunicatedSinguityDestination fromJson(const nlohmann::json& jsonData);
 
-        std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> destination() const
+        std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination, xg::Guid> destination() const
         {
             return _destination;
         }
@@ -27,7 +27,8 @@ namespace uw
 
         const static std::string POINT_LABEL;
         const static std::string SPAWNER_LABEL;
+        const static std::string UNCONDITIONAL_SPAWNER_LABEL;
 
-        std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> _destination;
+        std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination, xg::Guid> _destination;
     };
 }

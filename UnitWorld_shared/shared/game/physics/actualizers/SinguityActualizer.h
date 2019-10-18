@@ -2,6 +2,7 @@
 
 #include "shared/game/play/units/Singuity.h"
 #include "shared/game/play/units/UnitWithHealthPoint.h"
+#include "shared/game/play/spawners/Spawner.h"
 
 #include "shared/game/physics/collisions/CollisionDetector.h"
 #include "shared/game/geometry/Circle.h"
@@ -84,94 +85,96 @@ namespace uw
 
         void actualize(const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
         {
-            auto closestThing = _closestThingId.flatMap<std::shared_ptr<UnitWithHealthPoint>>([shootablesById](const xg::Guid& closestThingId) {
-                return shootablesById | findSafe<std::shared_ptr<UnitWithHealthPoint>>(closestThingId);
-            });
-
-            Vector2D repulsionForce;
-            closestThing.foreach([this, &repulsionForce](std::shared_ptr<UnitWithHealthPoint> thing) {
-
-                const double minDistance = 4;
-                const double maxDistance = 30;
-                const double maxRepulsionForce = _singuity->maximumAcceleration() * 0.2;
-
-                Vector2D repulsionDistance(_singuity->position() - thing->position());
-
-                if (repulsionDistance.moduleSq() <= minDistance * minDistance)
-                {
-                    repulsionForce = repulsionDistance.atModule(maxRepulsionForce);
-                }
-                else if (repulsionDistance.moduleSq() >= maxDistance * maxDistance)
-                {
-                    repulsionForce = Vector2D(0.0, 0.0);
-                }
-                else
-                {
-                    const double a = -1.0 / (maxDistance - minDistance);
-                    const double b = maxDistance / (maxDistance - minDistance);
-                    repulsionForce = repulsionDistance.atModule(maxRepulsionForce * (repulsionDistance.module() * a + b));
-                }
-
-            });
-
-            Vector2D acceleration = _singuity->destination().flatMap<Vector2D>([this, &spawnersById](const std::variant<Vector2D, SpawnerDestination>& destination) {
-                return std::visit(overloaded{
+            Vector2D acceleration = _singuity->destination().flatMap<Vector2D>([this, &spawnersById](const MobileUnitDestination& destination) {
+                return destination.map<Option<Vector2D>>(
                     [this](const Vector2D& point) {
-                        bool willBreakForDestination = (_singuity->position() + _singuity->speed().atModule(_singuity->stopDistanceFromTargetSq())).distanceSq(point) < 100;
-
-                        if (willBreakForDestination)
-                        {
-                            bool isReleaseBreakSpeed = _singuity->speed().moduleSq() < 0.01 * _singuity->maximumSpeed() * _singuity->maximumSpeed();
-
-                            if (isReleaseBreakSpeed)
-                            {
-                                _singuity->clearDestination();
-                                return Options::None<Vector2D>();
-                            }
-                            else
-                            {
-                                return Options::Some(_singuity->getBreakingAcceleration());
-                            }
-                        }
-                        else
-                        {
-                            return Options::Some(_singuity->getMaximalAcceleration(point));
-                        }
+                        return getOptimalAccelerationTowards(point).orExecute([this]() { _singuity->clearDestination(); });
                     }, [this, &spawnersById](const SpawnerDestination spawnerDestination) {
-                        return (&spawnersById | find<std::shared_ptr<Spawner>>(spawnerDestination.spawnerId())).map<Vector2D>([this, &spawnerDestination](std::shared_ptr<Spawner> spawner) {
+                        return (&spawnersById | find<std::shared_ptr<Spawner>>(spawnerDestination.spawnerId())).flatMap<Vector2D>([this, &spawnerDestination](std::shared_ptr<Spawner> spawner) {
                             if (spawner->hasSameAllegenceState(spawnerDestination.spawnerAllegence(), _playerId))
                             {
-                                if (spawner->canBeReguvenatedBy(_playerId) && Circle(spawner->position(), 8).contains(_singuity->position()))
+                                if (spawner->canBeReguvenatedBy(_playerId) && Circle(spawner->position(), ACCEPTABLE_DISTANCE_TO_SPAWNER_DESTINATION).contains(_singuity->position()))
                                 {
                                     spawner->reguvenate(_playerId, _singuity);
-                                    return Vector2D();
+                                    return Options::None<Vector2D>();
                                 }
-                                else if (spawner->canBeAttackedBy(_playerId) && Circle(spawner->position(), 8).contains(_singuity->position()))
+                                else if (spawner->canBeAttackedBy(_playerId) && Circle(spawner->position(), ACCEPTABLE_DISTANCE_TO_SPAWNER_DESTINATION).contains(_singuity->position()))
                                 {
                                     spawner->attackedBy(_playerId, _singuity);
-                                    return Vector2D();
+                                    return Options::None<Vector2D>();
                                 }
                                 else
                                 {
-                                    return _singuity->getMaximalAcceleration(spawner->position());
+                                    return getOptimalAccelerationTowards(spawner->position());
                                 }
                             }
                             else
                             {
                                 _singuity->setPointDestination(spawner->position());
-                                return _singuity->getMaximalAcceleration(spawner->position());
+                                return getOptimalAccelerationTowards(spawner->position());
+                            }
+                        });
+                    },
+                    [this, &spawnersById](const xg::Guid& unconditionalSpawnerDestination) {
+                        return (&spawnersById | find<std::shared_ptr<Spawner>>(unconditionalSpawnerDestination)).map<Vector2D>([this](std::shared_ptr<Spawner> spawner) {
+                            if (Circle(spawner->position(), ACCEPTABLE_DISTANCE_TO_SPAWNER_DESTINATION).contains(_singuity->position()))
+                            {
+                                if (spawner->canBeReguvenatedBy(_playerId))
+                                {
+                                    spawner->reguvenate(_playerId, _singuity);
+                                }
+                                else if (spawner->canBeAttackedBy(_playerId))
+                                {
+                                    spawner->attackedBy(_playerId, _singuity);
+                                }
+                                else
+                                {
+                                    _singuity->clearDestination();
+                                }
+                                return Options::None<Vector2D>();
+                            }
+                            else
+                            {
+                                return getOptimalAccelerationTowards(spawner->position());
                             }
                         });
                     }
-                }, destination);
+                );
             }).getOrElse([this]() {
                 return _singuity->getSlowBreakingAcceleration();
             });
 
             acceleration = acceleration.maxAt(_singuity->maximumAcceleration());
-            acceleration += repulsionForce;
 
-            _singuity->actualizeAcceleration(acceleration);
+            _singuity->actualizeSpeed(acceleration);
+
+            auto closestThing = _closestThingId.flatMap<std::shared_ptr<UnitWithHealthPoint>>([shootablesById](const xg::Guid& closestThingId) {
+                return shootablesById | findSafe<std::shared_ptr<UnitWithHealthPoint>>(closestThingId);
+            });
+
+            Vector2D repulsionSpeed;
+            closestThing.foreach([this, &repulsionSpeed](std::shared_ptr<UnitWithHealthPoint> thing) {
+                Vector2D repulsionDistance(_singuity->position() - thing->position());
+
+                const double maxRepulsionSpeed = _singuity->maximumSpeed() * REPULSION_MAX_SPEED_RATIO;
+
+                if (repulsionDistance.moduleSq() <= REPULSION_MIN_VARIABLE_DISTANCE * REPULSION_MIN_VARIABLE_DISTANCE)
+                {
+                    repulsionSpeed = repulsionDistance.atModule(maxRepulsionSpeed);
+                }
+                else if (repulsionDistance.moduleSq() >= REPULSION_MAX_VARIABLE_DISTANCE * REPULSION_MAX_VARIABLE_DISTANCE)
+                {
+                    repulsionSpeed = Vector2D(0.0, 0.0);
+                }
+                else
+                {
+                    const double a = -1.0 / (REPULSION_MAX_VARIABLE_DISTANCE - REPULSION_MIN_VARIABLE_DISTANCE);
+                    const double b = REPULSION_MAX_VARIABLE_DISTANCE / (REPULSION_MAX_VARIABLE_DISTANCE - REPULSION_MIN_VARIABLE_DISTANCE);
+                    repulsionSpeed = repulsionDistance.atModule(maxRepulsionSpeed * (repulsionDistance.module() * a + b));
+                }
+            });
+
+            _singuity->actualizePosition(repulsionSpeed);
         }
 
         std::shared_ptr<Singuity> singuity()
@@ -184,6 +187,36 @@ namespace uw
         {
             return value * value;
         }
+
+        Option<Vector2D> getOptimalAccelerationTowards(const Vector2D& position)
+        {
+            bool willBreakForDestination = (_singuity->position() + _singuity->speed().atModule(_singuity->stopDistanceFromTargetSq())).distanceSq(position) < ACCEPTABLE_DISTANCE_TO_POSITION_DESTINATION * ACCEPTABLE_DISTANCE_TO_POSITION_DESTINATION;
+
+            if (willBreakForDestination)
+            {
+                bool isReleaseBreakSpeed = _singuity->speed().moduleSq() < ACCEPTABLE_SPEED_RATIO_FOR_STOP_BREAKING * _singuity->maximumSpeed() * _singuity->maximumSpeed();
+
+                if (isReleaseBreakSpeed)
+                {
+                    return Options::None<Vector2D>();
+                }
+                else
+                {
+                    return Options::Some(_singuity->getBreakingAcceleration());
+                }
+            }
+            else
+            {
+                return Options::Some(_singuity->getMaximalAcceleration(position));
+            }
+        }
+
+        const static double REPULSION_MIN_VARIABLE_DISTANCE;
+        const static double REPULSION_MAX_VARIABLE_DISTANCE;
+        const static double REPULSION_MAX_SPEED_RATIO;
+        const static double ACCEPTABLE_DISTANCE_TO_POSITION_DESTINATION;
+        const static double ACCEPTABLE_DISTANCE_TO_SPAWNER_DESTINATION;
+        const static double ACCEPTABLE_SPEED_RATIO_FOR_STOP_BREAKING;
 
         const std::shared_ptr<Singuity> _singuity;
         const xg::Guid _playerId;

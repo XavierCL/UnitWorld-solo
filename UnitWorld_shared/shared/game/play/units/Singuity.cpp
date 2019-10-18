@@ -2,16 +2,16 @@
 
 using namespace uw;
 
-Singuity::Singuity(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<std::variant<Vector2D, SpawnerDestination>>& destination, const double& healthPoints, const unsigned long long& lastShootTimestamp) :
+Singuity::Singuity(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<MobileUnitDestination>& destination, const double& healthPoints, const unsigned long long& lastShootFrameCount) :
     Unit(id, position),
     MobileUnit(id, position, speed, destination),
-    Shooter(id, position, lastShootTimestamp),
+    Shooter(id, position, lastShootFrameCount),
     UnitWithHealthPoint(id, position, healthPoints)
 {}
 
-Singuity::Singuity(const Vector2D& position, const Vector2D& speed) :
+Singuity::Singuity(const Vector2D& position, const Vector2D& speed, const Option<MobileUnitDestination>& destination) :
     Unit(position),
-    MobileUnit(position, speed),
+    MobileUnit(position, speed, destination),
     Shooter(position),
     UnitWithHealthPoint(position, maximumHealthPoint())
 {}
@@ -30,9 +30,9 @@ Singuity::Singuity(const Singuity& other) :
     UnitWithHealthPoint(other)
 {}
 
-Singuity Singuity::spawn(const Vector2D& position, const Vector2D& speed)
+Singuity Singuity::spawn(const Vector2D& position, const Vector2D& speed, const Option<MobileUnitDestination>& destination)
 {
-    return Singuity(position, speed.maxAt(spawnSpeed()));
+    return Singuity(position, speed.maxAt(spawnSpeed()), destination);
 }
 
 double Singuity::spawnSpeed()
@@ -42,12 +42,12 @@ double Singuity::spawnSpeed()
 
 double Singuity::maximumSpeed() const
 {
-    return 0.5;
+    return 4;
 }
 
 double Singuity::maximumAcceleration() const
 {
-    return 0.02;
+    return 0.08;
 }
 
 double Singuity::maximumHealthPoint() const

@@ -4,6 +4,7 @@
 
 #include "shared/game/commands/MoveMobileUnitsToPosition.h"
 #include "shared/game/commands/MoveMobileUnitsToSpawner.h"
+#include "shared/game/commands/SetSpawnersRally.h"
 #include "shared/game/commands/GameCommand.h"
 
 #include <immer/vector.hpp>
@@ -88,6 +89,21 @@ namespace uw
             }
 
             const auto nextCommand(std::make_shared<MoveMobileUnitsToSpawner>(playerId, mobileUnitSet, spawnerId));
+
+            std::lock_guard<std::mutex> lockPlayerCommands(_nextCommandsMutex);
+
+            _nextCommands.push_back(nextCommand);
+        }
+
+        void setNextSpawnersRally(const xg::Guid& playerId, const std::vector<xg::Guid>& spawnersId, const MobileUnitDestination& rally)
+        {
+            immer::set<xg::Guid> spawnersIdSet;
+            for (const auto& spawnerId : spawnersId)
+            {
+                spawnersIdSet = std::move(spawnersIdSet).insert(spawnerId);
+            }
+
+            const auto nextCommand(std::make_shared<SetSpawnersRally>(playerId, spawnersIdSet, rally));
 
             std::lock_guard<std::mutex> lockPlayerCommands(_nextCommandsMutex);
 

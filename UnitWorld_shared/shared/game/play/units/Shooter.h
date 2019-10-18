@@ -14,14 +14,14 @@ namespace uw
             _lastShootFameCount(0)
         {}
 
-        Shooter(const Vector2D& position, unsigned long long& lastShootTimestamp) :
+        Shooter(const Vector2D& position, unsigned long long& lastShootFrameCount) :
             Unit(position),
-            _lastShootFameCount(lastShootTimestamp)
+            _lastShootFameCount(lastShootFrameCount)
         {}
 
-        Shooter(const xg::Guid& id, const Vector2D& position, const unsigned long long& lastShootTimestamp) :
+        Shooter(const xg::Guid& id, const Vector2D& position, const unsigned long long& lastShootFrameCount) :
             Unit(id, position),
-            _lastShootFameCount(lastShootTimestamp)
+            _lastShootFameCount(lastShootFrameCount)
         {}
 
         void shootIfCan(std::shared_ptr<UnitWithHealthPoint> unitWithHealthPoint, unsigned long long frameCount)

@@ -8,7 +8,7 @@
 	"scroll-ratio-per-tick": 0.2,
 	"server ip john": "147.253.89.52",
     "server port": "52124",
-	"ai-name": "strongholdAi",
+	"ai-name": "strongholdAi2",
     "spawners": [
         [
 		 {"x": 200, "y": 2900, "P1 naturals": 0},

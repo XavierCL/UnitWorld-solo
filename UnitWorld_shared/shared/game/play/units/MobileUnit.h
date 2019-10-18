@@ -1,12 +1,7 @@
 #pragma once
 
 #include "Unit.h"
-#include "SpawnerDestination.h"
-
-#include "commons/Option.hpp"
-#include "commons/CollectionPipe.h"
-
-#include <variant>
+#include "MobileUnitDestination.h"
 
 namespace uw
 {
@@ -19,7 +14,7 @@ namespace uw
             return _speed;
         }
 
-        Option<std::variant<Vector2D, SpawnerDestination>> destination() const
+        Option<MobileUnitDestination> destination() const
         {
             return _destination;
         }
@@ -52,37 +47,39 @@ namespace uw
 
         bool hasSpawnerDestination() const
         {
-            return _destination.map<bool>([](const std::variant<Vector2D, SpawnerDestination>& destination) {
-                return std::visit(overloaded{
-                    [](const Vector2D& positionDestination) { return false; },
-                    [](const SpawnerDestination& spawnerDestination) { return true; }
-                }, destination);
-            }).getOrElse(false);
+            return _destination
+                .map<bool>([](const MobileUnitDestination& destination) { return destination.isSpawnerDestination(); })
+                .getOrElse(false);
         }
 
         void setPointDestination(const Vector2D& destination)
         {
-            _destination = Options::Some<std::variant<Vector2D, SpawnerDestination>>(destination);
+            _destination = Options::Some(MobileUnitDestination(destination));
         }
 
         void setSpawnerDestination(const SpawnerDestination& spawnerDestination)
         {
-            _destination = Options::Some<std::variant<Vector2D, SpawnerDestination>>(spawnerDestination);
+            _destination = Options::Some(MobileUnitDestination(spawnerDestination));
         }
 
         void clearDestination()
         {
-            _destination = Options::None<std::variant<Vector2D, SpawnerDestination>>();
+            _destination = Options::None<MobileUnitDestination>();
         }
 
-        void actualizeAcceleration(const Vector2D& instantaneousAcceleration)
+        void actualizeSpeed(const Vector2D& instantaneousAcceleration)
         {
-            _speed += instantaneousAcceleration;
+            _speed = (_speed + instantaneousAcceleration).maxAt(maximumSpeed());
             position(position() + _speed);
         }
 
+        void actualizePosition(const Vector2D& instantaneousSpeed)
+        {
+            position(position() + instantaneousSpeed);
+        }
+
     protected:
-        MobileUnit(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<std::variant<Vector2D, SpawnerDestination>>& destination) :
+        MobileUnit(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<MobileUnitDestination>& destination) :
             Unit(id, position),
             _speed(speed),
             _destination(destination)
@@ -92,6 +89,12 @@ namespace uw
             Unit(position),
             _speed(speed),
             _destination()
+        {}
+
+        MobileUnit(const Vector2D& position, const Vector2D& speed, const Option<MobileUnitDestination>& destination) :
+            Unit(position),
+            _speed(speed),
+            _destination(destination)
         {}
 
         MobileUnit(const Vector2D& position) :
@@ -113,7 +116,7 @@ namespace uw
             return _speed.moduleSq() / (2.0 * maximumAcceleration());
         }
 
-        Option<std::variant<Vector2D, SpawnerDestination>> _destination;
+        Option<MobileUnitDestination> _destination;
         Vector2D _speed;
     };
 }

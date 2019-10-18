@@ -51,9 +51,6 @@
     <ClInclude Include="shared\communication\messages\MessageType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shared\communication\messages\MoveMobileUnitsToPositionMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="shared\game\commands\MoveMobileUnitsToPosition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -114,9 +111,6 @@
     <ClInclude Include="shared\game\geometry\Circle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shared\communication\messages\MoveMobileUnitsToSpawnerMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="shared\game\commands\MoveMobileUnitsToSpawner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -156,6 +150,21 @@
     <ClInclude Include="shared\communication\messages\game\CommunicatedSpawnerDestination.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="shared\game\play\units\MobileUnitDestination.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\commands\MoveMobileUnitsToPositionMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\commands\MoveMobileUnitsToSpawnerMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\commands\SetSpawnersRally.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\commands\SetSpawnersRallyMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="shared\communication\MessageWrapper.cpp">
@@ -176,9 +185,6 @@
     <ClCompile Include="shared\communication\messages\game\CommunicatedVector2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shared\communication\messages\MoveMobileUnitsToPositionMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="shared\configuration\ConfigurationManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -197,9 +203,6 @@
     <ClCompile Include="shared\communication\messages\game\CommunicatedSpawner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shared\communication\messages\MoveMobileUnitsToSpawner.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="shared\game\play\units\Singuity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -216,6 +219,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\communication\messages\game\CommunicatedSpawnerDestination.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\physics\actualizers\SinguityActualizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\commands\MoveMobileUnitsToPositionMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\commands\MoveMobileUnitsToSpawner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\commands\SetSpawnersRallyToPositionMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\commands\SetSpawnersRallyToSpawner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\commands\SetSpawnersRallyMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

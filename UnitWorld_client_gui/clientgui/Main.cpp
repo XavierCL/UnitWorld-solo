@@ -77,7 +77,7 @@ int main()
             const auto gameDrawer(std::make_shared<GameDrawer>(gameManager, userControlState, cameraRelativeGameManager));
             const auto sfmlCanvas(std::make_shared<uw::SFMLCanvas>(window));
             const auto canvasTransactionGenerator(std::make_shared<CanvasTransactionGenerator>(sfmlCanvas));
-            const auto windowInputs(std::make_shared<WindowInputs>(userControlState, camera));
+            const auto windowInputs(std::make_shared<WindowInputs>(userControlState, camera, uw::Rectangle(Vector2D(0.0, 0.0), Vector2D(window->getSize().x, window->getSize().y))));
             const auto windowManager(std::make_shared<WindowManager>(GRAPHICS_FRAME_PER_SECOND, gameDrawer, canvasTransactionGenerator, window, windowInputs));
 
             const auto serverReceiver(std::make_shared<ServerReceiver>(connectionHandler, gameManager, physicsCommunicationAssembler, messageSerializer));

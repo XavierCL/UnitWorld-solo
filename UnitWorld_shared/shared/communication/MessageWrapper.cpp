@@ -2,9 +2,11 @@
 
 #include "messages/CompleteGameStateMessage.h"
 #include "messages/InvalidMessage.h"
-#include "messages/MoveMobileUnitsToPositionMessage.h"
-#include "messages/MoveMobileUnitsToSpawnerMessage.h"
 #include "messages/MessageType.h"
+
+#include "messages/commands/MoveMobileUnitsToPositionMessage.h"
+#include "messages/commands/MoveMobileUnitsToSpawnerMessage.h"
+#include "messages/commands/SetSpawnersRallyMessage.h"
 
 #include <nlohmann/json.hpp>
 
@@ -13,10 +15,11 @@
 namespace uw
 {
     NLOHMANN_JSON_SERIALIZE_ENUM(MessageType, {
-        {InvalidMessageType, nullptr},
-        {CompleteGameStateMessageType, "complete-game-state"},
-        {MoveMobileUnitsToPositionMessageType, "move-units-to-position"},
-        {MoveMobileUnitsToSpawnerMessageType, "move-units-to-spawner"}
+        {MessageType::InvalidMessageType, nullptr},
+        {MessageType::CompleteGameStateMessageType, "complete-game-state"},
+        {MessageType::MoveMobileUnitsToPositionMessageType, "move-units-to-position"},
+        {MessageType::MoveMobileUnitsToSpawnerMessageType, "move-units-to-spawner"},
+        {MessageType::SetSpawnersRallyMessageType, "set-spawners-rally"}
     });
 
     const std::string MessageWrapper::MESSAGE_TYPE_JSON_ATTRIBUTE = "type";
@@ -86,6 +89,10 @@ std::shared_ptr<const Message> MessageWrapper::jsonToMessage(const std::string& 
     else if (messageType == MessageType::MoveMobileUnitsToSpawnerMessageType)
     {
         return MoveMobileUnitsToSpawnerMessage::fromJson(messageData);
+    }
+    else if (messageType == MessageType::SetSpawnersRallyMessageType)
+    {
+        return SetSpawnersRallyMessage::fromJson(messageData);
     }
     else
     {

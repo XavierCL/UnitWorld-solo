@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Message.h"
+#include "shared/communication/messages/Message.h"
 
-#include "game/CommunicatedVector2D.h"
+#include "shared/communication/messages/game/CommunicatedVector2D.h"
 
 #include <commons/Guid.hpp>
 

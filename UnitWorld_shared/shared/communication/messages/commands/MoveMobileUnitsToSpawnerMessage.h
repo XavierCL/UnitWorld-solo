@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Message.h"
+#include "shared/communication/messages/Message.h"
 
 #include "commons/Guid.hpp"
 

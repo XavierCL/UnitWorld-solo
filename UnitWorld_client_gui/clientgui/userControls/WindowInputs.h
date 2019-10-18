@@ -10,10 +10,13 @@ namespace uw
     class WindowInputs
     {
     public:
-        WindowInputs(std::shared_ptr<UserControlState> userControlState, std::shared_ptr<Camera> camera)
-        : _userControlState(userControlState),
-        _camera(camera),
-		_isLeftControlKeyPressed(false)
+        WindowInputs(std::shared_ptr<UserControlState> userControlState, std::shared_ptr<Camera> camera, const Rectangle& screenRelativeRectangle) :
+            _userControlState(userControlState),
+            _camera(camera),
+            _isLeftControlKeyPressed(false),
+            _isRapidClicking(false),
+            _justClicked(false),
+            _screenRelativeRectangle(screenRelativeRectangle)
         {}
 
         void frameHappened()
@@ -24,17 +27,33 @@ namespace uw
 
         void setUserMousePosition(const Vector2D& position)
         {
+            _isRapidClicking = false;
+            _justClicked = false;
             _userControlState->setUserMousePosition(position);
             _camera->mouseMovedTo(position);
         }
 
         void setUserLeftMouseUpPosition(const Vector2D& position)
         {
-            _userControlState->setUserLeftMouseUpPosition(position);
+            if (_justClicked && _isRapidClicking)
+            {
+                _userControlState->setUserDoubleClickMouseUpPosition(position);
+            }
+            else if (_isRapidClicking)
+            {
+                _userControlState->setUserClickMouseUpPosition(position, _isLeftControlKeyPressed);
+            }
+            else
+            {
+                _userControlState->setUserLeftMouseUpPosition(position);
+            }
+            _justClicked = _isRapidClicking;
+            _isRapidClicking = false;
         }
 
         void setUserLeftMouseDownPosition(const Vector2D& position)
         {
+            _isRapidClicking = true;
             _userControlState->setUserLeftMouseDownPosition(position);
         }
 
@@ -72,11 +91,11 @@ namespace uw
 		{
 			if (_isLeftControlKeyPressed)
 			{
-				_userControlState->addSelectedUnitsToUnitGroup(numberKey);
+				_userControlState->setSelectedUnitsToUnitGroup(numberKey);
 			}
 			else
 			{
-				_userControlState->setSelectedUnitToUnitGroup(numberKey);
+				_userControlState->setUnitGroupToSelectedUnits(numberKey);
 			}
 		}
 
@@ -85,9 +104,22 @@ namespace uw
             _userControlState->selectAllUnits();
         }
 
+        void userPressedAddKey()
+        {
+            _camera->mouseScrolled(1, _screenRelativeRectangle.center());
+        }
+
+        void userPressedSubstractKey()
+        {
+            _camera->mouseScrolled(-1, _screenRelativeRectangle.center());
+        }
+
     private:
         const std::shared_ptr<UserControlState> _userControlState;
         const std::shared_ptr<Camera> _camera;
+        const Rectangle _screenRelativeRectangle;
 		bool _isLeftControlKeyPressed;
+        bool _isRapidClicking;
+        bool _justClicked;
     };
 }

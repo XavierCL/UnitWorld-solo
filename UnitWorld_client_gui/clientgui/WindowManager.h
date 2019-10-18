@@ -151,6 +151,14 @@ namespace uw
                     {
                         _windowInputs->userPressedNumber(9);
                     }
+                    else if (event.key.code == sf::Keyboard::Add)
+                    {
+                        _windowInputs->userPressedAddKey();
+                    }
+                    else if (event.key.code == sf::Keyboard::Subtract)
+                    {
+                        _windowInputs->userPressedSubstractKey();
+                    }
                 }
                 else if(event.type == sf::Event::KeyReleased)
                 {
