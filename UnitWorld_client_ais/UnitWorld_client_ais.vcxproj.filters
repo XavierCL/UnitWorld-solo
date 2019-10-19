@@ -38,5 +38,8 @@
     <ClInclude Include="clientAis\ais\xaviercl\strongholdAi2\StrongholdAi2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="clientAis\AiStats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

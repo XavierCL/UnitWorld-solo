@@ -145,8 +145,6 @@
     <ClCompile Include="clientgui\graphics\canvas\CanvasTransactionGenerator.cpp" />
     <ClCompile Include="clientgui\graphics\canvas\SFMLCanvas.cpp" />
     <ClCompile Include="clientgui\graphics\GameDrawer.cpp" />
-    <ClCompile Include="clientgui\graphics\units\GraphicalSinguity.cpp" />
-    <ClCompile Include="clientgui\graphics\units\GraphicalUnit.cpp" />
     <ClCompile Include="clientgui\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -154,12 +152,11 @@
     <ClInclude Include="clientgui\cameras\Camera.h" />
     <ClInclude Include="clientgui\cameras\CameraRelativeGameManager.h" />
     <ClInclude Include="clientgui\graphics\GameDrawer.h" />
-    <ClInclude Include="clientgui\graphics\units\GraphicalSinguity.h" />
-    <ClInclude Include="clientgui\graphics\units\GraphicalUnit.h" />
     <ClInclude Include="clientgui\graphics\canvas\DisplayCanvas.h" />
     <ClInclude Include="clientgui\graphics\canvas\SFMLDrawingCanvas.h" />
     <ClInclude Include="clientgui\graphics\canvas\SFMLCanvas.h" />
     <ClInclude Include="clientgui\graphics\canvas\CanvasTransactionGenerator.h" />
+    <ClInclude Include="clientgui\WindowStats.h" />
     <ClInclude Include="clientgui\userControls\WindowInputs.h" />
     <ClInclude Include="clientgui\WindowManager.h" />
     <ClInclude Include="clientgui\userControls\UserControlState.h" />

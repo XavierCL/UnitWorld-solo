@@ -16,11 +16,11 @@ namespace uw
 
         SetSpawnersRallyMessage(const std::vector<xg::Guid>& spawnersId, const CommunicatedSinguityDestination& destination);
 
-        static std::shared_ptr<SetSpawnersRallyMessage> fromJson(const std::string& json);
+        static std::shared_ptr<SetSpawnersRallyMessage> fromJson(const nlohmann::json& json);
 
         MessageType messageType() const;
 
-        std::string toJsonData() const;
+        nlohmann::json toJsonData() const;
 
         std::vector<xg::Guid> spawnersId() const;
 

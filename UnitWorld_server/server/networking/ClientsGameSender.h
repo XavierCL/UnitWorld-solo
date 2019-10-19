@@ -99,6 +99,7 @@ namespace uw
                     : _maxMsBetweenCompleteStates - msSinceLastSend;
                 if (msRemainingUntilNextFrame <= 0)
                 {
+                    Logger::trace("Sending complete state: time since last sent ms: " + std::to_string(msSinceLastSend));
                     _hasStateChanged = false;
                     sendCompleteState();
                 }
@@ -142,10 +143,10 @@ namespace uw
 
             for (auto playerClient : localPlayerClients)
             {
-                const auto message = MessageWrapper(std::make_shared<CompleteGameStateMessage>(communicatedCompleteGameState, playerClient.playerId()));
+                const auto message = std::make_shared<MessageWrapper>(MessageWrapper::fromMessage(std::make_shared<CompleteGameStateMessage>(communicatedCompleteGameState, playerClient.playerId())));
                 try
                 {
-                    playerClient.client()->send(_messageSerializer->serialize(std::vector<MessageWrapper>(1, message)));
+                    playerClient.client()->send(_messageSerializer->serialize(std::vector<std::shared_ptr<MessageWrapper>>{ message }));
                 }
                 catch (std::exception& error)
                 {

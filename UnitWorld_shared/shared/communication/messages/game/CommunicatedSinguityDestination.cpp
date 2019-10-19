@@ -16,7 +16,7 @@ nlohmann::json CommunicatedSinguityDestination::toJson() const
             return nlohmann::json {{SPAWNER_LABEL, spawnerDestination.toJson()}};
         },
         [](const xg::Guid& unconditionalSpawnerDestination) {
-            return nlohmann::json {{UNCONDITIONAL_SPAWNER_LABEL, unconditionalSpawnerDestination.str()}};
+            return nlohmann::json {{UNCONDITIONAL_SPAWNER_LABEL, unconditionalSpawnerDestination.toBase64()}};
         }
     }, _destination);
 }
@@ -33,7 +33,7 @@ CommunicatedSinguityDestination CommunicatedSinguityDestination::fromJson(const 
     }
     else if (parsedData.contains(UNCONDITIONAL_SPAWNER_LABEL))
     {
-        return CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination, xg::Guid> {xg::Guid(parsedData.at(UNCONDITIONAL_SPAWNER_LABEL).get<std::string>())});
+        return CommunicatedSinguityDestination(std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination, xg::Guid> {xg::Guid::fromBase64(parsedData.at(UNCONDITIONAL_SPAWNER_LABEL).get<std::string>())});
     }
 }
 

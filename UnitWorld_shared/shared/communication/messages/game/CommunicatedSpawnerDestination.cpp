@@ -11,7 +11,7 @@ nlohmann::json CommunicatedSpawnerDestination::toJson() const
             .getOrElse(nlohmann::json(NO_ALLEGENCE_VALUE));
 
     return nlohmann::json {
-        {SPAWNER_ID_LABEL, _spawnerId.str()},
+        {SPAWNER_ID_LABEL, _spawnerId.toBase64()},
         {SPAWNER_ALLEGENCE_LABEL, parsedSpawnerAllegence}
     };
 }
@@ -23,7 +23,7 @@ CommunicatedSpawnerDestination CommunicatedSpawnerDestination::fromJson(const nl
         ? Options::None<CommunicatedSpawnerAllegence>()
         : Options::Some(CommunicatedSpawnerAllegence::fromJson(jsonAllegence));
 
-    return CommunicatedSpawnerDestination(xg::Guid(parsedJsonData.at(SPAWNER_ID_LABEL).get<std::string>()), communicatedSpawnerAllegence);
+    return CommunicatedSpawnerDestination(xg::Guid::fromBase64(parsedJsonData.at(SPAWNER_ID_LABEL).get<std::string>()), communicatedSpawnerAllegence);
 }
 
 const std::string CommunicatedSpawnerDestination::NO_ALLEGENCE_VALUE = "n";

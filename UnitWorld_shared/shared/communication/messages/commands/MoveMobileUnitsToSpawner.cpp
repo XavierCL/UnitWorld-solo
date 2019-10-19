@@ -9,19 +9,17 @@ MoveMobileUnitsToSpawnerMessage::MoveMobileUnitsToSpawnerMessage(const std::vect
     _spawnerId(spawnerId)
 {}
 
-std::shared_ptr<MoveMobileUnitsToSpawnerMessage> MoveMobileUnitsToSpawnerMessage::fromJson(const std::string& json)
+std::shared_ptr<MoveMobileUnitsToSpawnerMessage> MoveMobileUnitsToSpawnerMessage::fromJson(const nlohmann::json& json)
 {
-    nlohmann::json parsedData = nlohmann::json::parse(json);
-
     std::vector<xg::Guid> singuityIds;
-    for (const auto singuityId : parsedData.at(MOBILE_UNITS_ID_LABEL))
+    for (const auto singuityId : json.at(MOBILE_UNITS_ID_LABEL))
     {
-        singuityIds.emplace_back(singuityId.get<std::string>());
+        singuityIds.emplace_back(xg::Guid::fromBase64(singuityId.get<std::string>()));
     }
 
     return std::make_shared<MoveMobileUnitsToSpawnerMessage>(
         std::move(singuityIds),
-        xg::Guid(std::move(parsedData).at(SPAWNER_ID_LABEL).get<std::string>())
+        xg::Guid::fromBase64(json.at(SPAWNER_ID_LABEL).get<std::string>())
     );
 }
 
@@ -30,20 +28,20 @@ MessageType MoveMobileUnitsToSpawnerMessage::messageType() const
     return MessageType::MoveMobileUnitsToSpawnerMessageType;
 }
 
-std::string MoveMobileUnitsToSpawnerMessage::toJsonData() const
+nlohmann::json MoveMobileUnitsToSpawnerMessage::toJsonData() const
 {
     std::vector<std::string> singuityStringIds;
     for (const auto singuityId : _singuityIds)
     {
-        singuityStringIds.emplace_back(singuityId.str());
+        singuityStringIds.emplace_back(singuityId.toBase64());
     }
 
     nlohmann::json returnedJson({
         {MOBILE_UNITS_ID_LABEL, singuityStringIds},
-        {SPAWNER_ID_LABEL, _spawnerId.str()}
+        {SPAWNER_ID_LABEL, _spawnerId.toBase64()}
     });
 
-    return returnedJson.dump();
+    return returnedJson;
 }
 
 std::vector<xg::Guid> MoveMobileUnitsToSpawnerMessage::singuityIds() const

@@ -68,14 +68,14 @@ namespace uw
             }
         }
 
-        void handleServerMessage(const MessageWrapper& messageWrapper)
+        void handleServerMessage(const std::shared_ptr<MessageWrapper> messageWrapper)
         {
-            if (messageWrapper.messageType() == MessageType::CompleteGameStateMessageType)
+            if (messageWrapper->messageType() == MessageType::CompleteGameStateMessageType)
             {
-                if (messageWrapper.timestamp() > _mostRecentCompleteStateTimestamp)
+                if (messageWrapper->timestamp() > _mostRecentCompleteStateTimestamp)
                 {
-                    _mostRecentCompleteStateTimestamp = messageWrapper.timestamp();
-                    const auto completeStateMessage(std::dynamic_pointer_cast<CompleteGameStateMessage const>(messageWrapper.innerMessage()));
+                    _mostRecentCompleteStateTimestamp = messageWrapper->timestamp();
+                    const auto completeStateMessage(std::dynamic_pointer_cast<CompleteGameStateMessage const>(messageWrapper->innerMessage()));
                     handleCompleteGameStateMessage(completeStateMessage);
                 }
             }

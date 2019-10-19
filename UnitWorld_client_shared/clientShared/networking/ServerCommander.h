@@ -36,7 +36,7 @@ namespace uw
 
             try
             {
-                _serverCommunicator->send(_messageSerializer->serialize(std::vector<MessageWrapper> { MessageWrapper(message) }));
+                _serverCommunicator->send(_messageSerializer->serialize(std::vector<std::shared_ptr<MessageWrapper>> { std::make_shared<MessageWrapper>(MessageWrapper::fromMessage(message)) }));
             }
             catch (std::exception& error)
             {
@@ -50,7 +50,7 @@ namespace uw
 
             try
             {
-                _serverCommunicator->send(_messageSerializer->serialize(std::vector<MessageWrapper> { MessageWrapper(message) }));
+                _serverCommunicator->send(_messageSerializer->serialize(std::vector<std::shared_ptr<MessageWrapper>> { std::make_shared<MessageWrapper>(MessageWrapper::fromMessage(message)) }));
             }
             catch (std::exception& error)
             {
@@ -64,7 +64,7 @@ namespace uw
 
             try
             {
-                _serverCommunicator->send(_messageSerializer->serialize(std::vector<MessageWrapper> { MessageWrapper(message) }));
+                _serverCommunicator->send(_messageSerializer->serialize(std::vector<std::shared_ptr<MessageWrapper>> { std::make_shared<MessageWrapper>(MessageWrapper::fromMessage(message)) }));
             }
             catch (std::exception& error)
             {

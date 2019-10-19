@@ -13,11 +13,11 @@ namespace uw
     public:
         CompleteGameStateMessage(const CommunicatedCompleteGameState& completeGameState, const xg::Guid& currentPlayerId);
 
-        static std::shared_ptr<CompleteGameStateMessage> fromJson(const std::string& jsonData);
+        static std::shared_ptr<CompleteGameStateMessage> fromJson(const nlohmann::json& jsonData);
 
         virtual MessageType messageType() const;
 
-        virtual std::string toJsonData() const;
+        virtual nlohmann::json toJsonData() const;
 
         CommunicatedCompleteGameState completeGameState() const;
 

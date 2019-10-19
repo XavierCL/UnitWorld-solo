@@ -1,5 +1,7 @@
 #pragma once
 
+#include "WindowStats.h"
+
 #include "userControls/WindowInputs.h"
 
 #include "graphics/GameDrawer.h"
@@ -16,12 +18,13 @@ namespace uw
     class WindowManager
     {
     public:
-        WindowManager(const unsigned int& graphicsFramePerSecond, std::shared_ptr<GameDrawer> gameDrawer, std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator, std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<WindowInputs> windowInputs) :
+        WindowManager(const unsigned int& graphicsFramePerSecond, std::shared_ptr<GameDrawer> gameDrawer, std::shared_ptr<CanvasTransactionGenerator> canvasTransactionGenerator, std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<WindowInputs> windowInputs, std::shared_ptr<WindowStats> windowStats) :
             _msPerFrame(1000 / graphicsFramePerSecond),
             _gameDrawer(gameDrawer),
             _canvasTransactionGenerator(canvasTransactionGenerator),
             _window(window),
-            _windowInputs(windowInputs)
+            _windowInputs(windowInputs),
+            _windowStats(windowStats)
         {}
 
         void startSync()
@@ -41,6 +44,7 @@ namespace uw
                     const auto endFrameTime = std::chrono::steady_clock::now();
 
                     const auto frameTimeInMs = (unsigned int)std::chrono::duration<double, std::milli>(endFrameTime - startFrameTime).count();
+                    _windowStats->feedFrameDuration(frameTimeInMs);
 
                     if (frameTimeInMs < _msPerFrame)
                     {
@@ -188,5 +192,6 @@ namespace uw
         const std::shared_ptr<CanvasTransactionGenerator> _canvasTransactionGenerator;
         const std::shared_ptr<sf::RenderWindow> _window;
         const std::shared_ptr<WindowInputs> _windowInputs;
+        const std::shared_ptr<WindowStats> _windowStats;
     };
 }

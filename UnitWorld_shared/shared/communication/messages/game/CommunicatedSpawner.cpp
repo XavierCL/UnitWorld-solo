@@ -15,7 +15,7 @@ nlohmann::json CommunicatedSpawner::toJson() const
     }).getOrElse([] { return nlohmann::json(NO_RALLY_VALUE); });
 
     nlohmann::json jsonData = {
-        {SPAWNER_ID_LABEL, _id.str()},
+        {SPAWNER_ID_LABEL, _id.toBase64()},
         {POSITION_LABEL, _position.toJson()},
         {ALLEGENCE_LABEL, allegenceData},
         {RALLY_LABEL, rallyData},
@@ -32,7 +32,7 @@ CommunicatedSpawner CommunicatedSpawner::fromJson(const nlohmann::json& parsedJs
     nlohmann::json parsedRally = parsedJson.at(RALLY_LABEL);
 
     return CommunicatedSpawner(
-        xg::Guid(parsedJson.at(SPAWNER_ID_LABEL).get<std::string>()),
+        xg::Guid::fromBase64(parsedJson.at(SPAWNER_ID_LABEL).get<std::string>()),
         CommunicatedVector2D::fromJson(parsedJson.at(POSITION_LABEL)),
         parsedAllegence.is_string() && parsedAllegence.get<std::string>() == NO_ALLEGENCE_VALUE
             ? Options::None<CommunicatedSpawnerAllegence>()

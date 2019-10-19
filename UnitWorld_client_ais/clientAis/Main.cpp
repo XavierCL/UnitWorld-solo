@@ -1,3 +1,5 @@
+#include "AiStats.h"
+
 #include "shared/configuration/ConfigurationManager.h"
 
 #include "communications/ClientConnector.h"
@@ -19,6 +21,7 @@
 #include "shared/game/physics/PhysicsManager.h"
 
 #include <chrono>
+#include <fstream>
 
 using namespace uw;
 
@@ -54,13 +57,6 @@ std::shared_ptr<Artificial> generateAI(const std::string& aiName)
 
 int main()
 {
-    Logger::registerInfo([](const std::string& message) {
-        std::cout << "INFO: " << message << std::endl;
-    });
-    Logger::registerError([](const std::string& errorMessage) {
-        std::cout << "ERROR: " << errorMessage << std::endl;
-    });
-
     const ConfigurationManager configurationManager("config.json");
     const std::string DEFAULT_SERVER_IP("127.0.0.1");
     const std::string DEFAULT_SERVER_PORT("52124");
@@ -70,6 +66,22 @@ int main()
     const std::string serverIp = configurationManager.serverIpOrDefault(DEFAULT_SERVER_IP);
     const std::string serverPort = configurationManager.serverPortOrDefault(DEFAULT_SERVER_PORT);
     const std::string aiName = configurationManager.aiName(DEFAULT_AI_NAME);
+
+    std::ofstream traceLogFile("trace_client_ai_" + aiName + ".log", std::ios_base::app);
+    Logger::registerError([](const std::string& errorMessage) {
+        std::cout << "ERROR: " << errorMessage << std::endl;
+    });
+    Logger::registerInfo([](const std::string& message) {
+        std::cout << "INFO: " << message << std::endl;
+    });
+    Logger::registerTrace([&traceLogFile](const auto& traceMessage) {
+
+        auto currentTime = std::time(nullptr);
+        auto localTime = *std::localtime(&currentTime);
+
+        traceLogFile << std::put_time(&localTime, "%Y-%m-%dT%H-%M-%S") << ": " << traceMessage << std::endl;
+        traceLogFile.flush();
+    });
 
     const std::shared_ptr<Artificial> someAI = generateAI(aiName);
 
@@ -84,7 +96,9 @@ int main()
         const auto serverReceiver(std::make_shared<ServerReceiver>(connectionHandler, gameManager, physicsCommunicationAssembler, messageSerializer));
 
         const auto kdtreeCollisionDetectorFactory(std::make_shared<KdtreeCollisionDetectorFactory>());
-        const auto physicsManager(std::make_shared<PhysicsManager>(gameManager, kdtreeCollisionDetectorFactory));
+        const auto physicsManager(std::make_shared<PhysicsManager>(gameManager, kdtreeCollisionDetectorFactory, std::make_shared<PhysicsStats>()));
+
+        const auto aiStats(std::make_shared<AiStats>());
 
         serverReceiver->startAsync();
         physicsManager->startAsync();
@@ -100,6 +114,7 @@ int main()
             const auto endFrameTime = std::chrono::steady_clock::now();
 
             const auto frameTimeInMs = (unsigned int)std::chrono::duration<double, std::milli>(endFrameTime - startFrameTime).count();
+            aiStats->feedFrameDuration(frameTimeInMs);
 
             if (frameTimeInMs < MS_PER_FRAME)
             {

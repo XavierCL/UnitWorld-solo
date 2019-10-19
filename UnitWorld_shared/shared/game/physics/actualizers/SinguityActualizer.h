@@ -149,7 +149,7 @@ namespace uw
             _singuity->actualizeSpeed(acceleration);
 
             auto closestThing = _closestThingId.flatMap<std::shared_ptr<UnitWithHealthPoint>>([shootablesById](const xg::Guid& closestThingId) {
-                return shootablesById | findSafe<std::shared_ptr<UnitWithHealthPoint>>(closestThingId);
+                return shootablesById | find<std::shared_ptr<UnitWithHealthPoint>>(closestThingId);
             });
 
             Vector2D repulsionSpeed;

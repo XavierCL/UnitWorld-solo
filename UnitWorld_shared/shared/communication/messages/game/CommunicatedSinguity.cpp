@@ -1,5 +1,7 @@
 #include "CommunicatedSinguity.h"
 
+#include "commons/StringsHelper.h"
+
 #include <nlohmann/json.hpp>
 
 using namespace uw;
@@ -16,8 +18,8 @@ CommunicatedSinguity::CommunicatedSinguity(const xg::Guid& singuityId, const xg:
 
 nlohmann::json CommunicatedSinguity::toJson() const
 {
-    const auto singuityId = _singuityId.str();
-    const auto playerId = _playerId.str();
+    const auto singuityId = _singuityId.toBase64();
+    const auto playerId = _playerId.toBase64();
     const auto position = _position.toJson();
     const auto speed = _speed.toJson();
     const auto destination = _destination
@@ -42,8 +44,8 @@ CommunicatedSinguity CommunicatedSinguity::fromJson(const nlohmann::json& parsed
     const auto destinationJson = parsedJson.at(DESTINATION_LABEL);
 
     return CommunicatedSinguity(
-        xg::Guid(parsedJson.at(SINGUITY_ID_LABEL).get<std::string>()),
-        xg::Guid(parsedJson.at(PLAYER_ID_LABEL).get<std::string>()),
+        xg::Guid::fromBase64(parsedJson.at(SINGUITY_ID_LABEL).get<std::string>()),
+        xg::Guid::fromBase64(parsedJson.at(PLAYER_ID_LABEL).get<std::string>()),
         CommunicatedVector2D::fromJson(parsedJson.at(POSITION_LABEL)),
         CommunicatedVector2D::fromJson(parsedJson.at(SPEED_LABEL)),
         destinationJson.is_string() && destinationJson.get<std::string>() == NO_DESTINATION_VALUE

@@ -33,6 +33,7 @@
     <ClInclude Include="clientAis\ais\xaviercl\strongholdAi2\StrongholdAi2.h" />
     <ClInclude Include="clientAis\ais\xaviercl\strongholdAi\StrongholdAi.h" />
     <ClInclude Include="clientAis\ais\xaviercl\xavierclAi1\XavierclAi1.h" />
+    <ClInclude Include="clientAis\AiStats.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Commons\Commons.vcxproj">

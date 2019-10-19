@@ -168,6 +168,7 @@
     <ClInclude Include="shared\game\physics\collisions\NaiveCollisionDetectorFactory.h" />
     <ClInclude Include="shared\game\physics\PhysicsManager.h" />
     <ClInclude Include="shared\game\geometry\Vector2D.h" />
+    <ClInclude Include="shared\game\physics\PhysicsStats.h" />
     <ClInclude Include="shared\game\play\CompleteGameState.h" />
     <ClInclude Include="shared\game\play\units\MobileUnit.h" />
     <ClInclude Include="shared\game\play\players\Player.h" />

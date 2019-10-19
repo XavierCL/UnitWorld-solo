@@ -11,7 +11,7 @@ CommunicatedPlayer::CommunicatedPlayer(const xg::Guid& playerId) :
 nlohmann::json CommunicatedPlayer::toJson() const
 {
     nlohmann::json jsonData = {
-        {PLAYER_ID_LABEL, _playerId.str()}
+        {PLAYER_ID_LABEL, _playerId.toBase64()}
     };
 
     return jsonData;
@@ -19,7 +19,7 @@ nlohmann::json CommunicatedPlayer::toJson() const
 
 CommunicatedPlayer CommunicatedPlayer::fromJson(const nlohmann::json& parsedJson)
 {   
-    return CommunicatedPlayer(xg::Guid(parsedJson.at(PLAYER_ID_LABEL).get<std::string>()));
+    return CommunicatedPlayer(xg::Guid::fromBase64(parsedJson.at(PLAYER_ID_LABEL).get<std::string>()));
 }
 
 xg::Guid CommunicatedPlayer::playerId() const

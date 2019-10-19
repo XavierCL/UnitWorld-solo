@@ -165,6 +165,9 @@
     <ClInclude Include="shared\communication\messages\commands\SetSpawnersRallyMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="shared\game\physics\PhysicsStats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="shared\communication\MessageWrapper.cpp">
@@ -228,12 +231,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\communication\messages\commands\MoveMobileUnitsToSpawner.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shared\communication\messages\commands\SetSpawnersRallyToPositionMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shared\communication\messages\commands\SetSpawnersRallyToSpawner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\communication\messages\commands\SetSpawnersRallyMessage.cpp">

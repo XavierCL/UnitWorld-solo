@@ -27,6 +27,8 @@ THE SOFTWARE.
 
 #pragma once
 
+#include "StringsHelper.h"
+
 #ifdef GUID_ANDROID
 #include <thread>
 #include <jni.h>
@@ -57,6 +59,21 @@ public:
 
     explicit Guid(std::string_view fromString);
     Guid();
+    Guid(const char* rawData)
+    {
+        memcpy(_bytes.data(), rawData, _bytes.size());
+    }
+
+    static Guid fromBase64(const std::string& data)
+    {
+        const auto decodedData = StringsHelper::base64Decode(data.data(), data.size());
+        return Guid(decodedData.data());
+    }
+
+    std::string toBase64() const
+    {
+        return StringsHelper::base64Encode(_bytes.data(), _bytes.size());
+    }
 
     Guid(const Guid &other) = default;
     Guid &operator=(const Guid &other) = default;
