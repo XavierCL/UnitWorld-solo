@@ -59,7 +59,7 @@ namespace uw
             _gameManager->removeNewIndependentGameStateCallback(PLAYER_INPUT_GAME_MANAGER_CALLBACK_ID);
 
             {
-                auto wakerLock = std::unique_lock<std::mutex>(_sendCompleteGameStateMutex);
+                auto wakerLock = std::lock_guard<std::mutex>(_sendCompleteGameStateMutex);
                 _isRunning = false;
                 _completeStateWaker.notify_all();
             }
@@ -71,15 +71,23 @@ namespace uw
 
         void onGameManagerHasPlayerInput()
         {
-            auto wakerLock = std::unique_lock<std::mutex>(_sendCompleteGameStateMutex);
             _hasStateChanged = true;
-            _completeStateWaker.notify_one();
+            auto wakerLock = std::unique_lock<std::mutex>(_sendCompleteGameStateMutex, std::try_to_lock);
+
+            if (wakerLock.owns_lock())
+            {
+                _completeStateWaker.notify_one();
+            }
         }
 
         void onGameManagerHasNewGameState()
         {
-            auto wakerLock = std::unique_lock<std::mutex>(_sendCompleteGameStateMutex);
-            _completeStateWaker.notify_one();
+            auto wakerLock = std::unique_lock<std::mutex>(_sendCompleteGameStateMutex, std::try_to_lock);
+
+            if (wakerLock.owns_lock())
+            {
+                _completeStateWaker.notify_one();
+            }
         }
 
         void loopSendCompleteState()
