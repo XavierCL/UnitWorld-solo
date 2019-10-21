@@ -87,6 +87,7 @@ namespace uw
                 if (clickedOnOwnSpawner)
                 {
                     _selectedSpawners = currentPlayerSpawners;
+                    _selectedUnits = std::make_shared<std::unordered_set<xg::Guid>>();
                 }
             });
         }
