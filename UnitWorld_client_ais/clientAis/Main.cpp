@@ -15,6 +15,8 @@
 #include "ais/xaviercl/strongholdAi2/StrongholdAi2.h"
 #include "ais/xaviercl/arcAi/ArcAi.h"
 
+#include "ais/johnwl/microer/Microer.h"
+
 #include "clientShared/networking/ServerReceiver.h"
 
 #include "shared/game/physics/collisions/KdtreeCollisionDetectorFactory.h"
@@ -52,6 +54,10 @@ std::shared_ptr<Artificial> generateAI(const std::string& aiName)
     else if (aiName == "arcAi")
     {
         return std::make_shared<ArcAi>();
+    }
+    else if (aiName == "microer")
+    {
+        return std::make_shared<Microer>();
     }
     else
     {
