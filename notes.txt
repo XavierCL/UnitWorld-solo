@@ -1,0 +1,8 @@
+1. more feedback: hud on selecting troops and spawners, individual info and aggregated info
+2. have big planets (constellations) producing lots of singuities per second
+3. neutral units (like civilisation)
+4. moving spawners
+5. death objects, passing through kills units
+6. hot keys for spawners
+7. show hotkeys
+8. two sorts of units

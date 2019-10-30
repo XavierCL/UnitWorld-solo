@@ -41,5 +41,8 @@
     <ClInclude Include="clientAis\AiStats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="clientAis\ais\xaviercl\arcAi\ArcAi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

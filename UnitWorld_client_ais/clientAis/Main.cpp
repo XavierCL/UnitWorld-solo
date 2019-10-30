@@ -13,6 +13,7 @@
 #include "ais/xaviercl/packAi/PackAi.h"
 #include "ais/xaviercl/strongholdAi/StrongholdAi.h"
 #include "ais/xaviercl/strongholdAi2/StrongholdAi2.h"
+#include "ais/xaviercl/arcAi/ArcAi.h"
 
 #include "clientShared/networking/ServerReceiver.h"
 
@@ -47,6 +48,10 @@ std::shared_ptr<Artificial> generateAI(const std::string& aiName)
     else if (aiName == "strongholdAi2")
     {
         return std::make_shared<StrongholdAi2>();
+    }
+    else if (aiName == "arcAi")
+    {
+        return std::make_shared<ArcAi>();
     }
     else
     {
