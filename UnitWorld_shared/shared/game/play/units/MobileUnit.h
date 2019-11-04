@@ -52,6 +52,16 @@ namespace uw
                 .getOrElse(false);
         }
 
+        bool hasSpawnerDestination(const xg::Guid& spawnerDestinationId)
+        {
+            return _destination
+                .map<bool>([&spawnerDestinationId](const MobileUnitDestination& destination) { return destination.map<bool>(
+                    [](const Vector2D& positionDestination) { return false; },
+                    [&spawnerDestinationId](const SpawnerDestination& spawnerDestination) { return spawnerDestination.spawnerId() == spawnerDestinationId;  },
+                    [&spawnerDestinationId](const xg::Guid unconditionalSpawnerDestination) { return unconditionalSpawnerDestination == spawnerDestinationId; }
+                ); }).getOrElse(false);
+        }
+
         void setPointDestination(const Vector2D& destination)
         {
             _destination = Options::Some(MobileUnitDestination(destination));
