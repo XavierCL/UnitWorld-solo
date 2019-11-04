@@ -9,18 +9,18 @@ namespace uw
     class Shooter: virtual public Unit
     {
     public:
-        Shooter(const Vector2D& position) :
-            Unit(position),
+        Shooter(const Vector2D& position, const double& radius) :
+            Unit(position, radius),
             _lastShootFameCount(0)
         {}
 
-        Shooter(const Vector2D& position, unsigned long long& lastShootFrameCount) :
-            Unit(position),
+        Shooter(const Vector2D& position, const double& radius, unsigned long long& lastShootFrameCount) :
+            Unit(position, radius),
             _lastShootFameCount(lastShootFrameCount)
         {}
 
-        Shooter(const xg::Guid& id, const Vector2D& position, const unsigned long long& lastShootFrameCount) :
-            Unit(id, position),
+        Shooter(const xg::Guid& id, const Vector2D& position, const double& radius, const unsigned long long& lastShootFrameCount) :
+            Unit(id, position, radius),
             _lastShootFameCount(lastShootFrameCount)
         {}
 
@@ -30,7 +30,7 @@ namespace uw
             // When enemies are already dead, keep the shooting for the next frame
             if (_lastShootFameCount + shootFramelag() <= frameCount
                 && !unitWithHealthPoint->isDead()
-                && position().distanceSq(unitWithHealthPoint->position()) < maxShootingRangeSq())
+                && position().distanceSq(unitWithHealthPoint->position()) < maxShootingRangeSq() + radius() + unitWithHealthPoint->radius())
             {
                 _lastShootFameCount = frameCount;
                 unitWithHealthPoint->loseHealthPoint(firePower());

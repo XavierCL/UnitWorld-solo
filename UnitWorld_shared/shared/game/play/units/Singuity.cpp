@@ -3,23 +3,23 @@
 using namespace uw;
 
 Singuity::Singuity(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<MobileUnitDestination>& destination, const double& healthPoints, const unsigned long long& lastShootFrameCount) :
-    Unit(id, position),
+    Unit(id, position, singuityRadius()),
     MobileUnit(id, position, speed, destination),
-    Shooter(id, position, lastShootFrameCount),
+    Shooter(id, position, lastShootFrameCount, singuityRadius()),
     UnitWithHealthPoint(id, position, healthPoints)
 {}
 
 Singuity::Singuity(const Vector2D& position, const Vector2D& speed, const Option<MobileUnitDestination>& destination) :
-    Unit(position),
+    Unit(position, singuityRadius()),
     MobileUnit(position, speed, destination),
-    Shooter(position),
+    Shooter(position, singuityRadius()),
     UnitWithHealthPoint(position, maximumHealthPoint())
 {}
 
 Singuity::Singuity(const Vector2D& position) :
-    Unit(position),
+    Unit(position, singuityRadius()),
     MobileUnit(position),
-    Shooter(position),
+    Shooter(position, singuityRadius()),
     UnitWithHealthPoint(position, maximumHealthPoint())
 {}
 
@@ -67,5 +67,5 @@ double Singuity::firePower() const
 
 double uw::Singuity::maxShootingRangeSq() const
 {
-    return 700.0;
+    return 340.0;
 }

@@ -23,17 +23,17 @@ namespace uw
 
         double reguvenatingHealth() const
         {
-            return 20.0;
-        }
-
-        double spawnerAttackHealth() const
-        {
-            return 20.0;
+            return 50.0;
         }
 
     private:
         unsigned long long shootFramelag() const override;
         double firePower() const override;
         double maxShootingRangeSq() const override;
+
+        static double singuityRadius()
+        {
+            return 4.0;
+        }
     };
 }
