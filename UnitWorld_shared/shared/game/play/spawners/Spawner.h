@@ -76,6 +76,8 @@ namespace uw
                     _lastSpawnFrameCount = frameCount;
                     ++_totalSpawnedCount;
 
+                    gainHealthPoint(33.0, allegence.allegedPlayerId());
+
                     const std::shared_ptr<Singuity> spawnedSinguity = std::make_shared<Singuity>(Singuity::spawn(
                         position(),
                         UNIT_SPAWN_DIRECTION[_totalSpawnedCount % UNIT_SPAWN_DIRECTION.size()],
@@ -172,17 +174,22 @@ namespace uw
         {
             if (canBeReguvenatedBy(playerId))
             {
-                double gainedHealthPoint = healthPoint() + reguvenator->reguvenatingHealth() > maximumHealthPoint()
-                    ? maximumHealthPoint() - healthPoint()
-                    : reguvenator->reguvenatingHealth();
-                UnitWithHealthPoint::gainHealthPoint(gainedHealthPoint);
-                _allegence = _allegence.map<SpawnerAllegence>([&gainedHealthPoint](const SpawnerAllegence& oldAllegence) {
-                    return oldAllegence.gainHealthPoint(gainedHealthPoint);
-                }).orElse([&playerId, &gainedHealthPoint]() {
-                    return SpawnerAllegence(false, gainedHealthPoint, playerId);
-                });
+                Spawner::gainHealthPoint(reguvenator->reguvenatingHealth(), playerId);
                 reguvenator->makeHealthPointNone();
             }
+        }
+
+        void gainHealthPoint(const double& requestedHealthPoint, const xg::Guid& playerId)
+        {
+            double gainedHealthPoint = healthPoint() + requestedHealthPoint > maximumHealthPoint()
+                ? maximumHealthPoint() - healthPoint()
+                : requestedHealthPoint;
+            UnitWithHealthPoint::gainHealthPoint(gainedHealthPoint);
+            _allegence = _allegence.map<SpawnerAllegence>([&gainedHealthPoint](const SpawnerAllegence& oldAllegence) {
+                return oldAllegence.gainHealthPoint(gainedHealthPoint);
+            }).orElse([&playerId, &gainedHealthPoint]() {
+                return SpawnerAllegence(false, gainedHealthPoint, playerId);
+            });
         }
 
         void setRally(const MobileUnitDestination& rally)
