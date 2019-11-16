@@ -124,7 +124,7 @@ namespace uw
         {
             auto workingGameState(std::make_shared<CompleteGameState>(*_completeGameState));
 
-            auto newPlayer = _nextAddPlayer.exchange(nullptr);
+            const auto newPlayer = _nextAddedPlayer.exchange(nullptr);
             if (newPlayer)
             {
                 workingGameState->addPlayer(std::shared_ptr<Player>(newPlayer));
