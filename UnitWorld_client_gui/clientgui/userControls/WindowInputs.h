@@ -15,8 +15,7 @@ namespace uw
             _camera(camera),
             _isLeftControlKeyPressed(false),
             _isRapidClicking(false),
-            _justClicked(false),
-            _screenRelativeRectangle(screenRelativeRectangle)
+            _justClicked(false)
         {}
 
         void frameHappened()
@@ -67,37 +66,37 @@ namespace uw
             _camera->mouseScrolled(delta, mousePosition);
         }
 
-		void userPressedLeftControl()
-		{
-			_isLeftControlKeyPressed = true;
-		}
+        void userPressedLeftControl()
+        {
+            _isLeftControlKeyPressed = true;
+        }
 
-		void userReleasedLeftControl()
-		{
-			_isLeftControlKeyPressed = false;
-		}
+        void userReleasedLeftControl()
+        {
+            _isLeftControlKeyPressed = false;
+        }
 
-		void userPressedLeftShift()
-		{
+        void userPressedLeftShift()
+        {
             _userControlState->userPressedLeftShift();
-		}
+        }
 
-		void userReleasedLeftShift()
-		{
+        void userReleasedLeftShift()
+        {
             _userControlState->userReleasedLeftShift();
-		}
+        }
 
-		void userPressedNumber(const int& numberKey)
-		{
-			if (_isLeftControlKeyPressed)
-			{
-				_userControlState->setSelectedUnitsToUnitGroup(numberKey);
-			}
-			else
-			{
-				_userControlState->setUnitGroupToSelectedUnits(numberKey);
-			}
-		}
+        void userPressedNumber(const int& numberKey)
+        {
+            if (_isLeftControlKeyPressed)
+            {
+                _userControlState->addSelectedUnitsToUnitGroup(numberKey);
+            }
+            else
+            {
+                _userControlState->setSelectedUnitToUnitGroup(numberKey);
+            }
+        }
 
         void userPressedAKey()
         {
@@ -106,19 +105,18 @@ namespace uw
 
         void userPressedAddKey()
         {
-            _camera->mouseScrolled(1, _screenRelativeRectangle.center());
+            _camera->mouseScrolled(1);
         }
 
         void userPressedSubstractKey()
         {
-            _camera->mouseScrolled(-1, _screenRelativeRectangle.center());
+            _camera->mouseScrolled(-1);
         }
 
     private:
         const std::shared_ptr<UserControlState> _userControlState;
         const std::shared_ptr<Camera> _camera;
-        const Rectangle _screenRelativeRectangle;
-		bool _isLeftControlKeyPressed;
+        bool _isLeftControlKeyPressed;
         bool _isRapidClicking;
         bool _justClicked;
     };
