@@ -4,7 +4,7 @@
 
 using namespace uw;
 
-CommunicatedCompleteGameState::CommunicatedCompleteGameState(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const std::vector<CommunicatedSpawner>& spawners, const unsigned long long& frameCount):
+CommunicatedCompleteGameState::CommunicatedCompleteGameState(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const std::vector<CommunicatedSpawner>& spawners, const long long& frameCount):
     _players(players),
     _singuities(singuities),
     _spawners(spawners),
@@ -12,7 +12,7 @@ CommunicatedCompleteGameState::CommunicatedCompleteGameState(const std::vector<C
     _json(generateJson(players, singuities, spawners, frameCount))
 {}
 
-CommunicatedCompleteGameState::CommunicatedCompleteGameState(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const std::vector<CommunicatedSpawner>& spawners, const unsigned long long& frameCount, const nlohmann::json& json) :
+CommunicatedCompleteGameState::CommunicatedCompleteGameState(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const std::vector<CommunicatedSpawner>& spawners, const long long& frameCount, const nlohmann::json& json) :
     _players(players),
     _singuities(singuities),
     _spawners(spawners),
@@ -45,7 +45,7 @@ CommunicatedCompleteGameState CommunicatedCompleteGameState::fromJson(const nloh
         spawners.emplace_back(CommunicatedSpawner::fromJson(parsedSpawner));
     }
 
-    return CommunicatedCompleteGameState(players, singuities, spawners, parsedJson.at(FRAME_COUNT_LABEL).get<unsigned long long>(), parsedJson);
+    return CommunicatedCompleteGameState(players, singuities, spawners, parsedJson.at(FRAME_COUNT_LABEL).get<long long>(), parsedJson);
 }
 
 const std::string CommunicatedCompleteGameState::PLAYERS_LABEL = "p";

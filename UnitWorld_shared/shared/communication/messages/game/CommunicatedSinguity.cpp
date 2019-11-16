@@ -6,7 +6,7 @@
 
 using namespace uw;
 
-CommunicatedSinguity::CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedSinguityDestination>& destination, const double& healthPoint, const unsigned long long& lastShootFrameCount) :
+CommunicatedSinguity::CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedSinguityDestination>& destination, const double& healthPoint, const long long& lastShootFrameCount) :
     _singuityId(singuityId),
     _playerId(playerId),
     _position(position),
@@ -52,7 +52,7 @@ CommunicatedSinguity CommunicatedSinguity::fromJson(const nlohmann::json& parsed
             ? Options::None<CommunicatedSinguityDestination>()
             : Options::Some(CommunicatedSinguityDestination::fromJson(destinationJson)),
         parsedJson.at(HEALTH_POINTS_LABEL).get<double>(),
-        parsedJson.at(LAST_SHOOT_FRAME_COUNT_LABEL).get<unsigned long long>()
+        parsedJson.at(LAST_SHOOT_FRAME_COUNT_LABEL).get<long long>()
     );
 }
 
@@ -86,7 +86,7 @@ double CommunicatedSinguity::healthPoint() const
     return _healthPoint;
 }
 
-unsigned long long CommunicatedSinguity::lastShootFrameCount() const
+long long CommunicatedSinguity::lastShootFrameCount() const
 {
     return _lastShootFameCount;
 }

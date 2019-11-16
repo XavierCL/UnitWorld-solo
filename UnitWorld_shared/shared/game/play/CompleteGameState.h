@@ -8,7 +8,7 @@ namespace uw
     class CompleteGameState
     {
     public:
-        CompleteGameState(std::vector<std::shared_ptr<Spawner>>&& spawners, std::vector<std::shared_ptr<Player>>&& players, const unsigned long long frameCount) :
+        CompleteGameState(std::vector<std::shared_ptr<Spawner>>&& spawners, std::vector<std::shared_ptr<Player>>&& players, const long long frameCount) :
             _spawners(std::forward<std::vector<std::shared_ptr<Spawner>>>(spawners)),
             _players(std::forward<std::vector<std::shared_ptr<Player>>>(players)),
             _frameCount(frameCount),
@@ -68,7 +68,7 @@ namespace uw
             _version = xg::newGuid();
         }
 
-        unsigned long long frameCount() const
+        long long frameCount() const
         {
             return _frameCount;
         }
@@ -87,7 +87,7 @@ namespace uw
     private:
         std::vector<std::shared_ptr<Spawner>> _spawners;
         std::vector<std::shared_ptr<Player>> _players;
-        unsigned long long _frameCount;
+        long long _frameCount;
         xg::Guid _version;
     };
 }

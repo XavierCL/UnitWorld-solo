@@ -20,7 +20,8 @@ nlohmann::json CommunicatedSpawner::toJson() const
         {ALLEGENCE_LABEL, allegenceData},
         {RALLY_LABEL, rallyData},
         {LAST_SPAWN_FRAME_COUNT_LABEL, _lastSpawnFrameCount},
-        {TOTAL_SPAWNED_COUNT_LABEL, _totalSpawnedCount}
+        {TOTAL_SPAWNED_COUNT_LABEL, _totalSpawnedCount},
+        {LAST_CLAIMED_FRAME_COUNT_LABEL, _lastClaimedFrameCount}
     };
 
     return jsonData;
@@ -40,8 +41,9 @@ CommunicatedSpawner CommunicatedSpawner::fromJson(const nlohmann::json& parsedJs
         parsedRally.is_string() && parsedRally.get<std::string>() == NO_RALLY_VALUE
             ? Options::None<CommunicatedSinguityDestination>()
             : Options::Some(CommunicatedSinguityDestination::fromJson(parsedRally)),
-        parsedJson.at(LAST_SPAWN_FRAME_COUNT_LABEL).get<unsigned long long>(),
-        parsedJson.at(TOTAL_SPAWNED_COUNT_LABEL).get<unsigned long long>()
+        parsedJson.at(LAST_SPAWN_FRAME_COUNT_LABEL).get<long long>(),
+        parsedJson.at(TOTAL_SPAWNED_COUNT_LABEL).get<long long>(),
+        parsedJson.at(LAST_CLAIMED_FRAME_COUNT_LABEL).get<long long>()
     );
 }
 
@@ -53,3 +55,4 @@ const std::string CommunicatedSpawner::ALLEGENCE_LABEL = "a";
 const std::string CommunicatedSpawner::RALLY_LABEL = "r";
 const std::string CommunicatedSpawner::LAST_SPAWN_FRAME_COUNT_LABEL = "l";
 const std::string CommunicatedSpawner::TOTAL_SPAWNED_COUNT_LABEL = "t";
+const std::string CommunicatedSpawner::LAST_CLAIMED_FRAME_COUNT_LABEL = "c";

@@ -44,7 +44,7 @@ namespace uw
                     return potentialCapturesRelativeDistances[first.first] < potentialCapturesRelativeDistances[second.first];
                 });
 
-                std::unordered_map<xg::Guid, unsigned long long> spawnerEnemyStrongholds = getEnemySpawnerStrongholds(completeGameState, currentPlayer->id());
+                std::unordered_map<xg::Guid, long long> spawnerEnemyStrongholds = getEnemySpawnerStrongholds(completeGameState, currentPlayer->id());
 
                 // application of the singuity attacks
                 std::unordered_set<xg::Guid> singuitiesWentAttacking;
@@ -261,9 +261,9 @@ namespace uw
             return relativeDistances;
         }
 
-        std::unordered_map<xg::Guid, unsigned long long> getEnemySpawnerStrongholds(std::shared_ptr<const CompleteGameState> completeGameState, const xg::Guid& currentPlayerId)
+        std::unordered_map<xg::Guid, long long> getEnemySpawnerStrongholds(std::shared_ptr<const CompleteGameState> completeGameState, const xg::Guid& currentPlayerId)
         {
-            std::unordered_map<xg::Guid, unsigned long long> enemyStrongholds;
+            std::unordered_map<xg::Guid, long long> enemyStrongholds;
 
             std::shared_ptr<CollisionDetector> spawnersCollisionDetector = getCollisionDetectorForSpawners(completeGameState->spawners());
 
@@ -289,11 +289,11 @@ namespace uw
                 }
                 else if (spawner->isClaimed())
                 {
-                    enemyStrongholds[spawner->id()] += ceil(spawner->healthPoint() / referenceSinguity.spawnerAttackHealth());
+                    enemyStrongholds[spawner->id()] += ceil(spawner->healthPoint() / 20.0);
                 }
                 else
                 {
-                    enemyStrongholds[spawner->id()] += ceil(spawner->maximumHealthPoint() / referenceSinguity.reguvenatingHealth()) + ceil(spawner->healthPoint() / referenceSinguity.spawnerAttackHealth());
+                    enemyStrongholds[spawner->id()] += ceil(spawner->maximumHealthPoint() / referenceSinguity.reguvenatingHealth()) + ceil(spawner->healthPoint() / 20.0);
                 }
             }
 

@@ -25,15 +25,15 @@ namespace uw
             _player->removeSinguityAddedCallback(_singuityAddedCallbackId);
         }
 
-        void updateCollisions(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
+        void updateCollisions(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> singuityCollisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, std::shared_ptr<CollisionDetector> spawnerCollisionDetector, const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById, const long long& frameCount)
         {
             for (auto& singuityActualizer : *_singuityActualizers)
             {
-                singuityActualizer->updateCollisions(_player->id(), collisionDetectorsByPlayerId, shootablesById);
+                singuityActualizer->updateCollisions(_player->id(), singuityCollisionDetectorsByPlayerId, shootablesById, spawnerCollisionDetector, spawnersById, frameCount);
             }
         }
 
-        void shootEnemies(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameCount)
+        void shootEnemies(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const long long& frameCount)
         {
             for (auto& singuityActualizer : *_singuityActualizers)
             {

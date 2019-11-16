@@ -35,7 +35,7 @@ std::string MessageWrapper::json() const
     return _json;
 }
 
-unsigned long long MessageWrapper::timestamp() const
+long long MessageWrapper::timestamp() const
 {
     return _timestamp;
 }
@@ -45,7 +45,7 @@ MessageType MessageWrapper::messageType() const
     return _innerMessage->messageType();
 }
 
-std::string MessageWrapper::wrapMessageToJson(const std::shared_ptr<const Message> message, const unsigned long long& timestamp)
+std::string MessageWrapper::wrapMessageToJson(const std::shared_ptr<const Message> message, const long long& timestamp)
 {
     nlohmann::json jsonMessage = {
         {MESSAGE_TYPE_JSON_ATTRIBUTE, message->messageType()},
@@ -84,7 +84,7 @@ std::shared_ptr<const Message> MessageWrapper::jsonToMessage(const nlohmann::jso
     }
 }
 
-unsigned long long MessageWrapper::jsonToTimestamp(const nlohmann::json& json)
+long long MessageWrapper::jsonToTimestamp(const nlohmann::json& json)
 {
-    return json.at(MESSAGE_TIMESTAMP_JSON_ATTRIBUTE).get<unsigned long long>();
+    return json.at(MESSAGE_TIMESTAMP_JSON_ATTRIBUTE).get<long long>();
 }

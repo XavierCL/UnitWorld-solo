@@ -160,7 +160,8 @@ namespace uw
                 }),
                 spawner->rally().map<CommunicatedSinguityDestination>(std::bind(&PhysicsCommunicationAssembler::physicsSinguityDestinationToCommunicated, this, std::placeholders::_1)),
                 spawner->lastSpawnFrameCount(),
-                spawner->totalSpawnedCount()
+                spawner->totalSpawnedCount(),
+                spawner->lastClaimedFrameCount()
             );
         }
 
@@ -174,7 +175,8 @@ namespace uw
                 }),
                 spawner.rally().map<MobileUnitDestination>(std::bind(&PhysicsCommunicationAssembler::communicatedSinguityDestinationToPhysics, this, std::placeholders::_1)),
                 spawner.lastSpawnFrameCount(),
-                spawner.totalSpawnedCount()
+                spawner.totalSpawnedCount(),
+                spawner.lastClaimedFrameCount()
             );
         }
 

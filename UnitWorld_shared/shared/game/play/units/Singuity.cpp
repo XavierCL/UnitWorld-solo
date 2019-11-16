@@ -2,25 +2,25 @@
 
 using namespace uw;
 
-Singuity::Singuity(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<MobileUnitDestination>& destination, const double& healthPoints, const unsigned long long& lastShootFrameCount) :
+Singuity::Singuity(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<MobileUnitDestination>& destination, const double& healthPoints, const long long& lastShootFrameCount) :
     Unit(id, position, singuityRadius()),
-    MobileUnit(id, position, speed, destination),
+    MobileUnit(id, position, singuityRadius(), speed, destination),
     Shooter(id, position, lastShootFrameCount, singuityRadius()),
-    UnitWithHealthPoint(id, position, healthPoints)
+    UnitWithHealthPoint(id, position, singuityRadius(), healthPoints)
 {}
 
 Singuity::Singuity(const Vector2D& position, const Vector2D& speed, const Option<MobileUnitDestination>& destination) :
     Unit(position, singuityRadius()),
-    MobileUnit(position, speed, destination),
+    MobileUnit(position, singuityRadius(), speed, destination),
     Shooter(position, singuityRadius()),
-    UnitWithHealthPoint(position, maximumHealthPoint())
+    UnitWithHealthPoint(position, singuityRadius(), maximumHealthPoint())
 {}
 
 Singuity::Singuity(const Vector2D& position) :
     Unit(position, singuityRadius()),
-    MobileUnit(position),
+    MobileUnit(position, singuityRadius()),
     Shooter(position, singuityRadius()),
-    UnitWithHealthPoint(position, maximumHealthPoint())
+    UnitWithHealthPoint(position, singuityRadius(), maximumHealthPoint())
 {}
 
 Singuity::Singuity(const Singuity& other) :
@@ -55,7 +55,7 @@ double Singuity::maximumHealthPoint() const
     return 20.0;
 }
 
-unsigned long long Singuity::shootFramelag() const
+long long Singuity::shootFramelag() const
 {
     return 10;
 }
@@ -65,7 +65,7 @@ double Singuity::firePower() const
     return 5.0;
 }
 
-double uw::Singuity::maxShootingRangeSq() const
+double uw::Singuity::maxShootingRange() const
 {
-    return 340.0;
+    return 18.0;
 }

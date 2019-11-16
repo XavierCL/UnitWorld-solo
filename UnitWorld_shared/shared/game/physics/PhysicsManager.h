@@ -95,6 +95,11 @@ namespace uw
                     }
                 }
 
+                for (auto spawner: workingSpawners)
+                {
+                    shootablesById->emplace(std::make_pair<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>(spawner->id(), spawner));
+                }
+
                 std::unordered_map<xg::Guid, xg::Guid> playerIdBySinguityId;
                 playerIdBySinguityId.reserve(shootablesById->size());
                 for (const auto& player : workingPlayers)
@@ -124,10 +129,19 @@ namespace uw
                         _collisionDetectorsByPlayerId->at(player->id())->updateAllCollidablePoints(collidablePointsByPlayerId[player->id()]);
                     }
 
-                    _completeGameStateActualizer->updateCollisions(_collisionDetectorsByPlayerId, shootablesById);
+                    std::vector<CollidablePoint> collidablePoints;
+                    for (auto spawner : completeGameState->spawners())
+                    {
+                        collidablePoints.emplace_back(spawner->id(), spawner->position());
+                    }
+
+                    const auto spawnerCollisionDetector = _collisionDetectorFactory->create();
+                    spawnerCollisionDetector->updateAllCollidablePoints(collidablePoints);
+
+                    _completeGameStateActualizer->updateCollisions(_collisionDetectorsByPlayerId, shootablesById, spawnerCollisionDetector, *spawnersById);
                 }
 
-                _completeGameStateActualizer->shootEnemies(shootablesById, completeGameState->frameCount());
+                _completeGameStateActualizer->shootEnemies(shootablesById);
                 _completeGameStateActualizer->updatePhysics(*spawnersById, shootablesById);
                 _completeGameStateActualizer->updateSpawnerAllegences();
 

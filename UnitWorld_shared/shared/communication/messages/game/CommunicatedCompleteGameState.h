@@ -13,8 +13,8 @@ namespace uw
     class CommunicatedCompleteGameState
     {
     public:
-        CommunicatedCompleteGameState(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const std::vector<CommunicatedSpawner>& spawners, const unsigned long long& frameCount);
-        CommunicatedCompleteGameState(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const std::vector<CommunicatedSpawner>& spawners, const unsigned long long& frameCount, const nlohmann::json& json);
+        CommunicatedCompleteGameState(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const std::vector<CommunicatedSpawner>& spawners, const long long& frameCount);
+        CommunicatedCompleteGameState(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const std::vector<CommunicatedSpawner>& spawners, const long long& frameCount, const nlohmann::json& json);
 
         nlohmann::json toJson() const;
 
@@ -33,7 +33,7 @@ namespace uw
             return _singuities;
         }
 
-        const unsigned long long frameCount() const
+        const long long frameCount() const
         {
             return _frameCount;
         }
@@ -42,7 +42,7 @@ namespace uw
 
     private:
 
-        static nlohmann::json generateJson(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const std::vector<CommunicatedSpawner>& spawners, const unsigned long long& frameCount)
+        static nlohmann::json generateJson(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const std::vector<CommunicatedSpawner>& spawners, const long long& frameCount)
         {
             std::vector<nlohmann::json> jsonPlayers;
             for (const auto& player : players)
@@ -80,7 +80,7 @@ namespace uw
         std::vector<CommunicatedPlayer> _players;
         std::vector<CommunicatedSinguity> _singuities;
         std::vector<CommunicatedSpawner> _spawners;
-        unsigned long long _frameCount;
+        long long _frameCount;
 
         nlohmann::json _json;
     };

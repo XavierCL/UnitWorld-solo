@@ -91,7 +91,7 @@ namespace uw
 
         std::thread _receiveThread;
 
-        unsigned long long _mostRecentCompleteStateTimestamp;
+        long long _mostRecentCompleteStateTimestamp;
 
         const std::shared_ptr<CommunicationHandler> _serverHandler;
         const std::shared_ptr<GameManager> _gameManager;
