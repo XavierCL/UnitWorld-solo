@@ -10,10 +10,10 @@ namespace uw
     class WindowInputs
     {
     public:
-        WindowInputs(std::shared_ptr<UserControlState> userControlState, std::shared_ptr<Camera> camera)
-        : _userControlState(userControlState),
-        _camera(camera),
-		_isLeftControlKeyPressed(false)
+        WindowInputs(std::shared_ptr<UserControlState> userControlState, std::shared_ptr<Camera> camera) :
+            _userControlState(userControlState),
+            _camera(camera),
+            _isLeftControlKeyPressed(false)
         {}
 
         void frameHappened()
@@ -48,37 +48,37 @@ namespace uw
             _camera->mouseScrolled(delta, mousePosition);
         }
 
-		void userPressedLeftControl()
-		{
-			_isLeftControlKeyPressed = true;
-		}
+        void userPressedLeftControl()
+        {
+            _isLeftControlKeyPressed = true;
+        }
 
-		void userReleasedLeftControl()
-		{
-			_isLeftControlKeyPressed = false;
-		}
+        void userReleasedLeftControl()
+        {
+            _isLeftControlKeyPressed = false;
+        }
 
-		void userPressedLeftShift()
-		{
+        void userPressedLeftShift()
+        {
             _userControlState->userPressedLeftShift();
-		}
+        }
 
-		void userReleasedLeftShift()
-		{
+        void userReleasedLeftShift()
+        {
             _userControlState->userReleasedLeftShift();
-		}
+        }
 
-		void userPressedNumber(const int& numberKey)
-		{
-			if (_isLeftControlKeyPressed)
-			{
-				_userControlState->addSelectedUnitsToUnitGroup(numberKey);
-			}
-			else
-			{
-				_userControlState->setSelectedUnitToUnitGroup(numberKey);
-			}
-		}
+        void userPressedNumber(const int& numberKey)
+        {
+            if (_isLeftControlKeyPressed)
+            {
+                _userControlState->addSelectedUnitsToUnitGroup(numberKey);
+            }
+            else
+            {
+                _userControlState->setSelectedUnitToUnitGroup(numberKey);
+            }
+        }
 
         void userPressedAKey()
         {
@@ -88,6 +88,6 @@ namespace uw
     private:
         const std::shared_ptr<UserControlState> _userControlState;
         const std::shared_ptr<Camera> _camera;
-		bool _isLeftControlKeyPressed;
+        bool _isLeftControlKeyPressed;
     };
 }
