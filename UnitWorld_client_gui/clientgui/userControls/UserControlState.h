@@ -149,7 +149,7 @@ namespace uw
                             const auto singuityRelativeCircle(_cameraRelativeGameManager->relativeCircleOf(singuity));
                             return selectionRectangle.intersectsWith(singuityRelativeCircle);
                         }) | map<xg::Guid>([](std::shared_ptr<Singuity> singuity) { return singuity->id(); })
-                        | toUnorderedSet<xg::Guid>();
+                            | toUnorderedSet<xg::Guid>();
                     }).getOrElse(std::make_shared<std::unordered_set<xg::Guid>>());
                     if (_isLeftShiftKeyPressed)
                     {
@@ -278,14 +278,13 @@ namespace uw
             return *_lastSelectedSpawnerId;
         }
 
-		void setSelectedUnitsToUnitGroup(const int& unitGroupNumber)
-		{
-            const auto sharedSelectedUnitsCopy = _selectedUnits;
-            _unitGroups[unitGroupNumber] = *sharedSelectedUnitsCopy;
-		}
+        void addSelectedUnitsToUnitGroup(const int& unitGroupNumber)
+        {
+            _unitGroups[unitGroupNumber] = *_selectedUnits;
+        }
 
-		void setUnitGroupToSelectedUnits(const int& unitGroupNumber)
-		{
+        void setSelectedUnitToUnitGroup(const int& unitGroupNumber)
+        {
             _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
             _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();
             _selectedSpawners = std::make_shared<std::unordered_set<xg::Guid>>();
