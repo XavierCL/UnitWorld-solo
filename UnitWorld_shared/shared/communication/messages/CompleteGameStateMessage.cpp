@@ -11,13 +11,11 @@ CompleteGameStateMessage::CompleteGameStateMessage(const CommunicatedCompleteGam
     _currentPlayerId(currentPlayerId)
 {}
 
-std::shared_ptr<CompleteGameStateMessage> CompleteGameStateMessage::fromJson(const std::string& json)
+std::shared_ptr<CompleteGameStateMessage> CompleteGameStateMessage::fromJson(const nlohmann::json& json)
 {
-    nlohmann::json parsedData = nlohmann::json::parse(json);
-
     return std::make_shared<CompleteGameStateMessage>(
-        CommunicatedCompleteGameState::fromJson(parsedData.at(COMPLETE_GAME_STATE_LABEL)),
-        xg::Guid(parsedData.at(CURRENT_PLAYER_ID_LABEL).get<std::string>())
+        CommunicatedCompleteGameState::fromJson(json.at(COMPLETE_GAME_STATE_LABEL)),
+        xg::Guid::fromBase64(json.at(CURRENT_PLAYER_ID_LABEL).get<std::string>())
     );
 }
 
@@ -26,14 +24,14 @@ MessageType CompleteGameStateMessage::messageType() const
     return MessageType::CompleteGameStateMessageType;
 }
 
-std::string CompleteGameStateMessage::toJsonData() const
+nlohmann::json CompleteGameStateMessage::toJsonData() const
 {
     nlohmann::json jsonData = {
         {COMPLETE_GAME_STATE_LABEL, _completeGameState.toJson()},
-        {CURRENT_PLAYER_ID_LABEL, _currentPlayerId.str()}
+        {CURRENT_PLAYER_ID_LABEL, _currentPlayerId.toBase64()}
     };
 
-    return jsonData.dump();
+    return jsonData;
 }
 
 CommunicatedCompleteGameState CompleteGameStateMessage::completeGameState() const

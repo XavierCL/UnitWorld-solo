@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Message.h"
+#include "shared/communication/messages/Message.h"
 
-#include "game/CommunicatedVector2D.h"
+#include "shared/communication/messages/game/CommunicatedVector2D.h"
 
 #include <commons/Guid.hpp>
 
@@ -16,11 +16,11 @@ namespace uw
 
         MoveMobileUnitsToPositionMessage(const std::vector<xg::Guid>& singuityIds, const CommunicatedVector2D& destination);
 
-        static std::shared_ptr<MoveMobileUnitsToPositionMessage> fromJson(const std::string& json);
+        static std::shared_ptr<MoveMobileUnitsToPositionMessage> fromJson(const nlohmann::json& json);
 
         MessageType messageType() const;
 
-        std::string toJsonData() const;
+        nlohmann::json toJsonData() const;
 
         std::vector<xg::Guid> singuityIds() const;
 

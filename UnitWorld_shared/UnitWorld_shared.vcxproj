@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="shared\communication\messages\commands\SetSpawnersRallyMessage.h" />
     <ClInclude Include="shared\communication\messages\CompleteGameStateMessage.h" />
     <ClInclude Include="shared\communication\messages\game\CommunicatedCompleteGameState.h" />
     <ClInclude Include="shared\communication\messages\game\CommunicatedPlayer.h" />
@@ -142,14 +143,15 @@
     <ClInclude Include="shared\communication\messages\InvalidMessage.h" />
     <ClInclude Include="shared\communication\messages\Message.h" />
     <ClInclude Include="shared\communication\MessageSerializer.h" />
-    <ClInclude Include="shared\communication\messages\MoveMobileUnitsToPositionMessage.h" />
+    <ClInclude Include="shared\communication\messages\commands\MoveMobileUnitsToPositionMessage.h" />
     <ClInclude Include="shared\communication\messages\MessageType.h" />
-    <ClInclude Include="shared\communication\messages\MoveMobileUnitsToSpawnerMessage.h" />
+    <ClInclude Include="shared\communication\messages\commands\MoveMobileUnitsToSpawnerMessage.h" />
     <ClInclude Include="shared\communication\MessageWrapper.h" />
     <ClInclude Include="shared\configuration\ConfigurationManager.h" />
     <ClInclude Include="shared\game\commands\GameCommand.h" />
     <ClInclude Include="shared\game\commands\MoveMobileUnitsToPosition.h" />
     <ClInclude Include="shared\game\commands\MoveMobileUnitsToSpawner.h" />
+    <ClInclude Include="shared\game\commands\SetSpawnersRally.h" />
     <ClInclude Include="shared\game\GameManager.h" />
     <ClInclude Include="shared\game\geometry\Circle.h" />
     <ClInclude Include="shared\game\geometry\Rectangle.h" />
@@ -166,9 +168,11 @@
     <ClInclude Include="shared\game\physics\collisions\NaiveCollisionDetectorFactory.h" />
     <ClInclude Include="shared\game\physics\PhysicsManager.h" />
     <ClInclude Include="shared\game\geometry\Vector2D.h" />
+    <ClInclude Include="shared\game\physics\PhysicsStats.h" />
     <ClInclude Include="shared\game\play\CompleteGameState.h" />
     <ClInclude Include="shared\game\play\units\MobileUnit.h" />
     <ClInclude Include="shared\game\play\players\Player.h" />
+    <ClInclude Include="shared\game\play\units\MobileUnitDestination.h" />
     <ClInclude Include="shared\game\play\units\SpawnerDestination.h" />
     <ClInclude Include="shared\game\play\units\UnitWithHealthPoint.h" />
     <ClInclude Include="shared\game\play\units\Shooter.h" />
@@ -179,6 +183,7 @@
     <ClInclude Include="shared\transfers\PhysicsCommunicationAssembler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="shared\communication\messages\commands\SetSpawnersRallyMessage.cpp" />
     <ClCompile Include="shared\communication\messages\game\CommunicatedCompleteGameState.cpp" />
     <ClCompile Include="shared\communication\messages\game\CommunicatedPlayer.cpp" />
     <ClCompile Include="shared\communication\messages\game\CommunicatedSinguity.cpp" />
@@ -188,11 +193,12 @@
     <ClCompile Include="shared\communication\messages\game\CommunicatedSpawnerDestination.cpp" />
     <ClCompile Include="shared\communication\messages\game\CommunicatedVector2D.cpp" />
     <ClCompile Include="shared\communication\messages\CompleteGameStateMessage.cpp" />
-    <ClCompile Include="shared\communication\messages\MoveMobileUnitsToPositionMessage.cpp" />
-    <ClCompile Include="shared\communication\messages\MoveMobileUnitsToSpawner.cpp" />
+    <ClCompile Include="shared\communication\messages\commands\MoveMobileUnitsToPositionMessage.cpp" />
+    <ClCompile Include="shared\communication\messages\commands\MoveMobileUnitsToSpawner.cpp" />
     <ClCompile Include="shared\communication\MessageWrapper.cpp" />
     <ClCompile Include="shared\configuration\ConfigurationManager.cpp" />
     <ClCompile Include="shared\game\geometry\Rectangle.cpp" />
+    <ClCompile Include="shared\game\physics\actualizers\SinguityActualizer.cpp" />
     <ClCompile Include="shared\game\physics\PhysicsManager.cpp" />
     <ClCompile Include="shared\game\geometry\Vector2D.cpp" />
     <ClCompile Include="shared\game\play\players\Player.cpp" />

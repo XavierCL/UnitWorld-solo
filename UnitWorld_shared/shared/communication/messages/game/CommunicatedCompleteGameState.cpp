@@ -8,37 +8,21 @@ CommunicatedCompleteGameState::CommunicatedCompleteGameState(const std::vector<C
     _players(players),
     _singuities(singuities),
     _spawners(spawners),
-    _frameCount(frameCount)
+    _frameCount(frameCount),
+    _json(generateJson(players, singuities, spawners, frameCount))
+{}
+
+CommunicatedCompleteGameState::CommunicatedCompleteGameState(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const std::vector<CommunicatedSpawner>& spawners, const unsigned long long& frameCount, const nlohmann::json& json) :
+    _players(players),
+    _singuities(singuities),
+    _spawners(spawners),
+    _frameCount(frameCount),
+    _json(json)
 {}
 
 nlohmann::json CommunicatedCompleteGameState::toJson() const
 {
-    std::vector<nlohmann::json> jsonPlayers;
-    for (const auto& player : _players)
-    {
-        jsonPlayers.emplace_back(player.toJson());
-    }
-
-    std::vector<nlohmann::json> jsonSinguities;
-    for (const auto& singuity : _singuities)
-    {
-        jsonSinguities.emplace_back(singuity.toJson());
-    }
-
-    std::vector<nlohmann::json> jsonSpawners;
-    for (const auto& spawner : _spawners)
-    {
-        jsonSpawners.emplace_back(spawner.toJson());
-    }
-
-    nlohmann::json jsonData = {
-        {PLAYERS_LABEL, jsonPlayers},
-        {SINGUITIES_LABEL, jsonSinguities},
-        {SPAWNERS_LABEL, jsonSpawners},
-        {FRAME_COUNT_LABEL, _frameCount}
-    };
-
-    return jsonData;
+    return _json;
 }
 
 CommunicatedCompleteGameState CommunicatedCompleteGameState::fromJson(const nlohmann::json& parsedJson)
@@ -61,7 +45,7 @@ CommunicatedCompleteGameState CommunicatedCompleteGameState::fromJson(const nloh
         spawners.emplace_back(CommunicatedSpawner::fromJson(parsedSpawner));
     }
 
-    return CommunicatedCompleteGameState(players, singuities, spawners, parsedJson.at(FRAME_COUNT_LABEL).get<unsigned long long>());
+    return CommunicatedCompleteGameState(players, singuities, spawners, parsedJson.at(FRAME_COUNT_LABEL).get<unsigned long long>(), parsedJson);
 }
 
 const std::string CommunicatedCompleteGameState::PLAYERS_LABEL = "p";

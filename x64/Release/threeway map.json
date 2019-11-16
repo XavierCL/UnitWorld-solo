@@ -1,0 +1,39 @@
+{
+	"server ip": "127.0.0.1",
+	"server ip john local": "192.168.0.110",
+	"server ip raph": "147.253.45.11",
+	"server ip john": "147.253.89.52",
+	"server port": "52124",
+	"move-zone-width-ratio": 0.03,
+	"translation-pixel-per-frame": 30.0,
+	"scroll-ratio-per-tick": 0.2,
+	"ai-name": "strongholdAi2",
+	"world-absolute-width": 5000.0,
+	"world-absolute-height": 5000.0,
+    "spawners": [
+        [
+			{"x": 1000, "y": 1410, "naturals": 0},
+			{"x": 2320, "y": 4360},
+			{"x": 4220, "y": 1710},
+			
+			{"x": 1820, "y": 1280, "second natural": 0},
+			{"x": 1793, "y": 3693},
+			{"x": 3897, "y": 2514},
+			
+			{"x": 2790, "y": 1010, "side line": 0},
+			{"x": 1071, "y": 2989},
+			{"x": 3648, "y": 3494},
+			
+			{"x": 2280, "y": 1990, "first gold": 0},
+			{"x": 2171, "y": 2946},
+			{"x": 3060, "y": 2554},
+			
+			{"x": 2380, "y": 1998, "second golds": 0},
+			{"x": 2131, "y": 2853},
+			{"x": 2998, "y": 2639}
+		],
+        [{"x": 900, "y": 900, "singuities": 100}],
+		[{"x": 1921, "y": 4682, "singuities": 100}],
+		[{"x": 4688, "y": 1908, "singuities": 100}]
+    ]
+}

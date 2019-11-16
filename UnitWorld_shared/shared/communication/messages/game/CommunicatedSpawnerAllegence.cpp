@@ -9,7 +9,7 @@ nlohmann::json CommunicatedSpawnerAllegence::toJson() const
     nlohmann::json jsonData = {
         {IS_CLAIMED_LABEL, _isClaimed},
         {HEALTH_POINTS_LABEL, _healthPoint},
-        {PLAYER_ID_LABEL, _playerId.str()}
+        {PLAYER_ID_LABEL, _playerId.toBase64()}
     };
 
     return jsonData;
@@ -20,7 +20,7 @@ CommunicatedSpawnerAllegence CommunicatedSpawnerAllegence::fromJson(const nlohma
     return CommunicatedSpawnerAllegence(
         parsedJson.at(IS_CLAIMED_LABEL).get<bool>(),
         parsedJson.at(HEALTH_POINTS_LABEL).get<double>(),
-        xg::Guid(parsedJson.at(PLAYER_ID_LABEL).get<std::string>())
+        xg::Guid::fromBase64(parsedJson.at(PLAYER_ID_LABEL).get<std::string>())
     );
 }
 

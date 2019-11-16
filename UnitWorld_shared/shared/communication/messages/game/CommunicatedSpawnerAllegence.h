@@ -1,6 +1,9 @@
 #pragma once
 
+#include "shared/communication/messages/game/CommunicatedVector2D.h"
+
 #include "commons/Guid.hpp"
+#include "commons/Option.hpp"
 
 #include <nlohmann/json.hpp>
 

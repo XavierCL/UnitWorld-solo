@@ -21,12 +21,6 @@
     <ClCompile Include="clientgui\graphics\canvas\SFMLCanvas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="clientgui\graphics\units\GraphicalSinguity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="clientgui\graphics\units\GraphicalUnit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="clientgui\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -50,12 +44,6 @@
     <ClInclude Include="clientgui\graphics\canvas\SFMLDrawingCanvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="clientgui\graphics\units\GraphicalSinguity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="clientgui\graphics\units\GraphicalUnit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="clientgui\graphics\GameDrawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -75,6 +63,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="clientgui\userControls\WindowInputs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\WindowStats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,6 +4,7 @@
 
 #include "shared/game/commands/MoveMobileUnitsToPosition.h"
 #include "shared/game/commands/MoveMobileUnitsToSpawner.h"
+#include "shared/game/commands/SetSpawnersRally.h"
 #include "shared/game/commands/GameCommand.h"
 
 #include <immer/vector.hpp>
@@ -28,7 +29,9 @@ namespace uw
             _nextCurrentPlayerId(nullptr),
             _nextAddPlayer(nullptr),
             _nextAddSpawners(nullptr),
-            _independentGameWasAltered(false)
+            _independentGameWasAltered(false),
+            _nextCommandsMutex(std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<std::mutex>>>()),
+            _nextCommands(std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<std::vector<std::shared_ptr<GameCommand>>>>>())
         {}
 
         void setNextPlayer(std::shared_ptr<Player> newPlayer, const std::vector<std::shared_ptr<Spawner>>& spawners)
@@ -66,6 +69,8 @@ namespace uw
 
         void setNextMobileUnitsDestination(const xg::Guid& playerId, const std::vector<xg::Guid>& mobileUnitIds, const Vector2D& destination)
         {
+            addPlayerInCommandQueueIfNotThere(playerId);
+
             immer::set<xg::Guid> mobileUnitSet;
             for (const auto& mobileUnitId : mobileUnitIds)
             {
@@ -74,13 +79,17 @@ namespace uw
 
             const auto nextCommand(std::make_shared<MoveMobileUnitsToPosition>(playerId, mobileUnitSet, destination));
 
-            std::lock_guard<std::mutex> lockPlayerCommands(_nextCommandsMutex);
+            const auto localNextCommandsMutex = _nextCommandsMutex;
+            std::lock_guard<std::mutex> lockPlayerCommands(*localNextCommandsMutex->at(playerId));
 
-            _nextCommands.push_back(nextCommand);
+            const auto localNextCommands = _nextCommands;
+            localNextCommands->at(playerId)->push_back(nextCommand);
         }
 
         void setNextMobileUnitsSpawnerDestination(const xg::Guid& playerId, const std::vector<xg::Guid>& mobileUnitIds, const xg::Guid& spawnerId)
         {
+            addPlayerInCommandQueueIfNotThere(playerId);
+
             immer::set<xg::Guid> mobileUnitSet;
             for (const auto& mobileUnitId : mobileUnitIds)
             {
@@ -89,9 +98,30 @@ namespace uw
 
             const auto nextCommand(std::make_shared<MoveMobileUnitsToSpawner>(playerId, mobileUnitSet, spawnerId));
 
-            std::lock_guard<std::mutex> lockPlayerCommands(_nextCommandsMutex);
+            const auto localNextCommandsMutex = _nextCommandsMutex;
+            std::lock_guard<std::mutex> lockPlayerCommands(*localNextCommandsMutex->at(playerId));
 
-            _nextCommands.push_back(nextCommand);
+            const auto localNextCommands = _nextCommands;
+            localNextCommands->at(playerId)->push_back(nextCommand);
+        }
+
+        void setNextSpawnersRally(const xg::Guid& playerId, const std::vector<xg::Guid>& spawnersId, const MobileUnitDestination& rally)
+        {
+            addPlayerInCommandQueueIfNotThere(playerId);
+
+            immer::set<xg::Guid> spawnersIdSet;
+            for (const auto& spawnerId : spawnersId)
+            {
+                spawnersIdSet = std::move(spawnersIdSet).insert(spawnerId);
+            }
+
+            const auto nextCommand(std::make_shared<SetSpawnersRally>(playerId, spawnersIdSet, rally));
+
+            const auto localNextCommandsMutex = _nextCommandsMutex;
+            std::lock_guard<std::mutex> lockPlayerCommands(*localNextCommandsMutex->at(playerId));
+
+            const auto localNextCommands = _nextCommands;
+            localNextCommands->at(playerId)->push_back(nextCommand);
         }
 
         void addPlayerInputCallback(const xg::Guid& callbackId, const std::function<void()>& callback)
@@ -144,20 +174,26 @@ namespace uw
             {
                 _independentGameWasAltered = false;
 
-                std::lock_guard<std::mutex> lockCallback(_somePlayerInputCallbackMutex);
+                std::unique_lock<std::mutex> lockCallback(_somePlayerInputCallbackMutex, std::try_to_lock);
 
-                for (const auto callback : _somePlayerInputCallback)
+                if (lockCallback.owns_lock())
                 {
-                    callback.second();
+                    for (const auto callback : _somePlayerInputCallback)
+                    {
+                        callback.second();
+                    }
                 }
             }
             else
             {
-                std::lock_guard<std::mutex> lockCallback(_somePlayerInputCallbackMutex);
+                std::unique_lock<std::mutex> lockCallback(_somePlayerInputCallbackMutex, std::try_to_lock);
 
-                for (const auto callback : _someNewIndependantGameStateCallback)
+                if (lockCallback.owns_lock())
                 {
-                    callback.second();
+                    for (const auto callback : _someNewIndependantGameStateCallback)
+                    {
+                        callback.second();
+                    }
                 }
             }
         }
@@ -217,12 +253,17 @@ namespace uw
             }
 
             std::vector<std::shared_ptr<GameCommand>> localCommands;
+            const auto nextCommandsMutexCopy = _nextCommandsMutex;
+            for (const auto nextCommandsMutex: *nextCommandsMutexCopy)
             {
-                std::lock_guard<std::mutex> lockCommands(_nextCommandsMutex);
+                std::unique_lock<std::mutex> lockCommands(*nextCommandsMutex.second, std::try_to_lock);
 
-                localCommands = _nextCommands;
+                if (lockCommands.owns_lock()) {
+                    const auto playerNextCommands = _nextCommands->at(nextCommandsMutex.first);
+                    localCommands.insert(localCommands.end(), playerNextCommands->begin(), playerNextCommands->end());
 
-                _nextCommands.clear();
+                    playerNextCommands->clear();
+                }
             }
 
             for (const auto command : localCommands)
@@ -237,24 +278,44 @@ namespace uw
             _completeGameState = std::make_shared<const CompleteGameState>(*_localCompleteGameState);
 
             {
-                std::lock_guard<std::mutex> lockCallback(_somePlayerInputCallbackMutex);
+                std::unique_lock<std::mutex> lockCallback(_somePlayerInputCallbackMutex, std::try_to_lock);
 
-                for (const auto callback : _dependentGameStateChangedCallback)
+                if (lockCallback.owns_lock())
                 {
-                    callback.second();
+                    for (const auto callback : _dependentGameStateChangedCallback)
+                    {
+                        callback.second();
+                    }
                 }
             }
         }
 
     private:
 
+        void addPlayerInCommandQueueIfNotThere(const xg::Guid& playerId)
+        {
+            if (_nextCommandsMutex->count(playerId) == 0)
+            {
+                std::lock_guard<std::mutex> lockPlayerCommands(_nextCommandsModifierMutex);
+
+                auto newNextCommands = std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<std::vector<std::shared_ptr<GameCommand>>>>>(*_nextCommands);
+                newNextCommands->emplace(std::make_pair(playerId, std::make_shared<std::vector<std::shared_ptr<GameCommand>>>()));
+                _nextCommands = newNextCommands;
+
+                auto newNextCommandsMutex = std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<std::mutex>>>(*_nextCommandsMutex);
+                newNextCommandsMutex->emplace(std::make_pair(playerId, std::make_shared<std::mutex>()));
+                _nextCommandsMutex = newNextCommandsMutex;
+            }
+        }
+
         static const unsigned int PHISICS_FRAME_PER_SECOND;
 
         std::atomic<Player*> _nextAddPlayer;
         std::atomic<std::vector<std::shared_ptr<Spawner>>*> _nextAddSpawners;
         bool _independentGameWasAltered;
-        std::mutex _nextCommandsMutex;
-        std::vector<std::shared_ptr<GameCommand>> _nextCommands;
+        std::mutex _nextCommandsModifierMutex;
+        std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<std::mutex>>> _nextCommandsMutex;
+        std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<std::vector<std::shared_ptr<GameCommand>>>>> _nextCommands;
         std::atomic<CompleteGameState*> _nextCompleteGameState;
         std::atomic<xg::Guid*> _nextCurrentPlayerId;
 

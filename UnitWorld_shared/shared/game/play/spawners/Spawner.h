@@ -1,9 +1,10 @@
 #pragma once
 
-#include "shared/game/play/units/Singuity.h"
 #include "SpawnerAllegance.h"
 
+#include "shared/game/play/units/Singuity.h"
 #include "shared/game/play/units/UnitWithHealthPoint.h"
+#include "shared/game/play/units/MobileUnitDestination.h"
 
 #include "shared/game/geometry/Vector2D.h"
 
@@ -15,12 +16,13 @@ namespace uw
     class Spawner: virtual public UnitWithHealthPoint
     {
     public:
-        Spawner(const xg::Guid& id, const Vector2D& initialPosition, Option<SpawnerAllegence> allegence, const unsigned long long& lastSpawnFameCount, const unsigned long long& totalSpawnedCount) :
+        Spawner(const xg::Guid& id, const Vector2D& initialPosition, Option<SpawnerAllegence> allegence, const Option<MobileUnitDestination> rally, const unsigned long long& lastSpawnFameCount, const unsigned long long& totalSpawnedCount) :
             Unit(id, initialPosition),
             UnitWithHealthPoint(id, initialPosition, allegence.map<double>([](const SpawnerAllegence& spawnerAllegence) {
                 return spawnerAllegence.healthPoint();
             }).getOrElse(0.0)),
             _allegence(allegence),
+            _rally(rally),
             _lastSpawnFrameCount(lastSpawnFameCount),
             _totalSpawnedCount(totalSpawnedCount)
         {}
@@ -29,6 +31,7 @@ namespace uw
             Unit(initialPosition),
             UnitWithHealthPoint(initialPosition, maximumHealthPoint()),
             _allegence(Options::Some(SpawnerAllegence(true, maximumHealthPoint(), playerId))),
+            _rally(),
             _lastSpawnFrameCount(0),
             _totalSpawnedCount(0)
         {}
@@ -37,6 +40,7 @@ namespace uw
             Unit(initialPosition),
             UnitWithHealthPoint(initialPosition, 0),
             _allegence(Options::None<SpawnerAllegence>()),
+            _rally(),
             _lastSpawnFrameCount(0),
             _totalSpawnedCount(0)
         {}
@@ -44,9 +48,10 @@ namespace uw
         Spawner(const Spawner& copy):
             Unit(copy),
             UnitWithHealthPoint(copy.position(), copy._allegence.map<double>([](const SpawnerAllegence& spawnerAllegence) {
-            return spawnerAllegence.healthPoint();
-        }).getOrElse(0.0)),
+                return spawnerAllegence.healthPoint();
+            }).getOrElse(0.0)),
             _allegence(copy._allegence),
+            _rally(copy._rally),
             _lastSpawnFrameCount(copy._lastSpawnFrameCount),
             _totalSpawnedCount(copy._totalSpawnedCount)
         {}
@@ -56,6 +61,11 @@ namespace uw
             return _allegence;
         }
 
+        Option<MobileUnitDestination> rally() const
+        {
+            return _rally;
+        }
+
         void spawnIfCan(const std::function<void(xg::Guid, std::shared_ptr<Singuity>)>& spawned, const double& frameCount)
         {
             _allegence.foreach([this, &spawned, &frameCount](const SpawnerAllegence& allegence) {
@@ -63,7 +73,14 @@ namespace uw
                 {
                     _lastSpawnFrameCount = frameCount;
                     ++_totalSpawnedCount;
-                    spawned(allegence.allegedPlayerId(), std::make_shared<Singuity>(Singuity::spawn(position(), UNIT_SPAWN_DIRECTION[_totalSpawnedCount % UNIT_SPAWN_DIRECTION.size()])));
+
+                    const std::shared_ptr<Singuity> spawnedSinguity = std::make_shared<Singuity>(Singuity::spawn(
+                        position(),
+                        UNIT_SPAWN_DIRECTION[_totalSpawnedCount % UNIT_SPAWN_DIRECTION.size()],
+                        _rally
+                    ));
+
+                    spawned(allegence.allegedPlayerId(), spawnedSinguity);
                 }
             });
         }
@@ -82,6 +99,11 @@ namespace uw
                 .getOrElse(false);
         }
 
+        bool isClaimed() const
+        {
+            return _allegence.map<bool>([](const SpawnerAllegence& allegence) { return allegence.isClaimed(); }).getOrElse(false);
+        }
+
         virtual void loseHealthPoint(const double& healthPoint) override
         {
             _allegence = _allegence.map<SpawnerAllegence>([this, &healthPoint](const SpawnerAllegence& allegence) {
@@ -96,6 +118,7 @@ namespace uw
             _allegence = _allegence.flatMap<SpawnerAllegence>([this](const SpawnerAllegence& oldAllegence) {
                 if (isDead())
                 {
+                    _rally = Options::None<MobileUnitDestination>();
                     return Options::None<SpawnerAllegence>();
                 }
                 else if (!oldAllegence.isClaimed() && oldAllegence.healthPoint() >= maximumHealthPoint())
@@ -169,6 +192,11 @@ namespace uw
             }
         }
 
+        void setRally(const MobileUnitDestination& rally)
+        {
+            _rally = Options::Some(rally);
+        }
+
         double maximumHealthPoint() const override
         {
             return 2000.0;
@@ -193,6 +221,7 @@ namespace uw
         }
 
         Option<SpawnerAllegence> _allegence;
+        Option<MobileUnitDestination> _rally;
         unsigned long long _lastSpawnFrameCount;
         unsigned long long _totalSpawnedCount;
     };

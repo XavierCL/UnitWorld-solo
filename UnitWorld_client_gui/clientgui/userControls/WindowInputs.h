@@ -10,10 +10,12 @@ namespace uw
     class WindowInputs
     {
     public:
-        WindowInputs(std::shared_ptr<UserControlState> userControlState, std::shared_ptr<Camera> camera) :
+        WindowInputs(std::shared_ptr<UserControlState> userControlState, std::shared_ptr<Camera> camera, const Rectangle& screenRelativeRectangle) :
             _userControlState(userControlState),
             _camera(camera),
-            _isLeftControlKeyPressed(false)
+            _isLeftControlKeyPressed(false),
+            _isRapidClicking(false),
+            _justClicked(false)
         {}
 
         void frameHappened()
@@ -24,17 +26,33 @@ namespace uw
 
         void setUserMousePosition(const Vector2D& position)
         {
+            _isRapidClicking = false;
+            _justClicked = false;
             _userControlState->setUserMousePosition(position);
             _camera->mouseMovedTo(position);
         }
 
         void setUserLeftMouseUpPosition(const Vector2D& position)
         {
-            _userControlState->setUserLeftMouseUpPosition(position);
+            if (_justClicked && _isRapidClicking)
+            {
+                _userControlState->setUserDoubleClickMouseUpPosition(position);
+            }
+            else if (_isRapidClicking)
+            {
+                _userControlState->setUserClickMouseUpPosition(position, _isLeftControlKeyPressed);
+            }
+            else
+            {
+                _userControlState->setUserLeftMouseUpPosition(position);
+            }
+            _justClicked = _isRapidClicking;
+            _isRapidClicking = false;
         }
 
         void setUserLeftMouseDownPosition(const Vector2D& position)
         {
+            _isRapidClicking = true;
             _userControlState->setUserLeftMouseDownPosition(position);
         }
 
@@ -85,9 +103,21 @@ namespace uw
             _userControlState->selectAllUnits();
         }
 
+        void userPressedAddKey()
+        {
+            _camera->mouseScrolled(1);
+        }
+
+        void userPressedSubstractKey()
+        {
+            _camera->mouseScrolled(-1);
+        }
+
     private:
         const std::shared_ptr<UserControlState> _userControlState;
         const std::shared_ptr<Camera> _camera;
         bool _isLeftControlKeyPressed;
+        bool _isRapidClicking;
+        bool _justClicked;
     };
 }

@@ -7,7 +7,7 @@ namespace uw
     class InvalidMessage : public Message
     {
     public:
-        InvalidMessage(const std::string& invalidData):
+        InvalidMessage(const nlohmann::json& invalidData):
             _invalidJsonData(invalidData)
         {}
 
@@ -16,12 +16,12 @@ namespace uw
             return MessageType::InvalidMessageType;
         }
 
-        virtual std::string toJsonData() const
+        virtual nlohmann::json toJsonData() const
         {
-            throw new std::exception(("Cannot convert an invalid message to json. The message was: " + _invalidJsonData).c_str());
+            return _invalidJsonData;
         }
 
     private:
-        const std::string _invalidJsonData;
+        const nlohmann::json _invalidJsonData;
     };
 }

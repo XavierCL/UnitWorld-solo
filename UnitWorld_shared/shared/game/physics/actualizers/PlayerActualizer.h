@@ -16,7 +16,7 @@ namespace uw
             _singuityAddedCallbackId(xg::newGuid())
         {
             _player->addSinguityAddedCallback(_singuityAddedCallbackId, [this](std::shared_ptr<Singuity> singuity) {
-                _singuityActualizers->emplace_back(singuity, _player->id());
+                _singuityActualizers->emplace_back(std::make_shared<SinguityActualizer>(singuity, _player->id()));
             });
         }
 
@@ -29,7 +29,7 @@ namespace uw
         {
             for (auto& singuityActualizer : *_singuityActualizers)
             {
-                singuityActualizer.updateCollisions(_player->id(), collisionDetectorsByPlayerId, shootablesById);
+                singuityActualizer->updateCollisions(_player->id(), collisionDetectorsByPlayerId, shootablesById);
             }
         }
 
@@ -37,24 +37,28 @@ namespace uw
         {
             for (auto& singuityActualizer : *_singuityActualizers)
             {
-                singuityActualizer.shootEnemy(shootablesById, frameCount);
+                singuityActualizer->shootEnemy(shootablesById, frameCount);
             }
         }
 
         void removeSinguitiesAndUpdateTheirPhysics(const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
         {
             auto aliveSinguities(std::make_shared<std::vector<std::shared_ptr<Singuity>>>());
-            auto aliveSinguityActualizers(std::make_shared<std::vector<SinguityActualizer>>());
+            auto aliveSinguityActualizers(std::make_shared<std::vector<std::shared_ptr<SinguityActualizer>>>());
+
+            aliveSinguities->reserve(_player->singuities()->size());
+            aliveSinguityActualizers->reserve(_singuityActualizers->size());
+
             for (auto& singuityActualizer : *_singuityActualizers)
             {
-                if (!singuityActualizer.singuity()->isDead())
+                if (!singuityActualizer->singuity()->isDead())
                 {
-                    singuityActualizer.actualize(spawnersById, shootablesById);
+                    singuityActualizer->actualize(spawnersById, shootablesById);
 
                     // Singuities can kill themselves
-                    if (!singuityActualizer.singuity()->isDead())
+                    if (!singuityActualizer->singuity()->isDead())
                     {
-                        aliveSinguities->emplace_back(singuityActualizer.singuity());
+                        aliveSinguities->emplace_back(singuityActualizer->singuity());
                         aliveSinguityActualizers->emplace_back(singuityActualizer);
                     }
                 }
@@ -66,19 +70,19 @@ namespace uw
 
     private:
 
-        static std::shared_ptr<std::vector<SinguityActualizer>> initializeSinguityActualizers(std::shared_ptr<Player> player)
+        static std::shared_ptr<std::vector<std::shared_ptr<SinguityActualizer>>> initializeSinguityActualizers(std::shared_ptr<Player> player)
         {
-            auto singuityActualizers = std::make_shared<std::vector<SinguityActualizer>>();
+            auto singuityActualizers = std::make_shared<std::vector<std::shared_ptr<SinguityActualizer>>>();
             singuityActualizers->reserve(player->singuities()->size());
             for (const auto& singuity : *player->singuities())
             {
-                singuityActualizers->emplace_back(singuity, player->id());
+                singuityActualizers->emplace_back(std::make_shared<SinguityActualizer>(singuity, player->id()));
             }
             return singuityActualizers;
         }
 
         const std::shared_ptr<Player> _player;
         const xg::Guid _singuityAddedCallbackId;
-        std::shared_ptr<std::vector<SinguityActualizer>> _singuityActualizers;
+        std::shared_ptr<std::vector<std::shared_ptr<SinguityActualizer>>> _singuityActualizers;
     };
 }

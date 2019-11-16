@@ -10,19 +10,19 @@ namespace uw
     class MessageSerializer
     {
     public:
-        std::string serialize(std::vector<MessageWrapper> messages) const
+        std::string serialize(std::vector<std::shared_ptr<MessageWrapper>> messages) const
         {
             std::string communication;
 
             for (const auto message : messages)
             {
-                communication += message.json() + END_MESSAGE_FLAG;
+                communication += message->json() + END_MESSAGE_FLAG;
             }
 
             return communication;
         }
 
-        std::vector<MessageWrapper> deserialize(std::string currentCommunication)
+        std::vector<std::shared_ptr<MessageWrapper>> deserialize(std::string currentCommunication)
         {
             auto wholeCommunication = _remainingDeserializationBuffer + currentCommunication;
             auto communications(StringsHelper::split(wholeCommunication, END_MESSAGE_FLAG));
@@ -38,12 +38,12 @@ namespace uw
                 communications.pop_back();
             }
 
-            std::vector<MessageWrapper> messages;
+            std::vector<std::shared_ptr<MessageWrapper>> messages;
             for (const auto communication : communications)
             {
                 try
                 {
-                    messages.emplace_back(MessageWrapper(communication));
+                    messages.emplace_back(std::make_shared<MessageWrapper>(MessageWrapper::fromJson(communication)));
                 }
                 catch (...)
                 {

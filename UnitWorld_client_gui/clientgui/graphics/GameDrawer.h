@@ -1,7 +1,6 @@
 #pragma once
 
 #include "canvas/SFMLDrawingCanvas.h"
-#include "units/GraphicalSinguity.h"
 
 #include "clientgui/cameras/CameraRelativeGameManager.h"
 
@@ -55,6 +54,18 @@ namespace uw
                 });
             });
 
+            for(const auto& selectedSpawnerId: _userControlState->getSelectedSpawners())
+            {
+                (spawnersById | find<std::shared_ptr<Spawner>>(selectedSpawnerId)).foreach([&canvas, this](std::shared_ptr<Spawner> spawner) {
+                    const Circle spawnerCircle(_cameraRelativeGameManager->relativeCircleOf(spawner));
+                    const double spawnerSelectionRadius = spawnerCircle.radius() * 1.0454545454545454545454545454545;
+                    sf::CircleShape graphicalSpawner(spawnerSelectionRadius);
+                    graphicalSpawner.setPosition(spawnerCircle.center().x() - spawnerSelectionRadius, spawnerCircle.center().y() - spawnerSelectionRadius);
+                    graphicalSpawner.setFillColor(sf::Color::White);
+                    canvas->draw(graphicalSpawner);
+                });
+            }
+
             // Spawners
             &completeGameState->spawners() | forEach([&canvas, &playerIndexByPlayerId, this](std::shared_ptr<Spawner> spawner) {
                 auto spanwerOuterAndInnerColors = spawner->allegence().map<std::pair<sf::Color, sf::Color>>([&spawner, &playerIndexByPlayerId, this](SpawnerAllegence allegence) {
@@ -80,6 +91,33 @@ namespace uw
                 graphicalSpawner.setOutlineColor(spanwerOuterAndInnerColors.second);
                 canvas->draw(graphicalSpawner);
             });
+
+            for (const auto& selectedSpawnerId : _userControlState->getSelectedSpawners())
+            {
+                (spawnersById | find<std::shared_ptr<Spawner>>(selectedSpawnerId)).foreach([&canvas, this, &spawnersById](std::shared_ptr<Spawner> selectedSpawner) {
+                    Option<Vector2D> rallyPosition = selectedSpawner->rally().flatMap<Vector2D>([&spawnersById](const MobileUnitDestination& destination) {
+                        return destination.map<Option<Vector2D>>(
+                            [](const auto& positionDestination) { return Options::Some(positionDestination); },
+                            [&spawnersById](const SpawnerDestination& spawnerDestination) { return (spawnersById | find<std::shared_ptr<Spawner>>(spawnerDestination.spawnerId())).map<Vector2D>([](const std::shared_ptr<Spawner> spawner) { return spawner->position(); }); },
+                            [&spawnersById](const xg::Guid& unconditionalSpawnerDestination) { return (spawnersById | find<std::shared_ptr<Spawner>>(unconditionalSpawnerDestination)).map<Vector2D>([](const std::shared_ptr<Spawner> spawner) { return spawner->position(); }); }
+                        );
+                    });
+
+                    rallyPosition.foreach([this, &canvas, selectedSpawner](const Vector2D& target) {
+
+                        const auto selectedSpawnerRelativePosition = _cameraRelativeGameManager->absolutePositionToRelative(selectedSpawner->position());
+                        const auto targetRelativePosition = _cameraRelativeGameManager->absolutePositionToRelative(target);
+
+                        sf::Vertex line[] =
+                        {
+                            sf::Vertex(sf::Vector2f(selectedSpawnerRelativePosition.x(), selectedSpawnerRelativePosition.y())),
+                            sf::Vertex(sf::Vector2f(targetRelativePosition.x(), targetRelativePosition.y()))
+                        };
+
+                        canvas->draw(line, 2, sf::Lines);
+                    });
+                });
+            }
             
             // Last move units position
             _userControlState->getAbsoluteLastMoveUnitPosition().foreach([&canvas, this](const Vector2D& lastMoveUnitPosition) {
@@ -92,15 +130,16 @@ namespace uw
             });
 
             // Selected unit white aura
+            sf::CircleShape selectedUnitCircleShape;
             for (const auto selectedUnitId : _userControlState->getSelectedUnits())
             {
-                (currentPlayerSinguities | findSafe<std::shared_ptr<Singuity>>(selectedUnitId)).foreach([&canvas, this](std::shared_ptr<Singuity> singuity) {
+                (currentPlayerSinguities | findSafe<std::shared_ptr<Singuity>>(selectedUnitId)).foreach([&selectedUnitCircleShape, &canvas, this](std::shared_ptr<Singuity> singuity) {
                     Circle singuityCircle = _cameraRelativeGameManager->relativeCircleOf(singuity);
                     const double circleRadius(singuityCircle.radius() * 1.25);
-                    sf::CircleShape selectedUnitAura(circleRadius);
-                    selectedUnitAura.setPosition(singuityCircle.center().x() - circleRadius, singuityCircle.center().y() - circleRadius);
-                    selectedUnitAura.setFillColor(sf::Color(255, 255, 255));
-                    canvas->draw(selectedUnitAura);
+
+                    setCircleProperties(selectedUnitCircleShape, circleRadius, singuityCircle.center(), sf::Color::White, 0.0, sf::Color::White);
+
+                    canvas->draw(selectedUnitCircleShape);
                 });
             }
 
@@ -113,11 +152,21 @@ namespace uw
                     .getOrElse(sf::Color::Black);
 
                 auto playerSinguities = player->singuities();
+
+                sf::CircleShape circleShape;
                 for (size_t index = 0; index < playerSinguities->size(); ++index)
                 {
                     auto singuity = playerSinguities->operator[](index);
                     Circle singuityCircle = _cameraRelativeGameManager->relativeCircleOf(singuity);
-                    canvas->draw(*(GraphicalSinguity(singuity, singuityCircle, drawingSinguitiesColor).drawable()));
+
+                    auto lifeRatio = singuity->healthPoint() / singuity->maximumHealthPoint();
+                    sf::Color lifeColor(round(drawingSinguitiesColor.r * lifeRatio), round(drawingSinguitiesColor.g * lifeRatio), round(drawingSinguitiesColor.b * lifeRatio));
+
+                    const auto innerSinguityRadius(singuityCircle.radius() * 0.75);
+
+                    setCircleProperties(circleShape, innerSinguityRadius, singuityCircle.center(), lifeColor, singuityCircle.radius() * 0.25, drawingSinguitiesColor);
+
+                    canvas->draw(circleShape);
                 }
             }
 
@@ -134,6 +183,37 @@ namespace uw
         }
 
     private:
+
+        void setCircleProperties(sf::CircleShape& circleShape, const double& radius, const Vector2D& position, const sf::Color& innerColor, const double& outsideThickness, const sf::Color& outsideColor)
+        {
+            float newCircleRadius = (float)radius;
+            if (circleShape.getRadius() != newCircleRadius)
+            {
+                circleShape.setRadius(newCircleRadius);
+            }
+
+            sf::Vector2f newCirclePosition(position.x() - radius, position.y() - radius);
+            if (circleShape.getPosition() != newCirclePosition)
+            {
+                circleShape.setPosition(newCirclePosition);
+            }
+
+            if (circleShape.getFillColor() != innerColor)
+            {
+                circleShape.setFillColor(innerColor);
+            }
+
+            float newCircleOutlineThickness = (float)outsideThickness;
+            if (circleShape.getOutlineThickness() != newCircleOutlineThickness)
+            {
+                circleShape.setOutlineThickness(newCircleOutlineThickness);
+            }
+
+            if (circleShape.getOutlineColor() != outsideColor)
+            {
+                circleShape.setOutlineColor(outsideColor);
+            }
+        }
 
         static const std::vector<sf::Color> _playerColors;
 

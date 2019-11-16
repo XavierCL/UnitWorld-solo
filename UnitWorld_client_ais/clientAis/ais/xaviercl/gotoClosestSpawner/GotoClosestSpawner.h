@@ -38,11 +38,12 @@ namespace uw
                     closestSpawnerIdOpt.foreach([&destinations, &singuity](const xg::Guid closestSpawnerId) {
 
                         bool singuityDestinationIsAlreadySpawner = singuity->destination()
-                            .map<bool>([&closestSpawnerId](const auto destination) {
-                                return std::visit(overloaded{
+                            .map<bool>([&closestSpawnerId](const MobileUnitDestination& destination) {
+                                return destination.map<bool>(
                                     [&closestSpawnerId](const SpawnerDestination& spawnerDestination) { return spawnerDestination.spawnerId() == closestSpawnerId; },
-                                    [](const Vector2D& positionDestination) { return false; }
-                                }, destination);
+                                    [](const Vector2D& positionDestination) { return false; },
+                                    [&closestSpawnerId](const xg::Guid& unconditionalSpawnerDestination) { return unconditionalSpawnerDestination == closestSpawnerId; }
+                                );
                             }).getOrElse(false);
 
                         if (!singuityDestinationIsAlreadySpawner)

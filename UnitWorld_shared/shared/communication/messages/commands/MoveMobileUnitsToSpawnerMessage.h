@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Message.h"
+#include "shared/communication/messages/Message.h"
 
 #include "commons/Guid.hpp"
 
@@ -13,11 +13,11 @@ namespace uw
     public:
         MoveMobileUnitsToSpawnerMessage(const std::vector<xg::Guid>& singuityIds, const xg::Guid& spawnerId);
 
-        static std::shared_ptr<MoveMobileUnitsToSpawnerMessage> fromJson(const std::string& json);
+        static std::shared_ptr<MoveMobileUnitsToSpawnerMessage> fromJson(const nlohmann::json& json);
 
         MessageType messageType() const;
 
-        std::string toJsonData() const;
+        nlohmann::json toJsonData() const;
 
         std::vector<xg::Guid> singuityIds() const;
 

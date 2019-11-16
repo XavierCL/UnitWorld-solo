@@ -26,13 +26,23 @@ using namespace uw;
 
 int main()
 {
-    Logger::registerError([](const auto& errorMessage) {
+    std::ofstream errorLogFile("error_client_gui.log", std::ios_base::app);
+    std::ofstream traceLogFile("trace_client_gui.log", std::ios_base::app);
+    Logger::registerError([&errorLogFile](const auto& errorMessage) {
 
         auto currentTime = std::time(nullptr);
         auto localTime = *std::localtime(&currentTime);
 
-        std::ofstream outputFile("error.log", std::ios_base::app);
-        outputFile << std::put_time(&localTime, "%Y-%m-%dT%H-%M-%S") << ": " << errorMessage << std::endl;
+        errorLogFile << std::put_time(&localTime, "%Y-%m-%dT%H-%M-%S") << ": " << errorMessage << std::endl;
+        errorLogFile.flush();
+    });
+    Logger::registerTrace([&traceLogFile](const auto& traceMessage) {
+
+        auto currentTime = std::time(nullptr);
+        auto localTime = *std::localtime(&currentTime);
+
+        traceLogFile << std::put_time(&localTime, "%Y-%m-%dT%H-%M-%S") << ": " << traceMessage << std::endl;
+        traceLogFile.flush();
     });
 
     const std::string WINDOW_TITLE("Unit World client GUI");
@@ -56,7 +66,7 @@ int main()
         const double translationPixelPerFrame = configurationManager.translationPixelPerFrame(DEFAULT_TRANSLATION_PIXEL_PER_FRAME);
         const double scrollRatioPerTick = configurationManager.scrollRatioPerTick(DEFAULT_SCROLL_RATIO_PER_TICK);
 
-        const unsigned int GRAPHICS_FRAME_PER_SECOND(30);
+        const unsigned int GRAPHICS_FRAME_PER_SECOND(26);
 
         auto window(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes().front(), WINDOW_TITLE, sf::Style::Fullscreen));
 
@@ -65,7 +75,7 @@ int main()
             const auto gameManager(std::make_shared<GameManager>());
 
             const auto kdtreeCollisionDetectorFactory(std::make_shared<KdtreeCollisionDetectorFactory>());
-            const auto physicsManager(std::make_shared<PhysicsManager>(gameManager, kdtreeCollisionDetectorFactory));
+            const auto physicsManager(std::make_shared<PhysicsManager>(gameManager, kdtreeCollisionDetectorFactory, std::make_shared<PhysicsStats>()));
 
             const auto camera(std::make_shared<Camera>(worldAbsoluteWidth, worldAbsoluteHeight, uw::Rectangle(Vector2D(0.0, 0.0), Vector2D(window->getSize().x, window->getSize().y)), sidePanelWidthRatio, translationPixelPerFrame, scrollRatioPerTick));
             const auto cameraRelativeGameManager(std::make_shared<CameraRelativeGameManager>(camera));
@@ -77,8 +87,8 @@ int main()
             const auto gameDrawer(std::make_shared<GameDrawer>(gameManager, userControlState, cameraRelativeGameManager));
             const auto sfmlCanvas(std::make_shared<uw::SFMLCanvas>(window));
             const auto canvasTransactionGenerator(std::make_shared<CanvasTransactionGenerator>(sfmlCanvas));
-            const auto windowInputs(std::make_shared<WindowInputs>(userControlState, camera));
-            const auto windowManager(std::make_shared<WindowManager>(GRAPHICS_FRAME_PER_SECOND, gameDrawer, canvasTransactionGenerator, window, windowInputs));
+            const auto windowInputs(std::make_shared<WindowInputs>(userControlState, camera, uw::Rectangle(Vector2D(0.0, 0.0), Vector2D(window->getSize().x, window->getSize().y))));
+            const auto windowManager(std::make_shared<WindowManager>(GRAPHICS_FRAME_PER_SECOND, gameDrawer, canvasTransactionGenerator, window, windowInputs, std::make_shared<WindowStats>()));
 
             const auto serverReceiver(std::make_shared<ServerReceiver>(connectionHandler, gameManager, physicsCommunicationAssembler, messageSerializer));
 

@@ -2,8 +2,10 @@
 
 #include "shared/transfers/PhysicsCommunicationAssembler.h"
 
-#include "shared/communication/messages/MoveMobileUnitsToPositionMessage.h"
-#include "shared/communication/messages/MoveMobileUnitsToSpawnerMessage.h"
+#include "shared/communication/messages/commands/MoveMobileUnitsToPositionMessage.h"
+#include "shared/communication/messages/commands/MoveMobileUnitsToSpawnerMessage.h"
+#include "shared/communication/messages/commands/SetSpawnersRallyMessage.h"
+
 #include "shared/communication/MessageSerializer.h"
 
 #include "shared/game/geometry/Vector2D.h"
@@ -34,9 +36,9 @@ namespace uw
 
             try
             {
-                _serverCommunicator->send(_messageSerializer->serialize(std::vector<MessageWrapper> { MessageWrapper(message) }));
+                _serverCommunicator->send(_messageSerializer->serialize(std::vector<std::shared_ptr<MessageWrapper>> { std::make_shared<MessageWrapper>(MessageWrapper::fromMessage(message)) }));
             }
-            catch (std::exception error)
+            catch (std::exception& error)
             {
                 Logger::error("Error while sending command to server: " + std::string(error.what()));
             }
@@ -48,9 +50,23 @@ namespace uw
 
             try
             {
-                _serverCommunicator->send(_messageSerializer->serialize(std::vector<MessageWrapper> { MessageWrapper(message) }));
+                _serverCommunicator->send(_messageSerializer->serialize(std::vector<std::shared_ptr<MessageWrapper>> { std::make_shared<MessageWrapper>(MessageWrapper::fromMessage(message)) }));
             }
-            catch (std::exception error)
+            catch (std::exception& error)
+            {
+                Logger::error("Error while sending command to server: " + std::string(error.what()));
+            }
+        }
+
+        void setSpawnersRally(const std::unordered_set<xg::Guid>& spawnersId, const MobileUnitDestination& rally)
+        {
+            const auto message(std::make_shared<SetSpawnersRallyMessage>(std::vector<xg::Guid>(spawnersId.begin(), spawnersId.end()), _physicsCommunicationAssembler->physicsSinguityDestinationToCommunicated(rally)));
+
+            try
+            {
+                _serverCommunicator->send(_messageSerializer->serialize(std::vector<std::shared_ptr<MessageWrapper>> { std::make_shared<MessageWrapper>(MessageWrapper::fromMessage(message)) }));
+            }
+            catch (std::exception& error)
             {
                 Logger::error("Error while sending command to server: " + std::string(error.what()));
             }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "PhysicsStats.h"
+
 #include "shared/game/physics/collisions/CollisionDetectorFactory.h"
 #include "shared/game/physics/actualizers/CompleteGameStateActualizer.h"
 
@@ -12,7 +14,7 @@ namespace uw
     class PhysicsManager
     {
     public:
-        PhysicsManager(std::shared_ptr<GameManager> gameManager, std::shared_ptr<CollisionDetectorFactory> collisionDetectorFactory):
+        PhysicsManager(std::shared_ptr<GameManager> gameManager, std::shared_ptr<CollisionDetectorFactory> collisionDetectorFactory, std::shared_ptr<PhysicsStats> physicsStats):
             _gameManager(gameManager),
             _msPerFrame(1000 / PHISICS_FRAME_PER_SECOND),
             _collisionsFrameInterval((int)round((double)PHISICS_FRAME_PER_SECOND / (double)COLLISIONS_FRAME_PER_SECOND)),
@@ -20,7 +22,8 @@ namespace uw
             _collisionDetectorsByPlayerId(std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>>()),
             _neutralCollisionDetector(collisionDetectorFactory->create()),
             _collisionDetectorFactory(collisionDetectorFactory),
-            _completeGameStateActualizer()
+            _completeGameStateActualizer(),
+            _physicsStats(physicsStats)
         {}
 
         void startAsync()
@@ -48,6 +51,8 @@ namespace uw
                 const auto endFrameTime = std::chrono::steady_clock::now();
 
                 const auto frameTimeInMs = (unsigned int)std::chrono::duration<double, std::milli>(endFrameTime - startFrameTime).count();
+
+                _physicsStats->feedFrameDuration(frameTimeInMs);
 
                 if (frameTimeInMs < _msPerFrame)
                 {
@@ -96,7 +101,7 @@ namespace uw
                 {
                     for (const auto& singuity : *player->singuities())
                     {
-                        playerIdBySinguityId[singuity->id()] = player->id();
+                        playerIdBySinguityId.emplace(std::make_pair(singuity->id(), player->id()));
                     }
                 }
 
@@ -162,6 +167,7 @@ namespace uw
         const std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> _collisionDetectorsByPlayerId;
         const std::shared_ptr<CollisionDetector> _neutralCollisionDetector;
         const std::shared_ptr<CollisionDetectorFactory> _collisionDetectorFactory;
+        const std::shared_ptr<PhysicsStats> _physicsStats;
 
         std::shared_ptr<CompleteGameStateActualizer> _completeGameStateActualizer;
     };

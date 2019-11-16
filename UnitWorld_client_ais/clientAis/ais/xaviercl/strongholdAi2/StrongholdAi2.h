@@ -287,6 +287,10 @@ namespace uw
                 {
                     enemyStrongholds[spawner->id()] += ceil((spawner->maximumHealthPoint() - spawner->healthPoint()) / referenceSinguity.reguvenatingHealth());
                 }
+                else if (spawner->isClaimed())
+                {
+                    enemyStrongholds[spawner->id()] += ceil(spawner->healthPoint() / referenceSinguity.spawnerAttackHealth());
+                }
                 else
                 {
                     enemyStrongholds[spawner->id()] += ceil(spawner->maximumHealthPoint() / referenceSinguity.reguvenatingHealth()) + ceil(spawner->healthPoint() / referenceSinguity.spawnerAttackHealth());
