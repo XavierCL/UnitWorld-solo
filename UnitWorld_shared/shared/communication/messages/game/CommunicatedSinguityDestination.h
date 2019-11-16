@@ -24,6 +24,10 @@ namespace uw
         }
 
     private:
+
+        const static std::string POINT_LABEL;
+        const static std::string SPAWNER_LABEL;
+
         std::variant<CommunicatedVector2D, CommunicatedSpawnerDestination> _destination;
     };
 }

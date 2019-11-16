@@ -24,19 +24,27 @@ namespace uw
             }
         }
 
-        void updateShootingAndPhysicsPredictions(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
+        void updateCollisions(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
         {
             for (auto& playerActualizer : _playerActualizers)
             {
-                playerActualizer.updateShootingAndRepulsionForces(collisionDetectorsByPlayerId, shootablesById, frameTimestamp);
+                playerActualizer.updateCollisions(collisionDetectorsByPlayerId, shootablesById);
             }
         }
 
-        void updatePhysics(const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById)
+        void shootEnemies(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
         {
             for (auto& playerActualizer : _playerActualizers)
             {
-                playerActualizer.removeSinguitiesAndUpdateTheirPhysics(spawnersById);
+                playerActualizer.shootEnemies(shootablesById, frameTimestamp);
+            }
+        }
+
+        void updatePhysics(const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
+        {
+            for (auto& playerActualizer : _playerActualizers)
+            {
+                playerActualizer.removeSinguitiesAndUpdateTheirPhysics(spawnersById, shootablesById);
             }
         }
 

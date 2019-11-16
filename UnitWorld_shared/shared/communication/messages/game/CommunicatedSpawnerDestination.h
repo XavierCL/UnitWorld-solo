@@ -30,6 +30,11 @@ namespace uw
         }
 
     private:
+
+        const static std::string NO_ALLEGENCE_VALUE;
+        const static std::string SPAWNER_ALLEGENCE_LABEL;
+        const static std::string SPAWNER_ID_LABEL;
+
         xg::Guid _spawnerId;
         Option<CommunicatedSpawnerAllegence> _spawnerAllegence;
     };

@@ -14,14 +14,14 @@ std::shared_ptr<MoveMobileUnitsToPositionMessage> MoveMobileUnitsToPositionMessa
     nlohmann::json parsedData = nlohmann::json::parse(json);
 
     std::vector<xg::Guid> singuityIds;
-    for (const auto singuityId : parsedData.at("mobile-units-id"))
+    for (const auto singuityId : parsedData.at(MOBILE_UNITS_ID_LABEL))
     {
         singuityIds.emplace_back(singuityId.get<std::string>());
     }
 
     return std::make_shared<MoveMobileUnitsToPositionMessage>(
         std::move(singuityIds),
-        CommunicatedVector2D::fromJson(parsedData.at("destination-position"))
+        CommunicatedVector2D::fromJson(parsedData.at(DESTINATION_POSITION_LABEL))
     );
 }
 
@@ -41,8 +41,8 @@ std::string MoveMobileUnitsToPositionMessage::toJsonData() const
     nlohmann::json parsedDestination(_destination.toJson());
 
     nlohmann::json returnedJson({
-        {"mobile-units-id", singuityStringIds},
-        {"destination-position", parsedDestination}
+        {MOBILE_UNITS_ID_LABEL, singuityStringIds},
+        {DESTINATION_POSITION_LABEL, parsedDestination}
     });
 
     return returnedJson.dump();
@@ -57,3 +57,6 @@ CommunicatedVector2D MoveMobileUnitsToPositionMessage::destination() const
 {
     return _destination;
 }
+
+const std::string MoveMobileUnitsToPositionMessage::MOBILE_UNITS_ID_LABEL = "m";
+const std::string MoveMobileUnitsToPositionMessage::DESTINATION_POSITION_LABEL = "d";

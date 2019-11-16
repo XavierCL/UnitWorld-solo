@@ -102,11 +102,11 @@ namespace uw
             });
         }
 
-        bool hasSameAllegenceState(const Option<SpawnerAllegence>& otherAllegence)
+        bool hasSameAllegenceState(const Option<SpawnerAllegence>& otherAllegence, const xg::Guid& playerId)
         {
-            return otherAllegence.map<bool>([this](const SpawnerAllegence& allegence) {
-                return _allegence.map<bool>([this, &allegence](const SpawnerAllegence& ownAllegence) {
-                    return allegence.hasSameState(ownAllegence, maximumHealthPoint());
+            return otherAllegence.map<bool>([this, &playerId](const SpawnerAllegence& allegence) {
+                return _allegence.map<bool>([this, &allegence, &playerId](const SpawnerAllegence& ownAllegence) {
+                    return allegence.hasSameState(ownAllegence, playerId, maximumHealthPoint());
                 }).getOrElse([&allegence]() { return !allegence.isClaimed(); });
             }).getOrElse([this]() {
                 return _allegence

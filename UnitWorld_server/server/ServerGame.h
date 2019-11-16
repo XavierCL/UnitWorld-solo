@@ -36,7 +36,6 @@ namespace uw
 
         void startAsync()
         {
-            auto initialMap(generateInitialMap());
             _gameManager->setNextCompleteGameState(generateInitialMap());
 
             _physicsManager->startAsync();
@@ -112,7 +111,7 @@ namespace uw
                 }
             }
 
-            return CompleteGameState(std::move(spawners), std::vector<std::shared_ptr<Player>> {});
+            return CompleteGameState(std::move(spawners), std::vector<std::shared_ptr<Player>> {}, 0);
         }
 
         const std::shared_ptr<GameManager> _gameManager;

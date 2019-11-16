@@ -8,9 +8,11 @@ namespace uw
     class CompleteGameState
     {
     public:
-        CompleteGameState(std::vector<std::shared_ptr<Spawner>>&& spawners, std::vector<std::shared_ptr<Player>>&& players) :
+        CompleteGameState(std::vector<std::shared_ptr<Spawner>>&& spawners, std::vector<std::shared_ptr<Player>>&& players, const unsigned long long frameCount) :
             _spawners(std::forward<std::vector<std::shared_ptr<Spawner>>>(spawners)),
-            _players(std::forward<std::vector<std::shared_ptr<Player>>>(players))
+            _players(std::forward<std::vector<std::shared_ptr<Player>>>(players)),
+            _frameCount(frameCount),
+            _version(xg::newGuid())
         {}
 
         CompleteGameState(const CompleteGameState& copy)
@@ -24,11 +26,14 @@ namespace uw
             {
                 _players.emplace_back(std::make_shared<Player>(*player));
             }
+
+            _frameCount = copy._frameCount;
+            _version = copy._version;
         }
 
         static CompleteGameState empty()
         {
-            return CompleteGameState(std::vector<std::shared_ptr<Spawner>>(), std::vector<std::shared_ptr<Player>>());
+            return CompleteGameState(std::vector<std::shared_ptr<Spawner>>(), std::vector<std::shared_ptr<Player>>(), 0);
         }
 
         std::vector<std::shared_ptr<Player>>& players()
@@ -54,15 +59,35 @@ namespace uw
         void addPlayer(std::shared_ptr<Player> player)
         {
             _players.push_back(player);
+            _version = xg::newGuid();
         }
 
         void addSpawners(const std::vector<std::shared_ptr<Spawner>>& spawners)
         {
             _spawners.insert(_spawners.end(), spawners.begin(), spawners.end());
+            _version = xg::newGuid();
+        }
+
+        unsigned long long frameCount() const
+        {
+            return _frameCount;
+        }
+
+        void incrementFrameCount()
+        {
+            ++_frameCount;
+            _version = xg::newGuid();
+        }
+
+        xg::Guid version() const
+        {
+            return _version;
         }
 
     private:
         std::vector<std::shared_ptr<Spawner>> _spawners;
         std::vector<std::shared_ptr<Player>> _players;
+        unsigned long long _frameCount;
+        xg::Guid _version;
     };
 }

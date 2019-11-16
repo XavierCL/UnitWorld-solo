@@ -19,6 +19,7 @@
 
 #include <chrono>
 #include <mutex>
+#include <condition_variable>
 
 namespace uw
 {
@@ -29,9 +30,12 @@ namespace uw
             _gameManager(gameManager),
             _messageSerializer(messageSerializer),
             _maxMsBetweenCompleteStates(60000 / MINIMAL_COMPLETE_STATE_PER_MINUTE),
+            _minMsBetweenCompleteStates(1000 / MAXIMAL_COMPLETE_STATE_PER_SECOND),
+            _hasStateChanged(false),
             _isRunning(true),
             _lastSendCompleteState(std::chrono::steady_clock::now()),
-            _physicsCommunicationAssembler(physicsCommunicationAssembler)
+            _physicsCommunicationAssembler(physicsCommunicationAssembler),
+            _lastSentGameStateVersion()
         {}
 
         void addClient(const PlayerClient& playerClient)
@@ -43,7 +47,8 @@ namespace uw
 
         void startAsync()
         {
-            _gameManager->addPlayerInputCallback(PLAYER_INPUT_GAME_MANAGER_CALLBACK_ID, std::bind(&ClientsGameSender::onGameManagerHasPlayerInput, this, std::placeholders::_1));
+            _gameManager->addPlayerInputCallback(PLAYER_INPUT_GAME_MANAGER_CALLBACK_ID, std::bind(&ClientsGameSender::onGameManagerHasPlayerInput, this));
+            _gameManager->addNewIndependentGameStateCallback(PLAYER_INPUT_GAME_MANAGER_CALLBACK_ID, std::bind(&ClientsGameSender::onGameManagerHasNewGameState, this));
 
             _senderThread = std::thread([this] { loopSendCompleteState(); });
         }
@@ -51,42 +56,61 @@ namespace uw
         void stop()
         {
             _gameManager->removePlayerInputCallback(PLAYER_INPUT_GAME_MANAGER_CALLBACK_ID);
+            _gameManager->removeNewIndependentGameStateCallback(PLAYER_INPUT_GAME_MANAGER_CALLBACK_ID);
 
-            _isRunning = false;
+            {
+                auto wakerLock = std::unique_lock<std::mutex>(_sendCompleteGameStateMutex);
+                _isRunning = false;
+                _completeStateWaker.notify_all();
+            }
 
             _senderThread.join();
         }
 
     private:
 
-        void onGameManagerHasPlayerInput(std::shared_ptr<const CompleteGameState> completeGameState)
+        void onGameManagerHasPlayerInput()
         {
-            std::thread([this] { sendCompleteState(); }).detach();
+            auto wakerLock = std::unique_lock<std::mutex>(_sendCompleteGameStateMutex);
+            _hasStateChanged = true;
+            _completeStateWaker.notify_one();
+        }
+
+        void onGameManagerHasNewGameState()
+        {
+            auto wakerLock = std::unique_lock<std::mutex>(_sendCompleteGameStateMutex);
+            _completeStateWaker.notify_one();
         }
 
         void loopSendCompleteState()
         {
-            while (_isRunning)
+            while (true)
             {
+                auto wakerLock = std::unique_lock<std::mutex>(_sendCompleteGameStateMutex);
+
+                if (!_isRunning) break;
+
                 const auto currentTime = std::chrono::steady_clock::now();
 
                 const auto msSinceLastSend = (unsigned int)std::chrono::duration<double, std::milli>(currentTime - _lastSendCompleteState).count();
 
-                if (msSinceLastSend >= _maxMsBetweenCompleteStates)
+                int msRemainingUntilNextFrame = _hasStateChanged
+                    ? _minMsBetweenCompleteStates - msSinceLastSend
+                    : _maxMsBetweenCompleteStates - msSinceLastSend;
+                if (msRemainingUntilNextFrame <= 0)
                 {
+                    _hasStateChanged = false;
                     sendCompleteState();
                 }
                 else
                 {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(_maxMsBetweenCompleteStates - msSinceLastSend));
+                    _completeStateWaker.wait(wakerLock);
                 }
             }
         }
 
         void sendCompleteState()
         {
-            std::lock_guard<std::mutex> sendCompleteStateLock(_sendCompleteStateMutex);
-
             _lastSendCompleteState = std::chrono::steady_clock::now();
 
             {
@@ -110,7 +134,9 @@ namespace uw
 
             auto localPlayerClients(_playerClients);
 
-            const auto completeGameState = _gameManager->completeGameState();
+            const auto completeGameState = _gameManager->independentCompleteGameState();
+            if (completeGameState->version() == _lastSentGameStateVersion) return;
+            _lastSentGameStateVersion = completeGameState->version();
 
             CommunicatedCompleteGameState communicatedCompleteGameState(_physicsCommunicationAssembler->physicsCompleteGameStateToCommunicated(completeGameState));
 
@@ -121,7 +147,7 @@ namespace uw
                 {
                     playerClient.client()->send(_messageSerializer->serialize(std::vector<MessageWrapper>(1, message)));
                 }
-                catch (std::exception error)
+                catch (std::exception& error)
                 {
                     Logger::error("Error while sending complete state to client: " + std::string(error.what()));
                 }
@@ -129,6 +155,7 @@ namespace uw
         }
 
         static const unsigned int MINIMAL_COMPLETE_STATE_PER_MINUTE;
+        static const unsigned int MAXIMAL_COMPLETE_STATE_PER_SECOND;
         static const xg::Guid PLAYER_INPUT_GAME_MANAGER_CALLBACK_ID;
 
         bool _isRunning;
@@ -136,10 +163,14 @@ namespace uw
 
         immer::vector<PlayerClient> _playerClients;
         std::chrono::steady_clock::time_point _lastSendCompleteState;
-        std::mutex _sendCompleteStateMutex;
         std::mutex _updatePlayerClients;
-
+        std::mutex _sendCompleteGameStateMutex;
+        std::condition_variable _completeStateWaker;
+        std::atomic<bool> _hasStateChanged;
+        xg::Guid _lastSentGameStateVersion;
+        
         const unsigned int _maxMsBetweenCompleteStates;
+        const unsigned int _minMsBetweenCompleteStates;
         const std::shared_ptr<GameManager> _gameManager;
         const std::shared_ptr<MessageSerializer> _messageSerializer;
         const std::shared_ptr<PhysicsCommunicationAssembler> _physicsCommunicationAssembler;

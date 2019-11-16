@@ -24,6 +24,10 @@ namespace uw
         xg::Guid spawnerId() const;
 
     private:
+
+        const static std::string MOBILE_UNITS_ID_LABEL;
+        const static std::string SPAWNER_ID_LABEL;
+
         const std::vector<xg::Guid> _singuityIds;
         const xg::Guid _spawnerId;
     };

@@ -18,6 +18,9 @@ namespace uw
         xg::Guid playerId() const;
 
     private:
+
+        const static std::string PLAYER_ID_LABEL;
+
         const xg::Guid _playerId;
     };
 }

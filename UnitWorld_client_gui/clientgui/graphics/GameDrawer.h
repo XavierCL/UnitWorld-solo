@@ -17,12 +17,15 @@ namespace uw
         GameDrawer(std::shared_ptr<GameManager> gameManager, std::shared_ptr<UserControlState> userControlState, std::shared_ptr<CameraRelativeGameManager> cameraRelativeGameManager):
             _gameManager(gameManager),
             _userControlState(userControlState),
-            _cameraRelativeGameManager(cameraRelativeGameManager)
+            _cameraRelativeGameManager(cameraRelativeGameManager),
+            _lastDrawnGameStateVersion()
         {}
 
         void draw(std::shared_ptr<SFMLDrawingCanvas> canvas)
         {
             auto completeGameState = _gameManager->completeGameState();
+
+            _lastDrawnGameStateVersion = completeGameState->version();
 
             std::shared_ptr<std::unordered_map<xg::Guid, size_t>> playerIndexByPlayerId(std::make_shared<std::unordered_map<xg::Guid, size_t>>());
             for (size_t playerIndex = 0; playerIndex < completeGameState->players().size(); ++playerIndex)
@@ -91,7 +94,7 @@ namespace uw
             // Selected unit white aura
             for (const auto selectedUnitId : _userControlState->getSelectedUnits())
             {
-                (currentPlayerSinguities | find<std::shared_ptr<Singuity>>(selectedUnitId)).foreach([&canvas, this](std::shared_ptr<Singuity> singuity) {
+                (currentPlayerSinguities | findSafe<std::shared_ptr<Singuity>>(selectedUnitId)).foreach([&canvas, this](std::shared_ptr<Singuity> singuity) {
                     Circle singuityCircle = _cameraRelativeGameManager->relativeCircleOf(singuity);
                     const double circleRadius(singuityCircle.radius() * 1.25);
                     sf::CircleShape selectedUnitAura(circleRadius);
@@ -109,8 +112,10 @@ namespace uw
                     .map<sf::Color>([this](auto playerIndex) { return _playerColors[playerIndex]; })
                     .getOrElse(sf::Color::Black);
 
-                for (auto singuity : *player->singuities())
+                auto playerSinguities = player->singuities();
+                for (size_t index = 0; index < playerSinguities->size(); ++index)
                 {
+                    auto singuity = playerSinguities->operator[](index);
                     Circle singuityCircle = _cameraRelativeGameManager->relativeCircleOf(singuity);
                     canvas->draw(*(GraphicalSinguity(singuity, singuityCircle, drawingSinguitiesColor).drawable()));
                 }
@@ -135,5 +140,6 @@ namespace uw
         const std::shared_ptr<GameManager> _gameManager;
         const std::shared_ptr<UserControlState> _userControlState;
         const std::shared_ptr<CameraRelativeGameManager> _cameraRelativeGameManager;
+        xg::Guid _lastDrawnGameStateVersion;
     };
 }

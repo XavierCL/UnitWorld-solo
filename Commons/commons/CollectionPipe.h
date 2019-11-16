@@ -267,6 +267,33 @@ struct FunctionalDefinitions
         const Value _value;
     };
 
+    template<typename Found, typename Value>
+    struct FindSafe
+    {
+        FindSafe(const Value& value) :
+            _value(value)
+        {}
+
+        using Output = Option<Found>;
+
+        template <typename InputCollection>
+        Output operator() (InputCollection input) const
+        {
+            auto found = input->find(_value);
+            if (found != input->end())
+            {
+                return Options::Some(found->second);
+            }
+            else
+            {
+                return Options::None<Found>();
+            }
+        }
+
+    private:
+        const Value _value;
+    };
+
     template <typename Value, typename ValueHash, typename ValueEqual>
     struct ToUnorderedSet
     {
@@ -435,6 +462,12 @@ template <typename Found, typename Value>
 FunctionalDefinitions::Find<Found, Value> find(const Value& value)
 {
     return FunctionalDefinitions::Find<Found, Value>(value);
+}
+
+template<typename Found, typename Value>
+FunctionalDefinitions::FindSafe<Found, Value> findSafe(const Value& value)
+{
+    return FunctionalDefinitions::FindSafe<Found, Value>(value);
 }
 
 template <typename Value, typename ValueHash = std::hash<Value>, typename ValueEqual = std::equal_to<Value>>
