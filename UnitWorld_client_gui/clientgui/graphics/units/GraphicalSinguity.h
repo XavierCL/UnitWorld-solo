@@ -6,9 +6,9 @@
 
 namespace uw
 {
-    class GraphicalSinguity : public GraphicalUnit, public Singuity
+    class GraphicalSinguity : public GraphicalUnit
     {
     public:
-        GraphicalSinguity(const Singuity& self, const sf::Color& color);
+        GraphicalSinguity(std::shared_ptr<Singuity> self, const sf::Color& color);
     };
 }

@@ -24,9 +24,6 @@
     <ClInclude Include="shared\game\geometry\Rectangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shared\game\physics\Vector2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="shared\game\play\MobileUnit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -72,22 +69,64 @@
     <ClInclude Include="shared\game\commands\MoveMobileUnitsToPosition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shared\game\physics\CollisionDetector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\game\physics\CollidablePoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\game\physics\CollisionDetectorFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\game\physics\NaiveCollisionDetectorFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared\game\physics\NaiveCollisionDetector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="shared\configuration\ConfigurationManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\game\CommunicatedSpawner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\Spawner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\SpawnerAllegance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\CompleteGameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\game\CommunicatedCompleteGameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\PhysicsManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\UnitWithHealthPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\play\Shooter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\collisions\CollidablePoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\collisions\CollisionDetector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\collisions\CollisionDetectorFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\collisions\NaiveCollisionDetector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\collisions\NaiveCollisionDetectorFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\actualizers\SinguityActualizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\geometry\Vector2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\actualizers\SpawnerActualizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\actualizers\PlayerActualizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\game\physics\actualizers\CompleteGameStateActualizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\communication\messages\game\CommunicatedSpawnerAllegence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -96,9 +135,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\game\geometry\Rectangle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shared\game\physics\Vector2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\game\play\MobileUnit.cpp">
@@ -111,9 +147,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\game\play\Unit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shared\game\GameManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\communication\messages\CompleteGameStateMessage.cpp">
@@ -132,6 +165,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shared\configuration\ConfigurationManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\game\CommunicatedCompleteGameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\physics\PhysicsManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\geometry\Vector2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\game\play\Spawner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\game\CommunicatedSpawnerAllegence.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\communication\messages\game\CommunicatedSpawner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

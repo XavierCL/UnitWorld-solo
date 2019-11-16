@@ -29,26 +29,40 @@ xg::Guid Player::id() const
     return _id;
 }
 
-void Player::actualize()
+void Player::setSinguitiesDestination(const immer::set<xg::Guid>& singuitiesId, const Vector2D& destination)
 {
-    _singuities = _singuities
-        | filter<std::shared_ptr<Singuity>>([](auto singuity) {return !singuity->isDead(); })
-        | toVector<std::shared_ptr<Singuity>>();
+    _singuities
+        | filter<std::shared_ptr<Singuity>>([&singuitiesId](auto singuity) { return singuitiesId.count(singuity->id()) > 0; })
+        | forEach([&destination](auto singuity) { singuity->setDestination(destination); });
+}
 
-    for (auto singuity : *_singuities)
+void Player::addSinguity(std::shared_ptr<Singuity> newSinguity)
+{
+    _singuities->emplace_back(newSinguity);
+    
+    auto addSinguityCallbacks = _singuityAddedCallbacks;
+    for (const auto& callback : addSinguityCallbacks)
     {
-        singuity->actualize();
+        callback.second(newSinguity);
     }
 }
 
-void Player::setSinguitiesDestination(const std::unordered_set<xg::Guid>& singuitiesId, const Vector2D& destination)
+void Player::setSinguities(std::shared_ptr<std::vector<std::shared_ptr<Singuity>>> singuities)
 {
-    _singuities
-        | filter<std::shared_ptr<Singuity>>([&singuitiesId](auto singuity) { return singuitiesId.find(singuity->id()) != singuitiesId.cend(); })
-        | forEach([&destination](auto singuity) { singuity->setDestination(destination); });
+    _singuities = singuities;
 }
 
 std::shared_ptr<std::vector<std::shared_ptr<Singuity>>> Player::singuities() const
 {
     return _singuities;
+}
+
+void Player::addSinguityAddedCallback(const xg::Guid& callbackId, const std::function<void(std::shared_ptr<Singuity>)>& callback)
+{
+    _singuityAddedCallbacks = _singuityAddedCallbacks.insert(std::make_pair(callbackId, callback));
+}
+
+void Player::removeSinguityAddedCallback(const xg::Guid& callbackId)
+{
+    _singuityAddedCallbacks = _singuityAddedCallbacks.erase(callbackId);
 }

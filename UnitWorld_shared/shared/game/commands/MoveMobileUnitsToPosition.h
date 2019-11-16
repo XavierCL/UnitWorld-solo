@@ -1,6 +1,8 @@
 #pragma once
 
-#include "shared/game/play/Player.h"
+#include "shared/game/play/CompleteGameState.h"
+
+#include <immer/set.hpp>
 
 namespace uw
 {
@@ -8,15 +10,15 @@ namespace uw
     {
     public:
 
-        MoveMobileUnitsToPosition(const xg::Guid& playerId, const std::vector<xg::Guid>& singuityIds, const Vector2D& destination) :
+        MoveMobileUnitsToPosition(const xg::Guid& playerId, const immer::set<xg::Guid>& singuityIds, const Vector2D& destination) :
             _playerId(playerId),
-            _singuityIds(singuityIds.begin(), singuityIds.end()),
+            _singuityIds(singuityIds),
             _destination(destination)
         {}
 
-        void execute(const std::vector<std::shared_ptr<Player>>& players) const
+        void execute(std::shared_ptr<CompleteGameState> completeGameState) const
         {
-            for (auto player : players)
+            for (auto player : completeGameState->players())
             {
                 if (player->id() == _playerId)
                 {
@@ -28,7 +30,7 @@ namespace uw
 
     private:
         const xg::Guid _playerId;
-        const std::unordered_set<xg::Guid> _singuityIds;
+        const immer::set<xg::Guid> _singuityIds;
         const Vector2D _destination;
     };
 }

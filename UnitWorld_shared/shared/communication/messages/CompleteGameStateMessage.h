@@ -2,8 +2,7 @@
 
 #include "Message.h"
 
-#include "game/CommunicatedPlayer.h"
-#include "game/CommunicatedSinguity.h"
+#include "game/CommunicatedCompleteGameState.h"
 
 #include "commons/Guid.hpp"
 
@@ -12,7 +11,7 @@ namespace uw
     class CompleteGameStateMessage : public Message
     {
     public:
-        CompleteGameStateMessage(const std::vector<CommunicatedPlayer>& players, const std::vector<CommunicatedSinguity>& singuities, const xg::Guid& currentPlayerId);
+        CompleteGameStateMessage(const CommunicatedCompleteGameState& completeGameState, const xg::Guid& currentPlayerId);
 
         CompleteGameStateMessage(const std::string jsonData);
 
@@ -20,20 +19,16 @@ namespace uw
 
         virtual std::string toJsonData() const;
 
-        std::vector<CommunicatedPlayer> getPlayers() const;
-
-        std::vector<CommunicatedSinguity> getSinguities() const;
+        CommunicatedCompleteGameState completeGameState() const;
 
         xg::Guid getCurrentPlayerId() const;
 
     private:
 
-        static std::vector<CommunicatedPlayer> jsonDataToPlayers(const std::string& jsonData);
-        static std::vector<CommunicatedSinguity> jsonDataToSinguities(const std::string& jsonData);
+        static CommunicatedCompleteGameState jsonDataToCompleteGameState(const std::string& jsonData);
         static xg::Guid jsonDataToCurrentPlayerId(const std::string& jsonData);
 
-        const std::vector<CommunicatedPlayer> _players;
-        const std::vector<CommunicatedSinguity> _singuities;
+        const CommunicatedCompleteGameState _completeGameState;
         const xg::Guid _currentPlayerId;
     };
 }

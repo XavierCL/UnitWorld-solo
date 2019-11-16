@@ -7,7 +7,8 @@
 #include "commons/Hash.hpp"
 #include "commons/Guid.hpp"
 
-#include <unordered_set>
+#include <immer/map.hpp>
+#include <immer/set.hpp>
 
 namespace uw
 {
@@ -18,13 +19,19 @@ namespace uw
         Player(const Player& other);
 
         xg::Guid id() const;
-        void actualize();
-        void setSinguitiesDestination(const std::unordered_set<xg::Guid>& singuitiesId, const Vector2D& destination);
+        void setSinguitiesDestination(const immer::set<xg::Guid>& singuitiesId, const Vector2D& destination);
+        void addSinguity(std::shared_ptr<Singuity> newSinguity);
+        void setSinguities(std::shared_ptr<std::vector<std::shared_ptr<Singuity>>> singuities);
         std::shared_ptr<std::vector<std::shared_ptr<Singuity>>> singuities() const;
+
+        void addSinguityAddedCallback(const xg::Guid& callbackId, const std::function<void(std::shared_ptr<Singuity>)>& callback);
+        void removeSinguityAddedCallback(const xg::Guid& callbackId);
 
     private:
         const xg::Guid _id;
 
         std::shared_ptr<std::vector<std::shared_ptr<Singuity>>> _singuities;
+
+        immer::map<xg::Guid, std::function<void(std::shared_ptr<Singuity>)>> _singuityAddedCallbacks;
     };
 }
