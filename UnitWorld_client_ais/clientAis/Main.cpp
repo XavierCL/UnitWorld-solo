@@ -16,6 +16,7 @@
 #include "ais/xaviercl/arcAi/ArcAi.h"
 
 #include "ais/johnwl/microer/Microer.h"
+#include "ais/johnwl/microer/Microer2.h"
 
 #include "clientShared/networking/ServerReceiver.h"
 
@@ -58,6 +59,10 @@ std::shared_ptr<Artificial> generateAI(const std::string& aiName)
     else if (aiName == "microer")
     {
         return std::make_shared<Microer>();
+    }
+    else if (aiName == "microer2")
+    {
+        return std::make_shared<Microer2>();
     }
     else
     {
