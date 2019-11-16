@@ -93,6 +93,76 @@ namespace uw
                     double delta(event.mouseWheelScroll.delta);
                     _windowInputs->setUserMouseWheelScroll(delta, mousePosition);
                 }
+                else if(event.type == sf::Event::KeyPressed)
+                {
+                    if(event.key.code == sf::Keyboard::LControl)
+                    {
+                        _windowInputs->userPressedLeftControl();
+                    }
+                    else if(event.key.code == sf::Keyboard::LShift)
+                    {
+                        _windowInputs->userPressedLeftShift();
+                    }
+                    else if(event.key.code == sf::Keyboard::Escape)
+                    {
+                        _window->close();
+                    }
+                    else if (event.key.code == sf::Keyboard::A)
+                    {
+                        _windowInputs->userPressedAKey();
+                    }
+                    else if(event.key.code == sf::Keyboard::Num0)
+                    {
+                        _windowInputs->userPressedNumber(0);
+                    }
+                    else if(event.key.code == sf::Keyboard::Num1)
+                    {
+                        _windowInputs->userPressedNumber(1);
+                    }
+                    else if(event.key.code == sf::Keyboard::Num2)
+                    {
+                        _windowInputs->userPressedNumber(2);
+                    }
+                    else if(event.key.code == sf::Keyboard::Num3)
+                    {
+                        _windowInputs->userPressedNumber(3);
+                    }
+                    else if(event.key.code == sf::Keyboard::Num4)
+                    {
+                        _windowInputs->userPressedNumber(4);
+                    }
+                    else if(event.key.code == sf::Keyboard::Num5)
+                    {
+                        _windowInputs->userPressedNumber(5);
+                    }
+                    else if(event.key.code == sf::Keyboard::Num6)
+                    {
+                        _windowInputs->userPressedNumber(6);
+                    }
+                    else if(event.key.code == sf::Keyboard::Num7)
+                    {
+                        _windowInputs->userPressedNumber(7);
+                    }
+                    else if(event.key.code == sf::Keyboard::Num8)
+                    {
+                        _windowInputs->userPressedNumber(8);
+                    }
+                    else if(event.key.code == sf::Keyboard::Num9)
+                    {
+                        _windowInputs->userPressedNumber(9);
+                    }
+                }
+                else if(event.type == sf::Event::KeyReleased)
+                {
+                    if(event.key.code == sf::Keyboard::LControl)
+                    {
+                        _windowInputs->userReleasedLeftControl();
+                    }
+                    else if(event.key.code == sf::Keyboard::LShift)
+                    {
+                        _windowInputs->userReleasedLeftShift();
+                    }
+                }
             }
             _windowInputs->frameHappened();
         }
