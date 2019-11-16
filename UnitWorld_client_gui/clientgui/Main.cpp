@@ -5,7 +5,7 @@
 
 #include "graphics/WindowManager.h"
 
-#include "shared/game/physics/collisions/NaiveCollisionDetectorFactory.h"
+#include "shared/game/physics/collisions/KdtreeCollisionDetectorFactory.h"
 
 #include "shared/configuration/ConfigurationManager.h"
 
@@ -52,7 +52,7 @@ int main()
 
             const auto gameManager(std::make_shared<GameManager>());
 
-            const auto naiveCollisionDetectorFactory(std::make_shared<NaiveCollisionDetectorFactory>());
+            const auto naiveCollisionDetectorFactory(std::make_shared<KdtreeCollisionDetectorFactory>());
             const auto physicsManager(std::make_shared<PhysicsManager>(gameManager, naiveCollisionDetectorFactory));
 
             const auto physicsCommunicationAssembler(std::make_shared<PhysicsCommunicationAssembler>());

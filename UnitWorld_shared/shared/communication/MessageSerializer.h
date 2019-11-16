@@ -3,6 +3,7 @@
 #include "MessageWrapper.h"
 
 #include "commons/StringsHelper.h"
+#include "commons/Logger.hpp"
 
 namespace uw
 {
@@ -40,7 +41,15 @@ namespace uw
             std::vector<MessageWrapper> messages;
             for (const auto communication : communications)
             {
-                messages.emplace_back(MessageWrapper(communication));
+                try
+                {
+                    messages.emplace_back(MessageWrapper(communication));
+                }
+                catch (...)
+                {
+                    // Parsing failed, there was a problem with a middle message
+                    Logger::info("Discarded a message starting with : " + communication.substr(0, 100));
+                }
             }
 
             return messages;
