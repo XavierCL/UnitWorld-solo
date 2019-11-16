@@ -8,7 +8,7 @@ public:
 
     static const unsigned char debruijn64Table[64];
 
-    static const long long isolateMostSignificantBit(long long n)
+    static const unsigned long long isolateMostSignificantBit(unsigned long long n)
     {
         n |= (n >> 1);
         n |= (n >> 2);
@@ -19,32 +19,32 @@ public:
         return n & ~(n >> 1);
     }
 
-    static const long long isolateLeastSignificantBit(const long long& n)
+    static const unsigned long long isolateLeastSignificantBit(const unsigned long long& n)
     {
         return n & (0 - n);
     }
 
-    static const unsigned char singleBitToPosition(const long long& n)
+    static const unsigned char singleBitToPosition(const unsigned long long& n)
     {
         return debruijn64Table[(n * 0x03f79d71b4cb0a89) >> 58] + (unsigned char)(n != 0);
     }
 
-    static const unsigned char positionOfMostSignificantBit(long long n)
+    static const unsigned char positionOfMostSignificantBit(unsigned long long n)
     {
         return singleBitToPosition(isolateMostSignificantBit(n));
     }
 
-    static const unsigned char positionOfLeastSignificantBit(const long long& n)
+    static const unsigned char positionOfLeastSignificantBit(const unsigned long long& n)
     {
         return singleBitToPosition(isolateLeastSignificantBit(n));
     }
 
-    static const long long positionToSingleBit(const unsigned char& n)
+    static const unsigned long long positionToSingleBit(const unsigned char& n)
     {
-        return (long long)1 << n - 1;
+        return (unsigned long long)1 << n - 1;
     }
 
-    static const unsigned char bitBoardPopulationCount(long long n)
+    static const unsigned char bitBoardPopulationCount(unsigned long long n)
     {
         n = n - ((n >> 1) & 0x5555555555555555);
         n = ((n >> 2) & 0x3333333333333333) + (n & 0x3333333333333333);
@@ -54,13 +54,13 @@ public:
         return ((n >> 32) + n) & 0x00000000000000FF;
     }
 
-    static const bool isPrime(const long long n)
+    static const bool isPrime(const unsigned long long n)
     {
         if (n % 2 == 0 && n > 2)
         {
             return false;
         }
-        for (long long it = 3; it * it < n; it += 2)
+        for (unsigned long long it = 3; it * it < n; it += 2)
         {
             if (n % it == 0)
             {
@@ -70,9 +70,9 @@ public:
         return true;
     }
 
-    static const long long nextOrSamePrime(const long long n)
+    static const unsigned long long nextOrSamePrime(const unsigned long long n)
     {
-        long long it = n;
+        unsigned long long it = n;
         if (n < 4)
         {
             return n;
@@ -89,11 +89,11 @@ public:
     }
 
     template <typename _FunctionType>
-    static void foreachBit(long long bitBoard, const _FunctionType& foreachFunction)
+    static void foreachBit(unsigned long long bitBoard, const _FunctionType& foreachFunction)
     {
         while (bitBoard)
         {
-            const long long singleBit = isolateLeastSignificantBit(bitBoard);
+            const unsigned long long singleBit = isolateLeastSignificantBit(bitBoard);
             bitBoard ^= singleBit;
             foreachFunction(singleBitToPosition(singleBit));
         }
