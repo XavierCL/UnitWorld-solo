@@ -62,13 +62,7 @@
     <ClInclude Include="clientgui\ClientGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="clientgui\networking\ServerReceiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="clientgui\userControls\UserControlState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="clientgui\networking\ServerCommander.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="clientgui\cameras\Camera.h">

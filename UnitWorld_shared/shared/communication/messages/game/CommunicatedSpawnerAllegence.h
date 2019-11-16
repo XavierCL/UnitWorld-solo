@@ -2,6 +2,8 @@
 
 #include "commons/Guid.hpp"
 
+#include <nlohmann/json.hpp>
+
 namespace uw
 {
     class CommunicatedSpawnerAllegence
@@ -28,9 +30,9 @@ namespace uw
             return _playerId;
         }
 
-        std::string toJson() const;
+        nlohmann::json toJson() const;
 
-        static CommunicatedSpawnerAllegence fromJson(const std::string& jsonData);
+        static CommunicatedSpawnerAllegence fromJson(const nlohmann::json& jsonData);
 
     private:
         const bool _isClaimed;

@@ -4,7 +4,7 @@
 
 using namespace uw;
 
-std::string CommunicatedSpawnerAllegence::toJson() const
+nlohmann::json CommunicatedSpawnerAllegence::toJson() const
 {
     nlohmann::json jsonData = {
         {"is-claimed", _isClaimed},
@@ -12,13 +12,11 @@ std::string CommunicatedSpawnerAllegence::toJson() const
         {"player-id", _playerId.str()}
     };
 
-    return jsonData.dump();
+    return jsonData;
 }
 
-CommunicatedSpawnerAllegence CommunicatedSpawnerAllegence::fromJson(const std::string& jsonData)
+CommunicatedSpawnerAllegence CommunicatedSpawnerAllegence::fromJson(const nlohmann::json& parsedJson)
 {
-    nlohmann::json parsedJson = nlohmann::json::parse(jsonData);
-
     return CommunicatedSpawnerAllegence(
         parsedJson.at("is-claimed").get<bool>(),
         parsedJson.at("health-point").get<double>(),

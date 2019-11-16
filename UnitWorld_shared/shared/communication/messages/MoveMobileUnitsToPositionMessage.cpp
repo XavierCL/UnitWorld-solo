@@ -21,7 +21,7 @@ std::shared_ptr<MoveMobileUnitsToPositionMessage> MoveMobileUnitsToPositionMessa
 
     return std::make_shared<MoveMobileUnitsToPositionMessage>(
         std::move(singuityIds),
-        CommunicatedVector2D::fromJson(parsedData.at("destination-position").dump())
+        CommunicatedVector2D::fromJson(parsedData.at("destination-position"))
     );
 }
 
@@ -38,7 +38,7 @@ std::string MoveMobileUnitsToPositionMessage::toJsonData() const
         singuityStringIds.emplace_back(singuityId.str());
     }
 
-    nlohmann::json parsedDestination(nlohmann::json::parse(_destination.toJson()));
+    nlohmann::json parsedDestination(_destination.toJson());
 
     nlohmann::json returnedJson({
         {"mobile-units-id", singuityStringIds},

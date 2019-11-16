@@ -1,6 +1,6 @@
 #pragma once
 
-#include "clientgui/networking/ServerCommander.h"
+#include "clientShared/networking/ServerCommander.h"
 
 #include "clientgui/cameras/CameraRelativeGameManager.h"
 

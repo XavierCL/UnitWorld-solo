@@ -4,24 +4,22 @@
 
 using namespace uw;
 
-std::string CommunicatedSpawnerDestination::toJson() const
+nlohmann::json CommunicatedSpawnerDestination::toJson() const
 {
     nlohmann::json parsedSpawnerAllegence = _spawnerAllegence
-            .map<nlohmann::json>([](auto allegence) { return nlohmann::json::parse(allegence.toJson()); })
+            .map<nlohmann::json>([](auto allegence) { return allegence.toJson(); })
             .getOrElse(nlohmann::json("none"));
 
     return nlohmann::json {
         {"spawner-id", _spawnerId.str()},
         {"spawner-allegence", parsedSpawnerAllegence}
-    }.dump();
+    };
 }
 
-CommunicatedSpawnerDestination CommunicatedSpawnerDestination::fromJson(const std::string& jsonData)
+CommunicatedSpawnerDestination CommunicatedSpawnerDestination::fromJson(const nlohmann::json& parsedJsonData)
 {
-    nlohmann::json parsedJsonData = nlohmann::json::parse(jsonData);
-
-    std::string jsonAllegence = parsedJsonData.at("spawner-allegence").dump();
-    Option<CommunicatedSpawnerAllegence> communicatedSpawnerAllegence = jsonAllegence == "\"none\""
+    nlohmann::json jsonAllegence = parsedJsonData.at("spawner-allegence");
+    Option<CommunicatedSpawnerAllegence> communicatedSpawnerAllegence = jsonAllegence.is_string() && jsonAllegence.get<std::string>() == "none"
         ? Options::None<CommunicatedSpawnerAllegence>()
         : Options::Some(CommunicatedSpawnerAllegence::fromJson(jsonAllegence));
 
