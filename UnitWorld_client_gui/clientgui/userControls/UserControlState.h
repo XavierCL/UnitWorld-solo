@@ -2,11 +2,13 @@
 
 #include "clientgui/networking/ServerCommander.h"
 
-#include "shared/game/GameManager.h"
+#include "clientgui/cameras/CameraRelativeGameManager.h"
 
 #include "shared/game/geometry/Vector2D.h"
 #include "shared/game/geometry/Rectangle.h"
 #include "shared/game/geometry/Circle.h"
+
+#include "shared/game/GameManager.h"
 
 #include "commons/Option.hpp"
 #include "commons/Guid.hpp"
@@ -19,8 +21,9 @@ namespace uw
     class UserControlState
     {
     public:
-        UserControlState(std::shared_ptr<GameManager> gameManager, std::shared_ptr<ServerCommander> serverCommander) :
+        UserControlState(std::shared_ptr<GameManager> gameManager, std::shared_ptr<CameraRelativeGameManager> cameraRelativeGameManager, std::shared_ptr<ServerCommander> serverCommander) :
             _gameManager(gameManager),
+            _cameraRelativeGameManager(cameraRelativeGameManager),
             _serverCommander(serverCommander),
             _leftMouseDownPosition(std::make_shared<Option<const Vector2D>>()),
             _lastMousePosition(std::make_shared<Option<const Vector2D>>()),
@@ -32,14 +35,14 @@ namespace uw
 
         void setUserLeftMouseDownPosition(const Vector2D& position)
         {
-            _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>(position);
+            _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>(_cameraRelativeGameManager->relativePositionToAbsolute(position));
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>();
             _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>();
             _lastSelectedSpawnerAllegence = std::make_shared<Option<SpawnerAllegence>>();
             _selectedUnits = std::make_shared<std::vector<xg::Guid>>();
         }
 
-        void setUserLeftMouseUpPosition(const Vector2D position)
+        void setUserLeftMouseUpPosition(const Vector2D& position)
         {
             _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>();
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>();
@@ -51,13 +54,14 @@ namespace uw
         {
             _lastMousePosition->foreach([this](const auto& position) {
                 _leftMouseDownPosition->foreach([this, position](const Vector2D& leftMouseDownPosition) {
-                    const auto selectionRectangle(Rectangle(leftMouseDownPosition, position));
+                    const Rectangle selectionRectangle(_cameraRelativeGameManager->absolutePositionToRelative(leftMouseDownPosition), _cameraRelativeGameManager->absolutePositionToRelative(position));
 
-                    _selectedUnits = _gameManager->currentPlayer().map<std::shared_ptr<std::vector<xg::Guid>>>([&selectionRectangle](std::shared_ptr<Player> player) {
-                        return player->singuities() | filter<std::shared_ptr<Singuity>>([&selectionRectangle](std::shared_ptr<Singuity> singuity) {
-                            return selectionRectangle.contains(singuity->position());
+                    _selectedUnits = _gameManager->currentPlayer().map<std::shared_ptr<std::vector<xg::Guid>>>([&selectionRectangle, this](std::shared_ptr<Player> player) {
+                        return player->singuities() | filter<std::shared_ptr<Singuity>>([&selectionRectangle, this](std::shared_ptr<Singuity> singuity) {
+                            const auto singuityRelativeCircle(_cameraRelativeGameManager->relativeCircleOf(singuity));
+                            return selectionRectangle.intersectsWith(singuityRelativeCircle);
                         }) | map<xg::Guid>([](std::shared_ptr<Singuity> singuity) { return singuity->id(); })
-                            | toVector<xg::Guid>();
+                        | toVector<xg::Guid>();
                     }).getOrElse(std::make_shared<std::vector<xg::Guid>>());
                 });
             });
@@ -80,7 +84,7 @@ namespace uw
 
         void setUserMousePosition(const Vector2D& position)
         {
-            _lastMousePosition = std::make_shared<Option<const Vector2D>>(position);
+            _lastMousePosition = std::make_shared<Option<const Vector2D>>(_cameraRelativeGameManager->relativePositionToAbsolute(position));
         }
 
         void setUserRightMouseDownPosition(const Vector2D& position)
@@ -95,10 +99,10 @@ namespace uw
 
             for (auto spawner : *reverseSpawners)
             {
-                Circle spawnerShape(spawner->position(), 20.0);
+                const auto spawnerRelativeCircle(_cameraRelativeGameManager->relativeCircleOf(spawner));
                 auto currentPlayerId = _gameManager->currentPlayer().map<xg::Guid>([](std::shared_ptr<Player> player) { return player->id(); });
                 bool spawnerCanBeInterractedWith = currentPlayerId.map<bool>([spawner](const xg::Guid& id) { return spawner->canBeInteractedWithBy(id); }).getOrElse(false);
-                if (spawnerShape.contains(position) && spawnerCanBeInterractedWith)
+                if (spawnerRelativeCircle.contains(position) && spawnerCanBeInterractedWith)
                 {
                     _serverCommander->moveUnitsToSpawner(*_selectedUnits, spawner->id());
                     _lastSelectedSpawnerId = std::make_shared<Option<const xg::Guid>>(spawner->id());
@@ -106,11 +110,12 @@ namespace uw
                     return;
                 }
             }
-            _serverCommander->moveUnitsToPosition(*_selectedUnits, position);
-            _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>(position);
+            const Vector2D absoluteMousePosition(_cameraRelativeGameManager->relativePositionToAbsolute(position));
+            _serverCommander->moveUnitsToPosition(*_selectedUnits, absoluteMousePosition);
+            _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>(absoluteMousePosition);
         }
 
-        Option<Rectangle> getSelectionRectangle() const
+        Option<Rectangle> getAbsoluteSelectionRectangle() const
         {
             return _leftMouseDownPosition->flatMap<Rectangle>([this](const Vector2D& leftMouseDown) {
                 return _lastMousePosition->map<Rectangle>([&leftMouseDown](const Vector2D& currentMousePosition) {
@@ -124,7 +129,7 @@ namespace uw
             return *_selectedUnits;
         }
 
-        Option<const Vector2D> getLastMoveUnitPosition() const
+        Option<const Vector2D> getAbsoluteLastMoveUnitPosition() const
         {
             return *_lastMoveUnitPosition;
         }
@@ -136,6 +141,7 @@ namespace uw
 
     private:
         const std::shared_ptr<GameManager> _gameManager;
+        const std::shared_ptr<CameraRelativeGameManager> _cameraRelativeGameManager;
         const std::shared_ptr<ServerCommander> _serverCommander;
 
         std::shared_ptr<Option<const Vector2D>> _leftMouseDownPosition;

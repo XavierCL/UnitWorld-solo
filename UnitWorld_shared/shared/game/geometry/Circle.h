@@ -12,9 +12,19 @@ namespace uw
             _radius(radius)
         {}
 
-        bool contains(const Vector2D& point)
+        bool contains(const Vector2D& point) const
         {
             return sq(_center.x() - point.x()) + sq(_center.y() - point.y()) <= sq(_radius);
+        }
+
+        Vector2D center() const
+        {
+            return _center;
+        }
+
+        double radius() const
+        {
+            return _radius;
         }
 
     private:

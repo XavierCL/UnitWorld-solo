@@ -33,6 +33,9 @@
     <ClCompile Include="clientgui\graphics\GameDrawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="clientgui\cameras\CameraRelativeGameManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clientgui\graphics\canvas\CanvasTransactionGenerator.h">
@@ -62,13 +65,22 @@
     <ClInclude Include="clientgui\networking\ServerReceiver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="clientgui\graphics\WindowManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="clientgui\userControls\UserControlState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="clientgui\networking\ServerCommander.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\cameras\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\cameras\CameraRelativeGameManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\WindowManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clientgui\userControls\WindowInputs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
