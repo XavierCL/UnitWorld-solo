@@ -14,6 +14,8 @@
 
 #include "commons/MemoryExtension.h"
 
+#include "commons/Logger.hpp"
+
 namespace uw
 {
     class ServerReceiver
@@ -23,7 +25,8 @@ namespace uw
             _serverHandler(serverHandler),
             _gameManager(gameManager),
             _physicsCommunicationAssembler(physicsCommunicationAssembler),
-            _messageSerializer(messageSerializer)
+            _messageSerializer(messageSerializer),
+            _lastCurrentPlayerId()
         {}
 
         void stop()
@@ -37,11 +40,23 @@ namespace uw
         {
             _receiveThread = std::thread([this] {
             
-                while (_serverHandler->isOpen())
+                try
                 {
-                    receiveServerCommunications();
+                    while (_serverHandler->isOpen())
+                    {
+                        receiveServerCommunications();
+                    }
+                }
+                catch (std::exception error)
+                {
+                    Logger::error("Error while receiving from the server socket the socket is likely closed. Error message: " + std::string(error.what()));
                 }
             });
+        }
+
+        Option<xg::Guid> lastCurrentPlayerId() const
+        {
+            return _lastCurrentPlayerId;
         }
 
     private:
@@ -79,6 +94,9 @@ namespace uw
         void handleServerMessage(std::shared_ptr<const Message> message)
         {
             const auto completeStateMessage(std::dynamic_pointer_cast<CompleteGameStateMessage const>(message));
+
+            _lastCurrentPlayerId = Options::Some(completeStateMessage->getCurrentPlayerId());
+
             auto singuitiesByPlayerId(std::make_shared<std::vector<CommunicatedSinguity>>(completeStateMessage->getSinguities())
                 | groupBy<xg::Guid, CommunicatedSinguity>([](const CommunicatedSinguity& singuity) { return singuity.playerId(); }));
 
@@ -94,6 +112,8 @@ namespace uw
         }
 
         std::thread _receiveThread;
+
+        Option<xg::Guid> _lastCurrentPlayerId;
 
         const std::shared_ptr<CommunicationHandler> _serverHandler;
         const std::shared_ptr<GameManager> _gameManager;

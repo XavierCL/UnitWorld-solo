@@ -40,25 +40,30 @@ namespace uw
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>();
         }
 
+        void frameHappened()
+        {
+            _lastMousePosition->foreach([this](const auto& position) {
+                _leftMouseDownPosition->foreach([this, position](const Vector2D& leftMouseDownPosition) {
+                    const auto selectionRectangle(Rectangle(leftMouseDownPosition, position));
+
+                    _selectedUnits = std::make_shared<immer::vector<std::shared_ptr<const Singuity>>>(_gameManager->singuities())
+                        | filter<std::shared_ptr<const Singuity>>([this, &selectionRectangle](const std::shared_ptr<const Singuity>& singuity) {
+                        return selectionRectangle.contains(singuity->position());
+                    }) | map<xg::Guid>([](const std::shared_ptr<const Singuity>& singuity) { return singuity->id(); })
+                        | toVector<xg::Guid>();
+                });
+            });
+        }
+
         void setUserMousePosition(const Vector2D& position)
         {
             _lastMousePosition = std::make_shared<Option<const Vector2D>>(position);
-            _leftMouseDownPosition->foreach([this, position](const Vector2D& leftMouseDownPosition) {
-                const auto selectionRectangle(Rectangle(leftMouseDownPosition, position));
-
-                _selectedUnits = std::make_shared<immer::vector<std::shared_ptr<const Singuity>>>(_gameManager->singuities())
-                    | filter<std::shared_ptr<const Singuity>>([this, &selectionRectangle](const std::shared_ptr<const Singuity>& singuity) {
-                        return selectionRectangle.contains(singuity->position());
-                    }) | map<xg::Guid>([](const std::shared_ptr<const Singuity>& singuity) { return singuity->id(); })
-                    | toVector<xg::Guid>();
-            });
         }
 
         void setUserRightMouseDownPosition(const Vector2D& position)
         {
             _serverCommander->moveUnitsToPosition(*_selectedUnits, position);
             _lastMoveUnitPosition = std::make_shared<Option<const Vector2D>>(position);
-            _selectedUnits = std::make_shared<std::vector<xg::Guid>>();
             _leftMouseDownPosition = std::make_shared<Option<const Vector2D>>();
         }
 

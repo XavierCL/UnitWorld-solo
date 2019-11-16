@@ -14,6 +14,9 @@
 
 #include "communications/CommunicationHandler.h"
 
+#include "commons/CollectionPipe.h"
+#include "commons/Logger.hpp"
+
 #include <chrono>
 #include <mutex>
 
@@ -33,6 +36,8 @@ namespace uw
 
         void addClient(const PlayerClient& playerClient)
         {
+            std::lock_guard<std::mutex> playerClientsModificationGuard(_updatePlayerClients);
+
             _playerClients = _playerClients.push_back(playerClient);
         }
 
@@ -84,6 +89,26 @@ namespace uw
 
             _lastSendCompleteState = std::chrono::steady_clock::now();
 
+            {
+                std::lock_guard<std::mutex> playerClientsModificationGuard(_updatePlayerClients);
+
+                const auto sharedPlayerClients = std::make_shared<immer::vector<PlayerClient>>(_playerClients);
+                const auto openClients = sharedPlayerClients | filter<PlayerClient>([](const PlayerClient& playerClient) {
+                    if (!playerClient.client()->isOpen())
+                    {
+                        Logger::info("client " + playerClient.client()->prettyName() + " was no longer open while sending complete state, removing it from the sending list");
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                    return playerClient.client()->isOpen();
+                }) | toVector<PlayerClient>();
+
+                _playerClients = immer::vector<PlayerClient>(openClients->begin(), openClients->end());
+            }
+
             auto localPlayerClients(_playerClients);
 
             const auto players = _gameManager->players();
@@ -101,7 +126,14 @@ namespace uw
             for (auto playerClient : localPlayerClients)
             {
                 const auto message = MessageWrapper(std::make_shared<CompleteGameStateMessage>(communicatedPlayers, communicatedSinguities, playerClient.playerId()));
-                playerClient.client()->send(_messageSerializer->serialize(std::vector<MessageWrapper>(1, message)));
+                try
+                {
+                    playerClient.client()->send(_messageSerializer->serialize(std::vector<MessageWrapper>(1, message)));
+                }
+                catch (std::exception error)
+                {
+                    Logger::error("Error while sending complete state to client: " + std::string(error.what()));
+                }
             }
         }
 
@@ -114,6 +146,7 @@ namespace uw
         immer::vector<PlayerClient> _playerClients;
         std::chrono::steady_clock::time_point _lastSendCompleteState;
         std::mutex _sendCompleteStateMutex;
+        std::mutex _updatePlayerClients;
 
         const unsigned int _maxMsBetweenCompleteStates;
         const std::shared_ptr<GameManager> _gameManager;

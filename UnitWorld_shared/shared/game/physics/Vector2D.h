@@ -17,10 +17,15 @@ namespace uw
         const double distance(const Vector2D& other) const;
         const double distanceSq(const Vector2D& other) const;
         void operator+=(const Vector2D& other);
-        Vector2D operator+(const Vector2D& other);
+        Vector2D operator+(const Vector2D& other) const;
+        Vector2D operator-(const Vector2D& other) const;
+        bool operator==(const Vector2D& other) const;
         const double module() const;
         const double moduleSq() const;
-        Vector2D& maxAt(const double& maxModule);
+        Vector2D maxAt(const double& maxModule) const;
+        Vector2D atModule(const double& module) const;
+
+        Vector2D divide(const double& divided, const double& max) const;
     private:
 
         double _x;

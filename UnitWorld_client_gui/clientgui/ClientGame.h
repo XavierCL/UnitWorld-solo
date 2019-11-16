@@ -21,7 +21,6 @@ namespace uw
         void startSync()
         {
             _gameManager->startAsync();
-            _serverReceiver->startAsync();
 
             _windowManager->startSync();
 

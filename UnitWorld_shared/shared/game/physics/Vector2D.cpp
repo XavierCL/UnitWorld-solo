@@ -55,9 +55,19 @@ void Vector2D::operator+=(const Vector2D& other)
     _y += other._y;
 }
 
-Vector2D Vector2D::operator+(const Vector2D& other)
+Vector2D Vector2D::operator+(const Vector2D& other) const
 {
     return Vector2D(_x + other._x, _y + other._y);
+}
+
+Vector2D Vector2D::operator-(const Vector2D& other) const
+{
+    return Vector2D(_x - other._x, _y - other._y);
+}
+
+bool Vector2D::operator==(const Vector2D& other) const
+{
+    return _x == other._x && _y == other._y;
 }
 
 const double uw::Vector2D::module() const
@@ -70,19 +80,39 @@ const double uw::Vector2D::moduleSq() const
     return _x * _x + _y * _y;
 }
 
-Vector2D& uw::Vector2D::maxAt(const double & maxModule)
+Vector2D uw::Vector2D::maxAt(const double & maxModule) const
 {
     if (_x * _x + _y * _y > maxModule * maxModule)
     {
-        const auto absX = abs(_x);
-        const auto absY = abs(_y);
-        const auto xSign = absX / _x;
-        const auto ySign = absY / _y;
-        const auto xySum = absX + absY;
-        const auto relativeX = absX / xySum;
-        const auto relativeY = absY / xySum;
-        _x = xSign * sqrt(relativeX * maxModule * maxModule);
-        _y = ySign * sqrt((1 - relativeX) * maxModule * maxModule);
+        return atModule(maxModule);
     }
     return *this;
+}
+
+Vector2D uw::Vector2D::atModule(const double & module) const
+{
+    if (module <= 0)
+    {
+        return Vector2D(0, 0);
+    }
+    else
+    {
+        const auto modifier = sqrt((_x * _x + _y * _y) / (module * module));
+        return Vector2D(_x / modifier, _y / modifier);
+    }
+}
+
+Vector2D Vector2D::divide(const double& divided, const double& max) const
+{
+    auto xValue = _x == 0 ? max : divided / _x;
+    if (abs(xValue) > max)
+    {
+        xValue *= max / abs(xValue);
+    }
+    auto yValue = _y == 0 ? max : divided / _y;
+    if (abs(xValue) > max)
+    {
+        xValue *= max / abs(xValue);
+    }
+    return Vector2D(xValue, yValue);
 }

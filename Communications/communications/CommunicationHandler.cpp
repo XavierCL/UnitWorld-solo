@@ -3,27 +3,34 @@
 using namespace uw;
 
 CommunicationHandler::CommunicationHandler(const std::shared_ptr<asio::ip::tcp::socket>& socket, const asio::ip::tcp::endpoint& endpoint) :
+    _forceblyClosed(false),
     _socket(socket),
     _endpoint(endpoint)
 {
+    if (!_socket->is_open()) throw std::invalid_argument("socket was closed at communication handler creation");
     // Max TCP receive size
     _receiveBuffer.resize(MAX_TCP_BUFFER_SIZE);
 }
 
 void CommunicationHandler::send(const std::string& message)
 {
+    if (!isOpen()) throw std::logic_error("socket was closed while trying to send data through it: " + message.substr(0, 100) + (message.size() > 100 ? "..." : ""));
+
     try
     {
         asio::write(*_socket, asio::buffer(message));
     }
     catch (...)
     {
-        // socket was likely closed
+        _forceblyClosed = true;
+        throw;
     }
 }
 
 std::string CommunicationHandler::receive()
 {
+    if (!isOpen()) throw std::logic_error("socket was closed while trying to receive from it");
+
     try
     {
         _socket->read_some(asio::buffer(_receiveBuffer));
@@ -33,19 +40,22 @@ std::string CommunicationHandler::receive()
     }
     catch (...)
     {
-        // socket was likely closed
-        return "";
+        _forceblyClosed = true;
+        throw;
     }
 }
 
 void CommunicationHandler::close()
 {
-    _socket->close();
+    if (isOpen())
+    {
+        _socket->close();
+    }
 }
 
 bool CommunicationHandler::isOpen() const
 {
-    return _socket->is_open();
+    return !_forceblyClosed && _socket->is_open();
 }
 
 std::string CommunicationHandler::prettyName() const

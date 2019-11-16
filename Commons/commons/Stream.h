@@ -80,7 +80,7 @@ struct StreamIterator
 
     bool operator!=(const StreamIterator<Value>& other)
     {
-        return !_currentValue.isEmpty() || !other._currentValue.isEmpty();
+        return _currentValue.isDefined() || other._currentValue.isDefined();
     }
 
     bool operator==(const StreamIterator<Value>& other)

@@ -16,11 +16,15 @@ public:
         : _inner(new _Type(inner))
     {}
 
+    Option(_Type&& inner)
+        : _inner(new _Type(inner))
+    {}
+
     Option(const _Type* inner)
         : _inner(inner ? new _Type(*inner) : nullptr)
     {}
 
-    Option(const _Type*&& inner)
+    Option(_Type*&& inner)
         : _inner(inner)
     {}
 
@@ -29,7 +33,7 @@ public:
     {}
 
     Option(Option<_Type>&& moved)
-        : _inner(moved._inner)
+        : _inner(std::move(moved._inner))
     {
         moved._inner = nullptr;
     }
@@ -82,7 +86,7 @@ public:
         }
     }
 
-    const _Type& getOrElse(const _Type& defaultValue) const
+    _Type getOrElse(const _Type& defaultValue) const
     {
         if (isDefined())
         {
@@ -95,7 +99,7 @@ public:
     }
 
     template <typename _FunctionType>
-    const _Type getOrElse(const _FunctionType& defaultGenerator) const
+    _Type getOrElse(const _FunctionType& defaultGenerator) const
     {
         if (isDefined())
         {
@@ -107,17 +111,43 @@ public:
         }
     }
 
+    Option<_Type> orElse(Option<_Type>&& defaultOption) const
+    {
+        if (isDefined())
+        {
+            return *this;
+        }
+        else
+        {
+            return std::forward<Option<_Type>>(defaultOption);
+        }
+    }
+
     template <typename _FunctionType>
-    void orElse(const _FunctionType& elseAction) const
+    Option<_Type> orElse(const _FunctionType& defaultOptionGenerator) const
+    {
+        if (isDefined())
+        {
+            return *this;
+        }
+        if (isEmpty())
+        {
+            return defaultOptionGenerator();
+        }
+    }
+
+    template <typename _FunctionType>
+    const Option<_Type>& orExecute(_FunctionType&& elseAction) const
     {
         if (isEmpty())
         {
             elseAction();
         }
+        return *this;
     }
 
     template <typename _ReturnType, typename _FunctionType>
-    const Option<_ReturnType> map(const _FunctionType& mappingFunction) const
+    Option<_ReturnType> map(const _FunctionType& mappingFunction) const
     {
         if (isDefined())
         {
@@ -153,7 +183,7 @@ public:
     }
 
     template <typename _PredicateType>
-    const Option<_Type> filter(const _PredicateType& predicate) const
+    Option<_Type> filter(const _PredicateType& predicate) const
     {
         if (isDefined())
         {

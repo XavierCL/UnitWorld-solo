@@ -140,9 +140,15 @@
     <ClInclude Include="shared\communication\messages\MoveMobileUnitsToPositionMessage.h" />
     <ClInclude Include="shared\communication\messages\MessageType.h" />
     <ClInclude Include="shared\communication\MessageWrapper.h" />
+    <ClInclude Include="shared\configuration\ConfigurationManager.h" />
     <ClInclude Include="shared\game\commands\MoveMobileUnitsToPosition.h" />
     <ClInclude Include="shared\game\GameManager.h" />
     <ClInclude Include="shared\game\geometry\Rectangle.h" />
+    <ClInclude Include="shared\game\physics\CollidablePoint.h" />
+    <ClInclude Include="shared\game\physics\CollisionDetector.h" />
+    <ClInclude Include="shared\game\physics\CollisionDetectorFactory.h" />
+    <ClInclude Include="shared\game\physics\NaiveCollisionDetector.h" />
+    <ClInclude Include="shared\game\physics\NaiveCollisionDetectorFactory.h" />
     <ClInclude Include="shared\game\physics\Vector2D.h" />
     <ClInclude Include="shared\game\play\MobileUnit.h" />
     <ClInclude Include="shared\game\play\Player.h" />
@@ -157,6 +163,7 @@
     <ClCompile Include="shared\communication\messages\CompleteGameStateMessage.cpp" />
     <ClCompile Include="shared\communication\messages\MoveMobileUnitsToPositionMessage.cpp" />
     <ClCompile Include="shared\communication\MessageWrapper.cpp" />
+    <ClCompile Include="shared\configuration\ConfigurationManager.cpp" />
     <ClCompile Include="shared\game\GameManager.cpp" />
     <ClCompile Include="shared\game\geometry\Rectangle.cpp" />
     <ClCompile Include="shared\game\physics\Vector2D.cpp" />
