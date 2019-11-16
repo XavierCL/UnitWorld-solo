@@ -63,7 +63,6 @@ namespace uw
                 auto& workingSpawners = completeGameState->spawners();
 
                 std::unordered_map<xg::Guid, std::vector<CollidablePoint>> collidablePointsByPlayerId(getCollidablePointsByPlayerId(completeGameState));
-                std::vector<CollidablePoint> neutralCollidablePoints(getNeutralCollidablePoints(completeGameState));
 
                 std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<Player>>> playersById =
                     &workingPlayers
@@ -83,10 +82,6 @@ namespace uw
                     {
                         shootablesById->emplace(std::make_pair<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>(singuity->id(), singuity));
                     }
-                }
-                for (auto spawner : workingSpawners)
-                {
-                    shootablesById->emplace(std::make_pair<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>(spawner->id(), spawner));
                 }
 
                 for (unsigned int workingPlayerIndex = 0; workingPlayerIndex < workingPlayers.size(); ++workingPlayerIndex)
@@ -114,12 +109,10 @@ namespace uw
                     _collisionDetectorsByPlayerId->at(player->id())->updateAllCollidablePoints(collidablePointsByPlayerId[player->id()]);
                 }
 
-                _neutralCollisionDetector->updateAllCollidablePoints(neutralCollidablePoints);
-
                 CompleteGameStateActualizer completeGameStateActualizer(completeGameState);
 
                 completeGameStateActualizer.spawnAll(*playersById, frameTimestamp);
-                completeGameStateActualizer.updateShootingAndPhysicsPredictions(_collisionDetectorsByPlayerId, _neutralCollisionDetector, shootablesById, frameTimestamp);
+                completeGameStateActualizer.updateShootingAndPhysicsPredictions(_collisionDetectorsByPlayerId, shootablesById, frameTimestamp);
                 completeGameStateActualizer.updatePhysics(*spawnersById);
                 completeGameStateActualizer.updateSpawnerAllegences();
             });
@@ -128,13 +121,6 @@ namespace uw
         static std::unordered_map<xg::Guid, std::vector<CollidablePoint>> getCollidablePointsByPlayerId(std::shared_ptr<CompleteGameState> completeGameState)
         {
             std::unordered_map<xg::Guid, std::vector<CollidablePoint>> collidablePointsByPlayerId;
-
-            for (auto spawner : completeGameState->spawners())
-            {
-                spawner->allegence().foreach([spawner, &collidablePointsByPlayerId](const SpawnerAllegence& allegence) {
-                    collidablePointsByPlayerId[allegence.allegedPlayerId()].emplace_back(spawner->id(), spawner->position());
-                });
-            }
 
             for (auto player : completeGameState->players())
             {
@@ -145,20 +131,6 @@ namespace uw
             }
 
             return collidablePointsByPlayerId;
-        }
-
-        static std::vector<CollidablePoint> getNeutralCollidablePoints(std::shared_ptr<CompleteGameState> completeGameState)
-        {
-            std::vector<CollidablePoint> neutralCollidablePoints;
-
-            for (auto spawner : completeGameState->spawners())
-            {
-                spawner->allegence().orExecute([spawner, &neutralCollidablePoints]() {
-                    neutralCollidablePoints.emplace_back(spawner->id(), spawner->position());
-                });
-            }
-
-            return neutralCollidablePoints;
         }
 
         static const unsigned int PHISICS_FRAME_PER_SECOND;
