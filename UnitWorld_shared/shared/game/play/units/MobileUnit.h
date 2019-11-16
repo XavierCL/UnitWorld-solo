@@ -4,6 +4,7 @@
 #include "SpawnerDestination.h"
 
 #include "commons/Option.hpp"
+#include "commons/CollectionPipe.h"
 
 #include <variant>
 
@@ -47,6 +48,16 @@ namespace uw
         Vector2D getSlowBreakingAcceleration() const
         {
             return Vector2D(-_speed.x(), -_speed.y()).maxAt(maximumAcceleration() * 0.05);
+        }
+
+        bool hasSpawnerDestination() const
+        {
+            return _destination.map<bool>([](const std::variant<Vector2D, SpawnerDestination>& destination) {
+                return std::visit(overloaded{
+                    [](const Vector2D& positionDestination) { return false; },
+                    [](const SpawnerDestination& spawnerDestination) { return true; }
+                }, destination);
+            }).getOrElse(false);
         }
 
         void setPointDestination(const Vector2D& destination)

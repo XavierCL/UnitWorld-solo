@@ -186,7 +186,7 @@ namespace uw
         {
             bool gameAltered = false;
 
-            const auto newPlayer = _nextAddedPlayer.exchange(nullptr);
+            auto newPlayer = _nextAddPlayer.exchange(nullptr);
             if (newPlayer)
             {
                 _localCompleteGameState->addPlayer(std::shared_ptr<Player>(newPlayer));

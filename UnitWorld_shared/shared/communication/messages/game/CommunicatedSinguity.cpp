@@ -4,14 +4,14 @@
 
 using namespace uw;
 
-CommunicatedSinguity::CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedSinguityDestination>& destination, const double& healthPoint, const unsigned long long& lastShootTimestamp) :
+CommunicatedSinguity::CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedSinguityDestination>& destination, const double& healthPoint, const unsigned long long& lastShootFrameCount) :
     _singuityId(singuityId),
     _playerId(playerId),
     _position(position),
     _speed(speed),
     _destination(destination),
     _healthPoint(healthPoint),
-    _lastShootTimestamp(lastShootTimestamp)
+    _lastShootFameCount(lastShootFrameCount)
 {}
 
 nlohmann::json CommunicatedSinguity::toJson() const
@@ -31,7 +31,7 @@ nlohmann::json CommunicatedSinguity::toJson() const
         {SPEED_LABEL, speed},
         {DESTINATION_LABEL, destination},
         {HEALTH_POINTS_LABEL, _healthPoint},
-        {LAST_SHOOT_TIME_LABEL, _lastShootTimestamp}
+        {LAST_SHOOT_FRAME_COUNT_LABEL, _lastShootFameCount}
     };
 
     return jsonData;
@@ -50,7 +50,7 @@ CommunicatedSinguity CommunicatedSinguity::fromJson(const nlohmann::json& parsed
             ? Options::None<CommunicatedSinguityDestination>()
             : Options::Some(CommunicatedSinguityDestination::fromJson(destinationJson)),
         parsedJson.at(HEALTH_POINTS_LABEL).get<double>(),
-        parsedJson.at(LAST_SHOOT_TIME_LABEL).get<unsigned long long>()
+        parsedJson.at(LAST_SHOOT_FRAME_COUNT_LABEL).get<unsigned long long>()
     );
 }
 
@@ -84,9 +84,9 @@ double CommunicatedSinguity::healthPoint() const
     return _healthPoint;
 }
 
-unsigned long long CommunicatedSinguity::lastShootTimestamp() const
+unsigned long long CommunicatedSinguity::lastShootFrameCount() const
 {
-    return _lastShootTimestamp;
+    return _lastShootFameCount;
 }
 
 const std::string CommunicatedSinguity::NO_DESTINATION_VALUE = "n";
@@ -96,4 +96,4 @@ const std::string CommunicatedSinguity::POSITION_LABEL = "o";
 const std::string CommunicatedSinguity::SPEED_LABEL = "s";
 const std::string CommunicatedSinguity::DESTINATION_LABEL = "d";
 const std::string CommunicatedSinguity::HEALTH_POINTS_LABEL = "h";
-const std::string CommunicatedSinguity::LAST_SHOOT_TIME_LABEL = "l";
+const std::string CommunicatedSinguity::LAST_SHOOT_FRAME_COUNT_LABEL = "l";

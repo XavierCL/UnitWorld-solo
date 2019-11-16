@@ -8,7 +8,6 @@ CommunicationHandler::CommunicationHandler(const std::shared_ptr<asio::ip::tcp::
     _endpoint(endpoint)
 {
     if (!_socket->is_open()) throw std::invalid_argument("socket was closed at communication handler creation");
-    // Max TCP receive size
     _receiveBuffer.resize(MAX_TCP_BUFFER_SIZE);
 }
 

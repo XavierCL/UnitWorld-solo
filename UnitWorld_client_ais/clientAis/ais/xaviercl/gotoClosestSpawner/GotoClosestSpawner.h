@@ -31,7 +31,6 @@ namespace uw
 
                 collisionDetector->updateAllCollidablePoints(*collidableSpawners);
 
-                // we don't want to assign a destination to a spawner that's already going to the right destination
                 std::unordered_map<xg::Guid, std::unordered_set<xg::Guid>> destinations;
                 currentPlayer->singuities() | forEach([&destinations, &collisionDetector](const std::shared_ptr<Singuity> singuity) {
                     const auto closestSpawnerIdOpt = collisionDetector->getClosest(CollidablePoint(singuity->id(), singuity->position()));

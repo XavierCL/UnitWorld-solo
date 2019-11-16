@@ -81,7 +81,7 @@ namespace uw
                     communicatedVector2DToPhysics(singuity.speed()),
                     singuity.destination().map<std::variant<Vector2D, SpawnerDestination>>(std::bind(&PhysicsCommunicationAssembler::communicatedSinguityDestinationToPhysics, this, std::placeholders::_1)),
                     singuity.healthPoint(),
-                    singuity.lastShootTimestamp()
+                    singuity.lastShootFrameCount()
                 );
             }) | toVector<std::shared_ptr<Singuity>>();
 
@@ -103,7 +103,7 @@ namespace uw
                     physicsVector2DToCommunicated(singuity->speed()),
                     singuity->destination().map<CommunicatedSinguityDestination>([this](const std::variant<Vector2D, SpawnerDestination>& destination) { return physicsSinguityDestinationToCommunicated(destination); }),
                     singuity->healthPoint(),
-                    singuity->lastShootTimestamp()
+                    singuity->lastShootFrameCount()
                 );
             }
 
@@ -118,7 +118,7 @@ namespace uw
                 spawner->allegence().map<CommunicatedSpawnerAllegence>([this](const SpawnerAllegence& allegence) {
                     return physicsSpawnerAllegenceToCommunicated(allegence);
                 }),
-                spawner->lastSpawnTimestamp(),
+                spawner->lastSpawnFrameCount(),
                 spawner->totalSpawnedCount()
             );
         }
@@ -131,7 +131,7 @@ namespace uw
                 spawner.allegence().map<SpawnerAllegence>([this](const CommunicatedSpawnerAllegence& allegence) {
                     return communicatedSpawnerAllegenceToPhysics(allegence);
                 }),
-                spawner.lastSpawnTimestamp(),
+                spawner.lastSpawnFrameCount(),
                 spawner.totalSpawnedCount()
             );
         }

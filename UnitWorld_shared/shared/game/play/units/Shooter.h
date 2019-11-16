@@ -11,43 +11,43 @@ namespace uw
     public:
         Shooter(const Vector2D& position) :
             Unit(position),
-            _lastShootTimestamp(0)
+            _lastShootFameCount(0)
         {}
 
         Shooter(const Vector2D& position, unsigned long long& lastShootTimestamp) :
             Unit(position),
-            _lastShootTimestamp(lastShootTimestamp)
+            _lastShootFameCount(lastShootTimestamp)
         {}
 
         Shooter(const xg::Guid& id, const Vector2D& position, const unsigned long long& lastShootTimestamp) :
             Unit(id, position),
-            _lastShootTimestamp(lastShootTimestamp)
+            _lastShootFameCount(lastShootTimestamp)
         {}
 
-        void shootIfCan(std::shared_ptr<UnitWithHealthPoint> unitWithHealthPoint, unsigned long long frameTimestamp)
+        void shootIfCan(std::shared_ptr<UnitWithHealthPoint> unitWithHealthPoint, unsigned long long frameCount)
         {
             // Enemies can be marked as dead, but will only be removed from their player on the actualize phase
             // When enemies are already dead, keep the shooting for the next frame
-            if (_lastShootTimestamp + shootTimelag() <= frameTimestamp
+            if (_lastShootFameCount + shootFramelag() <= frameCount
                 && !unitWithHealthPoint->isDead()
                 && position().distanceSq(unitWithHealthPoint->position()) < maxShootingRangeSq())
             {
-                _lastShootTimestamp = frameTimestamp;
+                _lastShootFameCount = frameCount;
                 unitWithHealthPoint->loseHealthPoint(firePower());
             }
         }
 
-        unsigned long long lastShootTimestamp() const
+        unsigned long long lastShootFrameCount() const
         {
-            return _lastShootTimestamp;
+            return _lastShootFameCount;
         }
 
 
     private:
         virtual double maxShootingRangeSq() const = 0;
-        virtual unsigned long long shootTimelag() const = 0;
+        virtual unsigned long long shootFramelag() const = 0;
         virtual double firePower() const = 0;
 
-        unsigned long long _lastShootTimestamp;
+        unsigned long long _lastShootFameCount;
     };
 }

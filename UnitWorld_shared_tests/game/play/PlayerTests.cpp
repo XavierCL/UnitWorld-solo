@@ -12,7 +12,7 @@ namespace UnitWorld_shared_tests
 
         TEST_METHOD(constructor_shouldNotThrowAnyException)
         {
-            Player testPlayer(std::vector<std::shared_ptr<Singuity>>());
+            Player(xg::newGuid(), std::vector<std::shared_ptr<Singuity>>());
         }
     };
 }

@@ -33,11 +33,11 @@ namespace uw
             }
         }
 
-        void shootEnemies(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
+        void shootEnemies(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameCount)
         {
             for (auto& singuityActualizer : *_singuityActualizers)
             {
-                singuityActualizer.shootEnemy(shootablesById, frameTimestamp);
+                singuityActualizer.shootEnemy(shootablesById, frameCount);
             }
         }
 

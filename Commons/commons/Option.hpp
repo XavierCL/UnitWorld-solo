@@ -130,7 +130,7 @@ public:
         {
             return *this;
         }
-        if (isEmpty())
+        else
         {
             return defaultOptionGenerator();
         }

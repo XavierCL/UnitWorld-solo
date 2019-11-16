@@ -9,7 +9,7 @@ namespace uw
     class Singuity : virtual public MobileUnit, virtual public Shooter, virtual public UnitWithHealthPoint
     {
     public:
-        Singuity(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<std::variant<Vector2D, SpawnerDestination>>& destination, const double& healthPoints, const unsigned long long& lastShootTimestamp);
+        Singuity(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<std::variant<Vector2D, SpawnerDestination>>& destination, const double& healthPoints, const unsigned long long& lastShootFrameCount);
         Singuity(const Vector2D& position, const Vector2D& speed);
         Singuity(const Vector2D& position);
         Singuity(const Singuity& other);
@@ -21,8 +21,18 @@ namespace uw
         double maximumAcceleration() const override;
         double maximumHealthPoint() const override;
 
+        double reguvenatingHealth() const
+        {
+            return 20.0;
+        }
+
+        double spawnerAttackHealth() const
+        {
+            return 20.0;
+        }
+
     private:
-        unsigned long long shootTimelag() const override;
+        unsigned long long shootFramelag() const override;
         double firePower() const override;
         double maxShootingRangeSq() const override;
     };

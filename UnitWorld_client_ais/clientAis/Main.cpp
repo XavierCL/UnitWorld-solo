@@ -8,6 +8,9 @@
 
 #include "ais/xaviercl/xavierclAi1/XavierclAi1.h"
 #include "ais/xaviercl/gotoClosestSpawner/GotoClosestSpawner.h"
+#include "ais/xaviercl/packAi/PackAi.h"
+#include "ais/xaviercl/strongholdAi/StrongholdAi.h"
+#include "ais/xaviercl/strongholdAi2/StrongholdAi2.h"
 
 #include "clientShared/networking/ServerReceiver.h"
 
@@ -30,10 +33,22 @@ std::shared_ptr<Artificial> generateAI(const std::string& aiName)
     {
         return std::make_shared<GotoClosestSpawner>();
     }
+    else if (aiName == "packAi")
+    {
+        return std::make_shared<PackAi>();
+    }
+    else if (aiName == "strongholdAi")
+    {
+        return std::make_shared<StrongholdAi>();
+    }
+    else if (aiName == "strongholdAi2")
+    {
+        return std::make_shared<StrongholdAi2>();
+    }
     else
     {
         Logger::error("Could not find ai with name: " + aiName + ". Default ai will be used");
-        return std::make_shared<XavierclAi1>();
+        return std::make_shared<GotoClosestSpawner>();
     }
 }
 
@@ -49,8 +64,8 @@ int main()
     const ConfigurationManager configurationManager("config.json");
     const std::string DEFAULT_SERVER_IP("127.0.0.1");
     const std::string DEFAULT_SERVER_PORT("52124");
-    const std::string DEFAULT_AI_NAME("xavierclAi1");
-    const double MS_PER_FRAME(100);
+    const std::string DEFAULT_AI_NAME("gotoClosestSpawner");
+    const double MS_PER_FRAME(250);
 
     const std::string serverIp = configurationManager.serverIpOrDefault(DEFAULT_SERVER_IP);
     const std::string serverPort = configurationManager.serverPortOrDefault(DEFAULT_SERVER_PORT);

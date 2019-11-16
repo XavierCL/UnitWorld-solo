@@ -14,13 +14,13 @@ namespace uw
             _spawner(spawner)
         {}
 
-        void spawn(std::unordered_map<xg::Guid, std::shared_ptr<Player>>& playerById, const unsigned long long& frameTimestamp)
+        void spawn(std::unordered_map<xg::Guid, std::shared_ptr<Player>>& playerById, const unsigned long long& frameCount)
         {
             _spawner->spawnIfCan([&playerById](const xg::Guid& playerId, std::shared_ptr<Singuity> spawnedSinguity) {
                 (&playerById | find<std::shared_ptr<Player>>(playerId)).foreach([spawnedSinguity](std::shared_ptr<Player> player) {
                     player->addSinguity(spawnedSinguity);
                 });
-            }, frameTimestamp);
+            }, frameCount);
         }
 
         void updateAllegence()

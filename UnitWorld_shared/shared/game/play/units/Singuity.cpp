@@ -42,7 +42,7 @@ double Singuity::spawnSpeed()
 
 double Singuity::maximumSpeed() const
 {
-    return 0.8;
+    return 0.5;
 }
 
 double Singuity::maximumAcceleration() const
@@ -55,9 +55,9 @@ double Singuity::maximumHealthPoint() const
     return 20.0;
 }
 
-unsigned long long Singuity::shootTimelag() const
+unsigned long long Singuity::shootFramelag() const
 {
-    return 500000000;
+    return 10;
 }
 
 double Singuity::firePower() const

@@ -29,6 +29,9 @@
   <ItemGroup>
     <ClInclude Include="clientAis\ais\Artificial.h" />
     <ClInclude Include="clientAis\ais\xaviercl\gotoClosestSpawner\GotoClosestSpawner.h" />
+    <ClInclude Include="clientAis\ais\xaviercl\packAi\PackAi.h" />
+    <ClInclude Include="clientAis\ais\xaviercl\strongholdAi2\StrongholdAi2.h" />
+    <ClInclude Include="clientAis\ais\xaviercl\strongholdAi\StrongholdAi.h" />
     <ClInclude Include="clientAis\ais\xaviercl\xavierclAi1\XavierclAi1.h" />
   </ItemGroup>
   <ItemGroup>

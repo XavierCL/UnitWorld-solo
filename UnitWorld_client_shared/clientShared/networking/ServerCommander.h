@@ -34,8 +34,7 @@ namespace uw
 
             try
             {
-                const auto serializedMessages(_messageSerializer->serialize(std::vector<MessageWrapper> { MessageWrapper(message) }));
-                _serverCommunicator->send(serializedMessages);
+                _serverCommunicator->send(_messageSerializer->serialize(std::vector<MessageWrapper> { MessageWrapper(message) }));
             }
             catch (std::exception error)
             {

@@ -71,14 +71,14 @@ namespace uw
             });
         }
 
-        void shootEnemy(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameTimestamp)
+        void shootEnemy(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameCount)
         {
             auto closestEnemy = _closestEnemyId.flatMap<std::shared_ptr<UnitWithHealthPoint>>([shootablesById](const xg::Guid& closestEnemyId) {
                 return shootablesById | findSafe<std::shared_ptr<UnitWithHealthPoint>>(closestEnemyId);
             });
 
-            closestEnemy.foreach([this, &frameTimestamp](std::shared_ptr<UnitWithHealthPoint> enemy) {
-                _singuity->shootIfCan(enemy, frameTimestamp);
+            closestEnemy.foreach([this, &frameCount](std::shared_ptr<UnitWithHealthPoint> enemy) {
+                _singuity->shootIfCan(enemy, frameCount);
             });
         }
 

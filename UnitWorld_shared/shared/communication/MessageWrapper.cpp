@@ -73,6 +73,7 @@ std::shared_ptr<const Message> MessageWrapper::jsonToMessage(const std::string& 
 {
     nlohmann::json parsedJson = nlohmann::json::parse(json);
     const auto messageType = parsedJson.at(MESSAGE_TYPE_JSON_ATTRIBUTE).get<MessageType>();
+    const auto messageData = parsedJson.at(MESSAGE_DATA_JSON_ATTRIBUTE).dump();
 
     if (messageType == MessageType::CompleteGameStateMessageType)
     {
