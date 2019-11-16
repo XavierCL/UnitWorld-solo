@@ -78,6 +78,11 @@ namespace uw
             _centerAbsolutePosition = std::make_shared<Vector2D>(inbountAbsoluteCenter.closestPointTo(absoluteMousePosition - (mousePositionRelativeToCenter / _absoluteScale)));
         }
 
+        void mouseScrolled(const double& scrollDelta)
+        {
+            mouseScrolled(scrollDelta, _lastMousePosition);
+        }
+
         double absoluteLengthToRelative(const double& length)
         {
             return length * _absoluteScale;
