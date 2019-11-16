@@ -18,11 +18,14 @@ namespace uw
 
         std::string serverPortOrDefault(const std::string& defaultValue) const;
 
-        std::vector<Vector2D> firstSpawners() const;
+        std::vector<std::vector<Vector2D>> firstSpawners() const;
+
+        std::vector<std::vector<size_t>> singuitiesBySpawner() const;
 
     private:
         Option<std::string> _serverIp;
         Option<std::string> _serverPort;
-        std::vector<Vector2D> _firstSpawners;
+        std::vector<std::vector<Vector2D>> _firstSpawners;
+        std::vector<std::vector<size_t>> _singuitiesBySpawner;
     };
 }

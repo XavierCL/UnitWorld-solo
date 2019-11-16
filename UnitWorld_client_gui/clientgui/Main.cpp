@@ -46,7 +46,7 @@ int main()
 
         const unsigned int GRAPHICS_FRAME_PER_SECOND(30);
 
-        auto window(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes().front(), WINDOW_TITLE));
+        auto window(std::make_shared<sf::RenderWindow>(sf::VideoMode::getFullscreenModes().front(), WINDOW_TITLE, sf::Style::Fullscreen));
 
         ClientConnector(ConnectionInfo(serverIp, serverPort), [&window, &GRAPHICS_FRAME_PER_SECOND](const std::shared_ptr<CommunicationHandler>& connectionHandler) {
 

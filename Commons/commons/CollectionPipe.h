@@ -5,6 +5,9 @@
 #include <unordered_set>
 #include <functional>
 
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts> overloaded(Ts...)->overloaded<Ts...>;
+
 struct FunctionalDefinitions
 {
     struct Any
@@ -154,6 +157,38 @@ struct FunctionalDefinitions
 
     private:
         const std::function<bool(InputValue)> _filter;
+    };
+
+    template <typename Value>
+    struct Reverse
+    {
+        using Output = std::shared_ptr<Stream<Value>>;
+
+        template <typename InputCollection>
+        Output operator() (InputCollection input) const
+        {
+            bool isFirstIter = true;
+            auto inputBegin = input->rend();
+            auto inputEnd = input->rend();
+            return Streams::generate<Value>([isFirstIter, inputBegin, inputEnd, input]() mutable {
+                if (isFirstIter)
+                {
+                    isFirstIter = false;
+                    inputBegin = input->rbegin();
+                }
+
+                if (inputBegin != inputEnd)
+                {
+                    const auto returnedValue = Options::Some(*inputBegin);
+                    ++inputBegin;
+                    return returnedValue;
+                }
+                else
+                {
+                    return Options::None<Value>();
+                }
+            });
+        }
     };
 
     template <typename Action>
@@ -382,6 +417,12 @@ template <typename Action>
 FunctionalDefinitions::ForEach<Action> forEach(const Action& action)
 {
     return FunctionalDefinitions::ForEach<Action>(action);
+}
+
+template <typename Value>
+FunctionalDefinitions::Reverse<Value> reverse()
+{
+    return FunctionalDefinitions::Reverse<Value>();
 }
 
 template <typename Found, typename Predicate>

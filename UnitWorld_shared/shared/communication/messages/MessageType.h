@@ -6,6 +6,7 @@ namespace uw
     {
         InvalidMessageType,
         CompleteGameStateMessageType,
-        MoveMobileUnitsToPositionMessageType
+        MoveMobileUnitsToPositionMessageType,
+        MoveMobileUnitsToSpawnerMessageType
     };
 }

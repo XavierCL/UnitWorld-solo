@@ -2,7 +2,7 @@
 
 #include "SinguityActualizer.h"
 
-#include "shared/game/play/Player.h"
+#include "shared/game/play/players/Player.h"
 
 namespace uw
 {
@@ -34,15 +34,20 @@ namespace uw
             }
         }
 
-        void removeSinguitiesAndUpdateTheirPhysics()
+        void removeSinguitiesAndUpdateTheirPhysics(const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById)
         {
             auto aliveSinguities(std::make_shared<std::vector<std::shared_ptr<Singuity>>>());
             for (auto& singuityActualizer : _singuityActualizers)
             {
                 if (!singuityActualizer.singuity()->isDead())
                 {
-                    singuityActualizer.actualize();
-                    aliveSinguities->emplace_back(singuityActualizer.singuity());
+                    singuityActualizer.actualize(_player->id(), spawnersById);
+
+                    // Singuities can kill themselves
+                    if (!singuityActualizer.singuity()->isDead())
+                    {
+                        aliveSinguities->emplace_back(singuityActualizer.singuity());
+                    }
                 }
             }
 

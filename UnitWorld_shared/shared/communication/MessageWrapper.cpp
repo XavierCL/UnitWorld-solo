@@ -3,6 +3,7 @@
 #include "messages/CompleteGameStateMessage.h"
 #include "messages/InvalidMessage.h"
 #include "messages/MoveMobileUnitsToPositionMessage.h"
+#include "messages/MoveMobileUnitsToSpawnerMessage.h"
 #include "messages/MessageType.h"
 
 #include <nlohmann/json.hpp>
@@ -15,6 +16,7 @@ namespace uw
         {InvalidMessageType, nullptr},
         {CompleteGameStateMessageType, "complete-game-state"},
         {MoveMobileUnitsToPositionMessageType, "move-units-to-position"},
+        {MoveMobileUnitsToSpawnerMessageType, "move-units-to-spawner"}
     });
 
     const std::string MessageWrapper::MESSAGE_TYPE_JSON_ATTRIBUTE = "type";
@@ -74,12 +76,15 @@ std::shared_ptr<const Message> MessageWrapper::jsonToMessage(const std::string& 
 
     if (messageType == MessageType::CompleteGameStateMessageType)
     {
-        const auto messageData = parsedJson.at(MESSAGE_DATA_JSON_ATTRIBUTE).dump();
-        return std::make_shared<const CompleteGameStateMessage>(messageData);
+        return CompleteGameStateMessage::fromJson(messageData);
     }
     else if (messageType == MessageType::MoveMobileUnitsToPositionMessageType)
     {
-        return std::make_shared<const MoveMobileUnitsToPositionMessage>(messageData);
+        return MoveMobileUnitsToPositionMessage::fromJson(messageData);
+    }
+    else if (messageType == MessageType::MoveMobileUnitsToSpawnerMessageType)
+    {
+        return MoveMobileUnitsToSpawnerMessage::fromJson(messageData);
     }
     else
     {

@@ -1,9 +1,10 @@
 #pragma once
 
-#include "shared/game/play/Singuity.h"
-#include "shared/game/play/UnitWithHealthPoint.h"
+#include "shared/game/play/units/Singuity.h"
+#include "shared/game/play/units/UnitWithHealthPoint.h"
 
 #include "shared/game/physics/collisions/CollisionDetector.h"
+#include "shared/game/geometry/Circle.h"
 
 #include "commons/Option.hpp"
 #include "commons/CollectionPipe.h"
@@ -69,29 +70,53 @@ namespace uw
             });
         }
 
-        void actualize()
+        void actualize(const xg::Guid& playerId, const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById)
         {
-            Vector2D acceleration = _singuity->destination().flatMap<Vector2D>([this](const Vector2D& destination) {
-                _singuity->setIsBreakingForDestination(_singuity->position().distanceSq(destination) < _singuity->stopDistanceFromTargetSq() || _singuity->isBreakingForDestination());
+            Vector2D acceleration = _singuity->destination().flatMap<Vector2D>([this, &playerId, &spawnersById](const std::variant<Vector2D, SpawnerDestination>& destination) {
+                return std::visit(overloaded{
+                    [this](const Vector2D& point) {
+                    bool willBreakForDestination = (_singuity->position() + _singuity->speed().atModule(_singuity->stopDistanceFromTargetSq())).distanceSq(point) < 100;
 
-                if (_singuity->isBreakingForDestination())
-                {
-                    bool isReleaseBreakSpeed = _singuity->speed().moduleSq() < 0.01 * _singuity->maximumSpeed() * _singuity->maximumSpeed();
-
-                    if (isReleaseBreakSpeed)
+                    if (willBreakForDestination)
                     {
-                        _singuity->clearDestination();
-                        return Options::None<Vector2D>();
+                        bool isReleaseBreakSpeed = _singuity->speed().moduleSq() < 0.01 * _singuity->maximumSpeed() * _singuity->maximumSpeed();
+
+                        if (isReleaseBreakSpeed)
+                        {
+                            _singuity->clearDestination();
+                            return Options::None<Vector2D>();
+                        }
+                        else
+                        {
+                            return Options::Some(_singuity->getBreakingAcceleration());
+                        }
                     }
                     else
                     {
-                        return Options::Some(_singuity->getBreakingAcceleration());
+                        return Options::Some(_singuity->getMaximalAcceleration(point));
                     }
-                }
-                else
-                {
-                    return Options::Some(_singuity->getMaximalAcceleration(destination));
-                }
+                    }, [this, &playerId, &spawnersById](const SpawnerDestination spawnerDestination) {
+                        return (&spawnersById | find<std::shared_ptr<Spawner>>(spawnerDestination.spawnerId())).map<Vector2D>([this, &playerId, &spawnerDestination](std::shared_ptr<Spawner> spawner) {
+                            if (spawner->hasSameAllegenceState(spawnerDestination.spawnerAllegence()))
+                            {
+                                if (spawner->canBeReguvanatedBy(playerId) && Circle(spawner->position(), 8).contains(_singuity->position()))
+                                {
+                                    spawner->reguvenate(playerId, _singuity);
+                                    return Vector2D();
+                                }
+                                else
+                                {
+                                    return _singuity->getMaximalAcceleration(spawner->position());
+                                }
+                            }
+                            else
+                            {
+                                _singuity->setPointDestination(spawner->position());
+                                return _singuity->getMaximalAcceleration(spawner->position());
+                            }
+                        });
+                    }
+                }, destination);
             }).getOrElse([this]() {
                 return _singuity->getSlowBreakingAcceleration();
             });
@@ -108,6 +133,11 @@ namespace uw
         }
 
     private:
+        static double sq(const double& value)
+        {
+            return value * value;
+        }
+
         const std::shared_ptr<Singuity> _singuity;
 
         Vector2D _repulsionForce;

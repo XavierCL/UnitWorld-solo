@@ -71,6 +71,10 @@ namespace uw
                     return player->id();
                 });
 
+                std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>> spawnersById =
+                    &workingSpawners
+                    | toUnorderedMap<xg::Guid, std::shared_ptr<Spawner>>([](auto spawner) { return spawner->id(); });
+
                 auto shootablesById(std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>>());
                 for (auto player : workingPlayers)
                 {
@@ -116,7 +120,7 @@ namespace uw
 
                 completeGameStateActualizer.spawnAll(*playersById, frameTimestamp);
                 completeGameStateActualizer.updateShootingAndPhysicsPredictions(_collisionDetectorsByPlayerId, _neutralCollisionDetector, shootablesById, frameTimestamp);
-                completeGameStateActualizer.updatePhysics();
+                completeGameStateActualizer.updatePhysics(*spawnersById);
                 completeGameStateActualizer.updateSpawnerAllegences();
             });
         }

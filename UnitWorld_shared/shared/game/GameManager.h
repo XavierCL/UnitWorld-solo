@@ -3,6 +3,8 @@
 #include "shared/game/play/CompleteGameState.h"
 
 #include "shared/game/commands/MoveMobileUnitsToPosition.h"
+#include "shared/game/commands/MoveMobileUnitsToSpawner.h"
+#include "shared/game/commands/GameCommand.h"
 
 #include <immer/vector.hpp>
 #include <immer/set.hpp>
@@ -41,14 +43,17 @@ namespace uw
             }
         }
 
-        void setNextPlayers(CompleteGameState&& nextCompleteGameState, const xg::Guid& currentPlayerId)
+        void setNextCompleteGameState(CompleteGameState&& nextCompleteGameState)
         {
             auto oldStoredState = _nextCompleteGameState.exchange(new CompleteGameState(std::forward<CompleteGameState>(nextCompleteGameState)));
             if (oldStoredState)
             {
                 delete oldStoredState;
             }
+        }
 
+        void setNextCurrentPlayerId(const xg::Guid& currentPlayerId)
+        {
             auto oldStoredCurrent = _nextCurrentPlayerId.exchange(new xg::Guid(currentPlayerId));
             if (oldStoredCurrent)
             {
@@ -65,6 +70,21 @@ namespace uw
             }
 
             const auto nextCommand(std::make_shared<MoveMobileUnitsToPosition>(playerId, mobileUnitSet, destination));
+
+            std::lock_guard<std::mutex> lockPlayerCommands(_nextCommandsMutex);
+
+            _nextCommands.push_back(nextCommand);
+        }
+
+        void setNextMobileUnitsSpawnerDestination(const xg::Guid& playerId, const std::vector<xg::Guid>& mobileUnitIds, const xg::Guid& spawnerId)
+        {
+            immer::set<xg::Guid> mobileUnitSet;
+            for (const auto& mobileUnitId : mobileUnitIds)
+            {
+                mobileUnitSet = std::move(mobileUnitSet).insert(mobileUnitId);
+            }
+
+            const auto nextCommand(std::make_shared<MoveMobileUnitsToSpawner>(playerId, mobileUnitSet, spawnerId));
 
             std::lock_guard<std::mutex> lockPlayerCommands(_nextCommandsMutex);
 
@@ -129,7 +149,7 @@ namespace uw
                 _currentPlayerId = Option<xg::Guid>(truthNextCurrentPlayerId);
             }
 
-            std::vector<std::shared_ptr<MoveMobileUnitsToPosition>> localCommands;
+            std::vector<std::shared_ptr<GameCommand>> localCommands;
             {
                 std::lock_guard<std::mutex> lockCommands(_nextCommandsMutex);
 
@@ -165,7 +185,7 @@ namespace uw
         std::atomic<Player*> _nextAddPlayer;
         std::atomic<std::vector<std::shared_ptr<Spawner>>*> _nextAddSpawners;
         std::mutex _nextCommandsMutex;
-        std::vector<std::shared_ptr<MoveMobileUnitsToPosition>> _nextCommands;
+        std::vector<std::shared_ptr<GameCommand>> _nextCommands;
         std::atomic<CompleteGameState*> _nextCompleteGameState;
         std::atomic<xg::Guid*> _nextCurrentPlayerId;
 

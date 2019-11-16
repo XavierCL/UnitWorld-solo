@@ -29,7 +29,8 @@ int main()
         const ConfigurationManager configurationManager("config.json");
 
         const std::string serverPort = configurationManager.serverPortOrDefault(DEFAULT_SERVER_PORT);
-        const std::vector<Vector2D> firstSpawners = configurationManager.firstSpawners();
+        const std::vector<std::vector<Vector2D>> firstSpawners = configurationManager.firstSpawners();
+        const auto singuitiesBySpawner = configurationManager.singuitiesBySpawner();
 
         const auto gameManager(std::make_shared<GameManager>());
 
@@ -43,7 +44,7 @@ int main()
         const auto gameReceiver(std::make_shared<GameReceiver>(gameManager, physicsCommunicationAssembler));
         const auto clientsReceiver(std::make_shared<ClientsReceiver>(messageSerializer, gameReceiver));
 
-        ServerGame serverGame(gameManager, physicsManager, clientsGameSender, clientsReceiver, firstSpawners);
+        ServerGame serverGame(gameManager, physicsManager, clientsGameSender, clientsReceiver, firstSpawners, singuitiesBySpawner);
         serverGame.startAsync();
 
         Logger::info("Waiting for connections...");

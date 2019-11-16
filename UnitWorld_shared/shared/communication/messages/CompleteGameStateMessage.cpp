@@ -11,10 +11,15 @@ CompleteGameStateMessage::CompleteGameStateMessage(const CommunicatedCompleteGam
     _currentPlayerId(currentPlayerId)
 {}
 
-CompleteGameStateMessage::CompleteGameStateMessage(const std::string jsonData) :
-    _completeGameState(jsonDataToCompleteGameState(jsonData)),
-    _currentPlayerId(jsonDataToCurrentPlayerId(jsonData))
-{}
+std::shared_ptr<CompleteGameStateMessage> CompleteGameStateMessage::fromJson(const std::string& json)
+{
+    nlohmann::json parsedData = nlohmann::json::parse(json);
+
+    return std::make_shared<CompleteGameStateMessage>(
+        CommunicatedCompleteGameState::fromJson(parsedData.at("complete-game-state").dump()),
+        xg::Guid(parsedData.at("currentPlayerId").get<std::string>())
+    );
+}
 
 MessageType CompleteGameStateMessage::messageType() const
 {
@@ -39,18 +44,4 @@ CommunicatedCompleteGameState CompleteGameStateMessage::completeGameState() cons
 xg::Guid CompleteGameStateMessage::getCurrentPlayerId() const
 {
     return _currentPlayerId;
-}
-
-CommunicatedCompleteGameState CompleteGameStateMessage::jsonDataToCompleteGameState(const std::string& jsonData)
-{
-    nlohmann::json parsedData = nlohmann::json::parse(jsonData);
-
-    return CommunicatedCompleteGameState::fromJson(parsedData.at("complete-game-state").dump());
-}
-
-xg::Guid CompleteGameStateMessage::jsonDataToCurrentPlayerId(const std::string& jsonData)
-{
-    nlohmann::json parsedData = nlohmann::json::parse(jsonData);
-
-    return xg::Guid(parsedData.at("currentPlayerId").get<std::string>());
 }

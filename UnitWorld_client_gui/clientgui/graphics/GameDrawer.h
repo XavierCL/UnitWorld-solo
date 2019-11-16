@@ -27,6 +27,9 @@ namespace uw
                 (*playerIndexByPlayerId)[(completeGameState->players())[playerIndex]->id()] = playerIndex;
             }
 
+            auto spawnersById = &completeGameState->spawners()
+                | toUnorderedMap<xg::Guid, std::shared_ptr<Spawner>>([](std::shared_ptr<Spawner> spawner) { return spawner->id(); });
+
             const auto currentPlayerSinguities = _gameManager->currentPlayer()
                 .map<std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<Singuity>>>>([](std::shared_ptr<Player> player) {
                     return player->singuities()
@@ -35,9 +38,18 @@ namespace uw
                     });
                 }).getOrElse([] {return std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<Singuity>>>(); });
 
+            _userControlState->getLastSelectedSpawnerId().foreach([&canvas, spawnersById](const xg::Guid selectedSpawnerId) {
+                (spawnersById | find<std::shared_ptr<Spawner>>(selectedSpawnerId)).foreach([&canvas](std::shared_ptr<Spawner> spawner) {
+                    const int circleRadius(23.0);
+                    sf::CircleShape graphicalSpawner(circleRadius);
+                    graphicalSpawner.setPosition(round(spawner->position().x() - circleRadius), round(spawner->position().y() - circleRadius));
+                    graphicalSpawner.setFillColor(sf::Color::White);
+                    canvas->draw(graphicalSpawner);
+                });
+            });
+
             // Spawners
-            auto sharedSpawners(std::make_shared<const std::vector<std::shared_ptr<Spawner>>>(completeGameState->spawners()));
-            sharedSpawners | forEach([&canvas, &playerIndexByPlayerId, this](std::shared_ptr<Spawner> spawner) {
+            &completeGameState->spawners() | forEach([&canvas, &playerIndexByPlayerId, this](std::shared_ptr<Spawner> spawner) {
                 auto spanwerOuterAndInnerColors = spawner->allegence().map<std::pair<sf::Color, sf::Color>>([&spawner, &playerIndexByPlayerId, this](SpawnerAllegence allegence) {
                     auto playerFullColor = (playerIndexByPlayerId
                         | find<size_t>(allegence.allegedPlayerId()))
@@ -47,15 +59,17 @@ namespace uw
                     auto lifeRatio = allegence.healthPoint() / spawner->maximumHealthPoint();
                     sf::Color playerLifeColor(round(playerFullColor.r * lifeRatio), round(playerFullColor.g * lifeRatio), round(playerFullColor.b * lifeRatio));
 
-                    return std::make_pair(playerFullColor, playerLifeColor);
+                    return allegence.isClaimed()
+                        ? std::make_pair(playerLifeColor, playerFullColor)
+                        : std::make_pair(sf::Color(70, 70, 70), playerLifeColor);
                 }).getOrElse(std::make_pair(sf::Color(70, 70, 70), sf::Color(70, 70, 70)));
 
                 const int circleRadius(20.0);
                 sf::CircleShape graphicalSpawner(circleRadius);
                 graphicalSpawner.setPosition(round(spawner->position().x() - circleRadius), round(spawner->position().y() - circleRadius));
-                graphicalSpawner.setFillColor(spanwerOuterAndInnerColors.second);
+                graphicalSpawner.setFillColor(spanwerOuterAndInnerColors.first);
                 graphicalSpawner.setOutlineThickness(2.0);
-                graphicalSpawner.setOutlineColor(spanwerOuterAndInnerColors.first);
+                graphicalSpawner.setOutlineColor(spanwerOuterAndInnerColors.second);
                 canvas->draw(graphicalSpawner);
             });
             

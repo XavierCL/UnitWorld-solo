@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Spawner.h"
-#include "Player.h"
+#include "spawners/Spawner.h"
+#include "players/Player.h"
 
 namespace uw
 {
