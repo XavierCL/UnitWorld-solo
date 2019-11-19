@@ -199,7 +199,7 @@ namespace uw
 
         double maximumHealthPoint() const override
         {
-            return 20000.0;
+            return 50000.0;
         }
 
         long long lastSpawnFrameCount() const

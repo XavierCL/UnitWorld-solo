@@ -23,7 +23,7 @@ namespace uw
 
         double reguvenatingHealth() const
         {
-            return 200.0;
+            return 500.0;
         }
 
     private:

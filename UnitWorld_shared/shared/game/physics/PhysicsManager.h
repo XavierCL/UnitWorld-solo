@@ -124,6 +124,13 @@ namespace uw
                         }
                     }
 
+                    for (auto spawner : workingSpawners)
+                    {
+                        spawner->allegence().foreach([&collidablePointsByPlayerId, spawner](const SpawnerAllegence& allegence) {
+                            collidablePointsByPlayerId[allegence.allegedPlayerId()].emplace_back(spawner->id(), spawner->position());
+                        });
+                    }
+
                     for (auto player : workingPlayers)
                     {
                         _collisionDetectorsByPlayerId->at(player->id())->updateAllCollidablePoints(collidablePointsByPlayerId[player->id()]);

@@ -283,7 +283,7 @@ namespace uw
             for (const auto spawner : completeGameState->spawners())
             {
                 Singuity referenceSinguity(Vector2D(0, 0));
-                const double hundreadthOfSpawnerMaxHealth = 200.0;
+                const double hundreadthOfSpawnerMaxHealth = spawner->maximumHealthPoint() / 100.0;
                 if (spawner->isAllegedToPlayer(currentPlayerId))
                 {
                     enemyStrongholds[spawner->id()] += ceil((spawner->maximumHealthPoint() - spawner->healthPoint()) / referenceSinguity.reguvenatingHealth());

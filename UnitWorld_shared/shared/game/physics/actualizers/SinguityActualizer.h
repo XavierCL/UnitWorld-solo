@@ -20,11 +20,11 @@ namespace uw
             _playerId(playerId)
         {}
 
-        void updateCollisions(const xg::Guid& playerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> singuitycollisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const std::shared_ptr<CollisionDetector> spawnerCollisionDetector, const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById, const long long& frameCount)
+        void updateCollisions(const xg::Guid& playerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const std::shared_ptr<CollisionDetector> spawnerCollisionDetector, const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById, const long long& frameCount)
         {
             Option<std::shared_ptr<UnitWithHealthPoint>> closestThing;
             Option<std::shared_ptr<UnitWithHealthPoint>> closestEnemy;
-            for (const auto& playerIdAndCollisionDetector : *singuitycollisionDetectorsByPlayerId)
+            for (const auto& playerIdAndCollisionDetector : *collisionDetectorsByPlayerId)
             {
                 const auto& collisionDetectorPlayerId = playerIdAndCollisionDetector.first;
                 const auto& collisionDetector = playerIdAndCollisionDetector.second;
@@ -66,7 +66,10 @@ namespace uw
             _closestEnemyId = spawnerCollisionDetector->getClosest(CollidablePoint(xg::Guid(), _singuity->position()))
                 .filter([&spawnersById, this, &frameCount](const xg::Guid& spawnerId) {
                     const auto closestSpawner = spawnersById.at(spawnerId);
-                    return closestSpawner->isAllegedToAPlayer() && !closestSpawner->isAllegedToPlayer(_playerId) && _singuity->canShoot(closestSpawner, frameCount);
+                    return closestSpawner->isAllegedToAPlayer()
+                        && !closestSpawner->isAllegedToPlayer(_playerId)
+                        && _singuity->canShoot(closestSpawner, frameCount)
+                        && _singuity->position().distanceSq(closestSpawner->position()) <= ACCEPTABLE_DISTANCE_TO_FORCE_SPAWNER_ATTACK * ACCEPTABLE_DISTANCE_TO_FORCE_SPAWNER_ATTACK;
                 }).orElse([&closestEnemy]() {
                     return closestEnemy.map<xg::Guid>([](std::shared_ptr<UnitWithHealthPoint> enemy) {
                         return enemy->id();
@@ -218,6 +221,7 @@ namespace uw
         const static double ACCEPTABLE_DISTANCE_TO_POSITION_DESTINATION;
         const static double ACCEPTABLE_DISTANCE_TO_SPAWNER_DESTINATION;
         const static double ACCEPTABLE_SPEED_RATIO_FOR_STOP_BREAKING;
+        const static double ACCEPTABLE_DISTANCE_TO_FORCE_SPAWNER_ATTACK;
 
         const std::shared_ptr<Singuity> _singuity;
         const xg::Guid _playerId;
