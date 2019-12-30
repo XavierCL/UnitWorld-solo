@@ -21,6 +21,9 @@
     <ClCompile Include="server\networking\ClientsGameSender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="server\game\ImmutableClientGameStateFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="server\ServerGame.h">
@@ -36,6 +39,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="server\game\GameReceiver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server\game\ImmutableClientGameStateFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server\game\ClientGameStateFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

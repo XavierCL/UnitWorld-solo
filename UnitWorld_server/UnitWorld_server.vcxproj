@@ -122,6 +122,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="server\game\ImmutableClientGameStateFactory.cpp" />
     <ClCompile Include="server\networking\ClientsGameSender.cpp" />
     <ClCompile Include="server\Main.cpp" />
   </ItemGroup>
@@ -137,7 +138,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="server\game\ClientGameStateFactory.h" />
     <ClInclude Include="server\game\GameReceiver.h" />
+    <ClInclude Include="server\game\ImmutableClientGameStateFactory.h" />
     <ClInclude Include="server\networking\ClientsGameSender.h" />
     <ClInclude Include="server\networking\ClientsReceiver.h" />
     <ClInclude Include="server\networking\PlayerClient.h" />
