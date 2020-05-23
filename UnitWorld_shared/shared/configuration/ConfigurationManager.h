@@ -28,7 +28,7 @@ namespace uw
         double translationPixelPerFrame(const double& defaultValue) const;
         double scrollRatioPerTick(const double& defaultValue) const;
         std::string aiName(const std::string& defaultValue) const;
-
+        bool isFogOfWarEnabled(const bool& defaultValue) const;
 
     private:
         Option<std::string> _serverIp;
@@ -42,5 +42,6 @@ namespace uw
         Option<double> _translationPixelPerFrame;
         Option<double> _scrollRatioPerTick;
         Option<std::string> _aiName;
+        Option<bool> _isFogOfWarEnabled;
     };
 }

@@ -2,6 +2,8 @@
 
 #include "PlayerClient.h"
 
+#include "server/game/ClientGameStateFactory.h"
+
 #include "shared/game/GameManager.h"
 
 #include "shared/transfers/PhysicsCommunicationAssembler.h"
@@ -26,7 +28,7 @@ namespace uw
     class ClientsGameSender
     {
     public:
-        ClientsGameSender(std::shared_ptr<GameManager> gameManager, std::shared_ptr<MessageSerializer> messageSerializer, std::shared_ptr<PhysicsCommunicationAssembler> physicsCommunicationAssembler) :
+        ClientsGameSender(std::shared_ptr<GameManager> gameManager, std::shared_ptr<MessageSerializer> messageSerializer, std::shared_ptr<PhysicsCommunicationAssembler> physicsCommunicationAssembler, const std::shared_ptr<ClientGameStateFactory>& clientGameStateFactory) :
             _gameManager(gameManager),
             _messageSerializer(messageSerializer),
             _maxMsBetweenCompleteStates(60000 / MINIMAL_COMPLETE_STATE_PER_MINUTE),
@@ -35,7 +37,8 @@ namespace uw
             _isRunning(true),
             _lastSendCompleteState(std::chrono::steady_clock::now()),
             _physicsCommunicationAssembler(physicsCommunicationAssembler),
-            _lastSentGameStateVersion()
+            _lastSentGameStateVersion(),
+            _clientGameStateFactory(clientGameStateFactory)
         {}
 
         void addClient(const PlayerClient& playerClient)
@@ -147,10 +150,11 @@ namespace uw
             if (completeGameState->version() == _lastSentGameStateVersion) return;
             _lastSentGameStateVersion = completeGameState->version();
 
-            CommunicatedCompleteGameState communicatedCompleteGameState(_physicsCommunicationAssembler->physicsCompleteGameStateToCommunicated(completeGameState));
+            const auto immutableClientGameStateFactory(_clientGameStateFactory->createImmutableStateFactory(completeGameState));
 
             for (auto playerClient : localPlayerClients)
             {
+                CommunicatedCompleteGameState communicatedCompleteGameState(_physicsCommunicationAssembler->physicsCompleteGameStateToCommunicated(immutableClientGameStateFactory.createGameStateFor(playerClient.playerId())));
                 const auto message = std::make_shared<MessageWrapper>(MessageWrapper::fromMessage(std::make_shared<CompleteGameStateMessage>(communicatedCompleteGameState, playerClient.playerId())));
                 try
                 {
@@ -183,5 +187,6 @@ namespace uw
         const std::shared_ptr<GameManager> _gameManager;
         const std::shared_ptr<MessageSerializer> _messageSerializer;
         const std::shared_ptr<PhysicsCommunicationAssembler> _physicsCommunicationAssembler;
+        const std::shared_ptr<ClientGameStateFactory> _clientGameStateFactory;
     };
 }

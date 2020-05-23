@@ -33,6 +33,7 @@ int main()
     });
 
     const std::string DEFAULT_SERVER_PORT("52124");
+    const bool DEFAULT_FOG_OF_WAR_ENABLED(false);
 
     try
     {
@@ -41,15 +42,17 @@ int main()
         const std::string serverPort = configurationManager.serverPortOrDefault(DEFAULT_SERVER_PORT);
         const std::vector<std::vector<Vector2D>> firstSpawners = configurationManager.firstSpawners();
         const auto singuitiesBySpawner = configurationManager.singuitiesBySpawner();
+        const auto isFogOfWarEnabled = configurationManager.isFogOfWarEnabled(DEFAULT_FOG_OF_WAR_ENABLED);
 
         const auto gameManager(std::make_shared<GameManager>());
 
-        const auto naiveCollisionDetectorFactory(std::make_shared<KdtreeCollisionDetectorFactory>());
-        const auto physicsManager(std::make_shared<PhysicsManager>(gameManager, naiveCollisionDetectorFactory, std::make_shared<PhysicsStats>()));
+        const auto kdtreeCollisionDetectorFactory(std::make_shared<KdtreeCollisionDetectorFactory>());
+        const auto physicsManager(std::make_shared<PhysicsManager>(gameManager, kdtreeCollisionDetectorFactory, std::make_shared<PhysicsStats>()));
 
         const auto messageSerializer(std::make_shared<MessageSerializer>());
         const auto physicsCommunicationAssembler(std::make_shared<PhysicsCommunicationAssembler>());
-        const auto clientsGameSender(std::make_shared<ClientsGameSender>(gameManager, messageSerializer, physicsCommunicationAssembler));
+        const auto clientGameStateFactory(std::make_shared<ClientGameStateFactory>(isFogOfWarEnabled, kdtreeCollisionDetectorFactory));
+        const auto clientsGameSender(std::make_shared<ClientsGameSender>(gameManager, messageSerializer, physicsCommunicationAssembler, clientGameStateFactory));
 
         const auto gameReceiver(std::make_shared<GameReceiver>(gameManager, physicsCommunicationAssembler));
         const auto clientsReceiver(std::make_shared<ClientsReceiver>(messageSerializer, gameReceiver));

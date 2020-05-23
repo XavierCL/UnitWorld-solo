@@ -19,7 +19,8 @@ ConfigurationManager::ConfigurationManager(const std::string& fileName):
     _sidePanelWidthRatio(),
     _translationPixelPerFrame(),
     _scrollRatioPerTick(),
-    _aiName()
+    _aiName(),
+    _isFogOfWarEnabled()
 {
     try
     {
@@ -94,6 +95,11 @@ ConfigurationManager::ConfigurationManager(const std::string& fileName):
         {
             _aiName = Options::Some(jsonConfiguration.at("ai-name").get<std::string>());
         }
+
+        if (jsonConfiguration.contains("fog-of-war"))
+        {
+            _isFogOfWarEnabled = Options::Some(jsonConfiguration.at("fog-of-war").get<bool>());
+        }
     }
     catch (nlohmann::json::exception jsonError)
     {
@@ -153,4 +159,9 @@ double ConfigurationManager::scrollRatioPerTick(const double& defaultValue) cons
 std::string ConfigurationManager::aiName(const std::string& defaultValue) const
 {
     return _aiName.getOrElse(defaultValue);
+}
+
+bool ConfigurationManager::isFogOfWarEnabled(const bool& defaultValue) const
+{
+    return _isFogOfWarEnabled.getOrElse(defaultValue);
 }
