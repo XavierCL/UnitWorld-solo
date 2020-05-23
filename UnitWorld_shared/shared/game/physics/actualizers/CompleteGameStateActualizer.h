@@ -16,7 +16,7 @@ namespace uw
             _playerActualizers(initializePlayerActualizers(completeGameState))
         {}
 
-        void spawnAll(std::unordered_map<xg::Guid, std::shared_ptr<Player>>& playerById, const unsigned long long& frameCount)
+        void spawnAll(std::unordered_map<xg::Guid, std::shared_ptr<Player>>& playerById, const long long& frameCount)
         {
             for (auto& spawnerActualizer : _spawnerActualizers)
             {
@@ -24,19 +24,19 @@ namespace uw
             }
         }
 
-        void updateCollisions(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
+        void updateCollisions(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, std::shared_ptr<CollisionDetector> spawnerCollisionDetector, const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById)
         {
             for (auto& playerActualizer : _playerActualizers)
             {
-                playerActualizer.updateCollisions(collisionDetectorsByPlayerId, shootablesById);
+                playerActualizer.updateCollisions(collisionDetectorsByPlayerId, shootablesById, spawnerCollisionDetector, spawnersById, _completeGameState->frameCount());
             }
         }
 
-        void shootEnemies(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameCount)
+        void shootEnemies(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
         {
             for (auto& playerActualizer : _playerActualizers)
             {
-                playerActualizer.shootEnemies(shootablesById, frameCount);
+                playerActualizer.shootEnemies(shootablesById, _completeGameState->frameCount());
             }
         }
 
@@ -52,7 +52,7 @@ namespace uw
         {
             for (auto& spawnerActualizer : _spawnerActualizers)
             {
-                spawnerActualizer.updateAllegence();
+                spawnerActualizer.updateAllegence(_completeGameState->frameCount());
             }
         }
 

@@ -12,7 +12,7 @@ namespace uw
     {
     public:
 
-        MessageWrapper(const std::string& json, const std::shared_ptr<const Message> message, const unsigned long long timestamp):
+        MessageWrapper(const std::string& json, const std::shared_ptr<const Message> message, const long long timestamp):
             _json(json),
             _innerMessage(message),
             _timestamp(timestamp)
@@ -22,7 +22,7 @@ namespace uw
 
         std::string json() const;
 
-        unsigned long long timestamp() const;
+        long long timestamp() const;
 
         MessageType messageType() const;
 
@@ -35,7 +35,7 @@ namespace uw
 
         static MessageWrapper fromMessage(const std::shared_ptr<Message> message)
         {
-            const unsigned long long timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch()).count();
+            const long long timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()).time_since_epoch()).count();
 
             return MessageWrapper(wrapMessageToJson(message, timestamp), message, timestamp);
         }
@@ -46,11 +46,11 @@ namespace uw
         static const std::string MESSAGE_DATA_JSON_ATTRIBUTE;
         static const std::string MESSAGE_TIMESTAMP_JSON_ATTRIBUTE;
 
-        static std::string wrapMessageToJson(const std::shared_ptr<const Message> message, const unsigned long long& timestamp);
+        static std::string wrapMessageToJson(const std::shared_ptr<const Message> message, const long long& timestamp);
         static std::shared_ptr<const Message> jsonToMessage(const nlohmann::json& json);
-        static unsigned long long jsonToTimestamp(const nlohmann::json& json);
+        static long long jsonToTimestamp(const nlohmann::json& json);
 
-        const unsigned long long _timestamp;
+        const long long _timestamp;
         const std::shared_ptr<const Message> _innerMessage;
         const std::string _json;
     };

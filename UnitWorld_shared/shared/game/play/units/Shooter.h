@@ -2,6 +2,8 @@
 
 #include "UnitWithHealthPoint.h"
 
+#include "shared/game/geometry/Circle.h"
+
 #include <memory>
 
 namespace uw
@@ -9,45 +11,50 @@ namespace uw
     class Shooter: virtual public Unit
     {
     public:
-        Shooter(const Vector2D& position) :
-            Unit(position),
+        Shooter(const Vector2D& position, const double& radius) :
+            Unit(position, radius),
             _lastShootFameCount(0)
         {}
 
-        Shooter(const Vector2D& position, unsigned long long& lastShootFrameCount) :
-            Unit(position),
+        Shooter(const Vector2D& position, const double& radius, long long& lastShootFrameCount) :
+            Unit(position, radius),
             _lastShootFameCount(lastShootFrameCount)
         {}
 
-        Shooter(const xg::Guid& id, const Vector2D& position, const unsigned long long& lastShootFrameCount) :
-            Unit(id, position),
+        Shooter(const xg::Guid& id, const Vector2D& position, const double& radius, const long long& lastShootFrameCount) :
+            Unit(id, position, radius),
             _lastShootFameCount(lastShootFrameCount)
         {}
 
-        void shootIfCan(std::shared_ptr<UnitWithHealthPoint> unitWithHealthPoint, unsigned long long frameCount)
+        void shootIfCan(std::shared_ptr<UnitWithHealthPoint> unitWithHealthPoint, long long frameCount)
         {
-            // Enemies can be marked as dead, but will only be removed from their player on the actualize phase
-            // When enemies are already dead, keep the shooting for the next frame
-            if (_lastShootFameCount + shootFramelag() <= frameCount
-                && !unitWithHealthPoint->isDead()
-                && position().distanceSq(unitWithHealthPoint->position()) < maxShootingRangeSq())
+            if (canShoot(unitWithHealthPoint, frameCount))
             {
                 _lastShootFameCount = frameCount;
                 unitWithHealthPoint->loseHealthPoint(firePower());
             }
         }
 
-        unsigned long long lastShootFrameCount() const
+        bool canShoot(std::shared_ptr<UnitWithHealthPoint> unitWithHealthPoint, long long frameCount)
+        {
+            // Enemies can be marked as dead, but will only be removed from their player on the actualize phase
+            // When enemies are already dead, keep the shooting for the next frame
+            return _lastShootFameCount + shootFramelag() <= frameCount
+                && !unitWithHealthPoint->isDead()
+                && Circle(position(), maxShootingRange() + radius() + unitWithHealthPoint->radius()).contains(unitWithHealthPoint->position());
+        }
+
+        long long lastShootFrameCount() const
         {
             return _lastShootFameCount;
         }
 
 
     private:
-        virtual double maxShootingRangeSq() const = 0;
-        virtual unsigned long long shootFramelag() const = 0;
+        virtual double maxShootingRange() const = 0;
+        virtual long long shootFramelag() const = 0;
         virtual double firePower() const = 0;
 
-        unsigned long long _lastShootFameCount;
+        long long _lastShootFameCount;
     };
 }

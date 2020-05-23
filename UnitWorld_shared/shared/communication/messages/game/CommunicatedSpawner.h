@@ -11,13 +11,14 @@ namespace uw
     class CommunicatedSpawner
     {
     public:
-        CommunicatedSpawner(const xg::Guid& id, const CommunicatedVector2D& position, const Option<CommunicatedSpawnerAllegence>& allegence, const Option<CommunicatedSinguityDestination>& rally, const unsigned long long& lastSpawnFrameCount, const unsigned long long totalSpawnedCount) :
+        CommunicatedSpawner(const xg::Guid& id, const CommunicatedVector2D& position, const Option<CommunicatedSpawnerAllegence>& allegence, const Option<CommunicatedSinguityDestination>& rally, const long long& lastSpawnFrameCount, const long long totalSpawnedCount, const long long lastClaimedFrameCount) :
             _id(id),
             _position(position),
             _allegence(allegence),
             _rally(rally),
             _lastSpawnFrameCount(lastSpawnFrameCount),
-            _totalSpawnedCount(totalSpawnedCount)
+            _totalSpawnedCount(totalSpawnedCount),
+            _lastClaimedFrameCount(lastClaimedFrameCount)
         {}
 
         xg::Guid id() const
@@ -40,14 +41,19 @@ namespace uw
             return _rally;
         }
 
-        unsigned long long lastSpawnFrameCount() const
+        long long lastSpawnFrameCount() const
         {
             return _lastSpawnFrameCount;
         }
 
-        unsigned long long totalSpawnedCount() const
+        long long totalSpawnedCount() const
         {
             return _totalSpawnedCount;
+        }
+
+        long long lastClaimedFrameCount() const
+        {
+            return _lastClaimedFrameCount;
         }
 
         nlohmann::json toJson() const;
@@ -64,12 +70,14 @@ namespace uw
         const static std::string RALLY_LABEL;
         const static std::string LAST_SPAWN_FRAME_COUNT_LABEL;
         const static std::string TOTAL_SPAWNED_COUNT_LABEL;
+        const static std::string LAST_CLAIMED_FRAME_COUNT_LABEL;
 
         const xg::Guid _id;
         const CommunicatedVector2D _position;
         const Option<CommunicatedSpawnerAllegence> _allegence;
         const Option<CommunicatedSinguityDestination> _rally;
-        const unsigned long long _lastSpawnFrameCount;
-        const unsigned long long _totalSpawnedCount;
+        const long long _lastSpawnFrameCount;
+        const long long _totalSpawnedCount;
+        const long long _lastClaimedFrameCount;
     };
 }

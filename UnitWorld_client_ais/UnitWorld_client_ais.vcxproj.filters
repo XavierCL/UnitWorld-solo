@@ -50,5 +50,8 @@
     <ClInclude Include="clientAis\ais\johnwl\microer\Microer2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="clientAis\ais\xaviercl\spearAi\SpearAi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,0 +1,25 @@
+{
+	"server ip": "127.0.0.1",
+	"server ip john local": "192.168.0.110",
+	"server ip raph": "147.253.45.11",
+	"server ip john": "147.253.89.52",
+	"server port": "52124",
+	"move-zone-width-ratio": 0.03,
+	"translation-pixel-per-frame": 30.0,
+	"scroll-ratio-per-tick": 0.2,
+	"ai-name": "arcAi",
+	"world-absolute-width": 2000.0,
+	"world-absolute-height": 2000.0,
+    "spawners": [
+        [
+			{"x": 500, "y": 500},
+			{"x": 1500, "y": 1500},
+			{"x": 500, "y": 1500},
+			{"x": 1500, "y": 500}
+		],
+        [{"x": 400, "y": 400, "singuities": 100}],
+		[{"x": 1600, "y": 1600, "singuities": 100}],
+		[{"x": 400, "y": 1600, "singuities": 100}],
+		[{"x": 1600, "y": 400, "singuities": 100}]
+    ]
+}

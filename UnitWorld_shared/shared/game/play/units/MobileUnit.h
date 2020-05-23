@@ -89,26 +89,26 @@ namespace uw
         }
 
     protected:
-        MobileUnit(const xg::Guid& id, const Vector2D& position, const Vector2D& speed, const Option<MobileUnitDestination>& destination) :
-            Unit(id, position),
+        MobileUnit(const xg::Guid& id, const Vector2D& position, const double& radius, const Vector2D& speed, const Option<MobileUnitDestination>& destination) :
+            Unit(id, position, radius),
             _speed(speed),
             _destination(destination)
         {}
 
-        MobileUnit(const Vector2D& position, const Vector2D& speed) :
-            Unit(position),
+        MobileUnit(const Vector2D& position, const double& radius, const Vector2D& speed) :
+            Unit(position, radius),
             _speed(speed),
             _destination()
         {}
 
-        MobileUnit(const Vector2D& position, const Vector2D& speed, const Option<MobileUnitDestination>& destination) :
-            Unit(position),
+        MobileUnit(const Vector2D& position, const double& radius, const Vector2D& speed, const Option<MobileUnitDestination>& destination) :
+            Unit(position, radius),
             _speed(speed),
             _destination(destination)
         {}
 
-        MobileUnit(const Vector2D& position) :
-            Unit(position),
+        MobileUnit(const Vector2D& position, const double& radius) :
+            Unit(position, radius),
             _speed(0.0),
             _destination()
         {}

@@ -7,7 +7,7 @@
 	"move-zone-width-ratio": 0.03,
 	"translation-pixel-per-frame": 30.0,
 	"scroll-ratio-per-tick": 0.2,
-	"ai-name": "strongholdAi2",
+	"ai-name": "arcAi",
 	"world-absolute-width": 5000.0,
 	"world-absolute-height": 5000.0,
     "spawners": [

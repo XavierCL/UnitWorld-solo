@@ -20,7 +20,7 @@ namespace uw
             _playerId(playerId)
         {}
 
-        void updateCollisions(const xg::Guid& playerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById)
+        void updateCollisions(const xg::Guid& playerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<CollisionDetector>>> collisionDetectorsByPlayerId, std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const std::shared_ptr<CollisionDetector> spawnerCollisionDetector, const std::unordered_map<xg::Guid, std::shared_ptr<Spawner>>& spawnersById, const long long& frameCount)
         {
             Option<std::shared_ptr<UnitWithHealthPoint>> closestThing;
             Option<std::shared_ptr<UnitWithHealthPoint>> closestEnemy;
@@ -63,16 +63,25 @@ namespace uw
                 });
             }
 
-            _closestEnemyId = closestEnemy.map<xg::Guid>([](std::shared_ptr<UnitWithHealthPoint> enemy) {
-                return enemy->id();
-            });
+            _closestEnemyId = spawnerCollisionDetector->getClosest(CollidablePoint(xg::Guid(), _singuity->position()))
+                .filter([&spawnersById, this, &frameCount](const xg::Guid& spawnerId) {
+                    const auto closestSpawner = spawnersById.at(spawnerId);
+                    return closestSpawner->isAllegedToAPlayer()
+                        && !closestSpawner->isAllegedToPlayer(_playerId)
+                        && _singuity->canShoot(closestSpawner, frameCount)
+                        && _singuity->position().distanceSq(closestSpawner->position()) <= ACCEPTABLE_DISTANCE_TO_FORCE_SPAWNER_ATTACK * ACCEPTABLE_DISTANCE_TO_FORCE_SPAWNER_ATTACK;
+                }).orElse([&closestEnemy]() {
+                    return closestEnemy.map<xg::Guid>([](std::shared_ptr<UnitWithHealthPoint> enemy) {
+                        return enemy->id();
+                    });
+                });
 
             _closestThingId = closestThing.map<xg::Guid>([](std::shared_ptr<UnitWithHealthPoint> thing) {
                 return thing->id();
             });
         }
 
-        void shootEnemy(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const unsigned long long& frameCount)
+        void shootEnemy(std::shared_ptr<std::unordered_map<xg::Guid, std::shared_ptr<UnitWithHealthPoint>>> shootablesById, const long long& frameCount)
         {
             auto closestEnemy = _closestEnemyId.flatMap<std::shared_ptr<UnitWithHealthPoint>>([shootablesById](const xg::Guid& closestEnemyId) {
                 return shootablesById | findSafe<std::shared_ptr<UnitWithHealthPoint>>(closestEnemyId);
@@ -98,11 +107,6 @@ namespace uw
                                     spawner->reguvenate(_playerId, _singuity);
                                     return Options::None<Vector2D>();
                                 }
-                                else if (spawner->canBeAttackedBy(_playerId) && Circle(spawner->position(), ACCEPTABLE_DISTANCE_TO_SPAWNER_DESTINATION).contains(_singuity->position()))
-                                {
-                                    spawner->attackedBy(_playerId, _singuity);
-                                    return Options::None<Vector2D>();
-                                }
                                 else
                                 {
                                     return getOptimalAccelerationTowards(spawner->position());
@@ -125,7 +129,7 @@ namespace uw
                                 }
                                 else if (spawner->canBeAttackedBy(_playerId))
                                 {
-                                    spawner->attackedBy(_playerId, _singuity);
+                                    return getOptimalAccelerationTowards(spawner->position());
                                 }
                                 else
                                 {
@@ -217,6 +221,7 @@ namespace uw
         const static double ACCEPTABLE_DISTANCE_TO_POSITION_DESTINATION;
         const static double ACCEPTABLE_DISTANCE_TO_SPAWNER_DESTINATION;
         const static double ACCEPTABLE_SPEED_RATIO_FOR_STOP_BREAKING;
+        const static double ACCEPTABLE_DISTANCE_TO_FORCE_SPAWNER_ATTACK;
 
         const std::shared_ptr<Singuity> _singuity;
         const xg::Guid _playerId;

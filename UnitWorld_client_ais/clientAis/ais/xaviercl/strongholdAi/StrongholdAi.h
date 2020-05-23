@@ -56,7 +56,7 @@ namespace uw
                     });
                 }
 
-                std::unordered_map<xg::Guid, unsigned long long> spawnerEnemyStrongholds = getEnemySpawnerStrongholds(completeGameState, currentPlayer->id());
+                std::unordered_map<xg::Guid, long long> spawnerEnemyStrongholds = getEnemySpawnerStrongholds(completeGameState, currentPlayer->id());
 
                 // application of the singuity attacks
                 std::unordered_set<xg::Guid> singuitiesWentAttacking;
@@ -146,9 +146,9 @@ namespace uw
             return collisionDetector;
         }
 
-        std::unordered_map<xg::Guid, unsigned long long> getEnemySpawnerStrongholds(std::shared_ptr<const CompleteGameState> completeGameState, const xg::Guid& currentPlayerId)
+        std::unordered_map<xg::Guid, long long> getEnemySpawnerStrongholds(std::shared_ptr<const CompleteGameState> completeGameState, const xg::Guid& currentPlayerId)
         {
-            std::unordered_map<xg::Guid, unsigned long long> enemyStrongholds;
+            std::unordered_map<xg::Guid, long long> enemyStrongholds;
 
             std::shared_ptr<CollisionDetector> spawnersCollisionDetector = getCollisionDetectorForSpawners(completeGameState->spawners());
 
@@ -168,13 +168,14 @@ namespace uw
             for (const auto spawner : completeGameState->spawners())
             {
                 Singuity referenceSinguity(Vector2D(0, 0));
+                const double hundreadthOfSpawnerMaxHealth = spawner->maximumHealthPoint() / 100.0;
                 if (spawner->isAllegedToPlayer(currentPlayerId))
                 {
                     enemyStrongholds[spawner->id()] += ceil((spawner->maximumHealthPoint() - spawner->healthPoint()) / referenceSinguity.reguvenatingHealth());
                 }
                 else
                 {
-                    enemyStrongholds[spawner->id()] += ceil(spawner->maximumHealthPoint() / referenceSinguity.reguvenatingHealth()) + ceil(spawner->healthPoint() / referenceSinguity.spawnerAttackHealth());
+                    enemyStrongholds[spawner->id()] += ceil(spawner->maximumHealthPoint() / referenceSinguity.reguvenatingHealth()) + ceil(spawner->healthPoint() / hundreadthOfSpawnerMaxHealth);
                 }
             }
 

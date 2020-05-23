@@ -16,44 +16,46 @@ namespace uw
     class Spawner: virtual public UnitWithHealthPoint
     {
     public:
-        Spawner(const xg::Guid& id, const Vector2D& initialPosition, Option<SpawnerAllegence> allegence, const Option<MobileUnitDestination> rally, const unsigned long long& lastSpawnFameCount, const unsigned long long& totalSpawnedCount) :
-            Unit(id, initialPosition),
-            UnitWithHealthPoint(id, initialPosition, allegence.map<double>([](const SpawnerAllegence& spawnerAllegence) {
+        Spawner(const xg::Guid& id, const Vector2D& initialPosition, Option<SpawnerAllegence> allegence, const Option<MobileUnitDestination> rally, const long long& lastSpawnFameCount, const long long& totalSpawnedCount, const long long& lastClaimedFrameCount) :
+            Unit(id, initialPosition, spawnerRadius()),
+            UnitWithHealthPoint(id, initialPosition, spawnerRadius(), allegence.map<double>([](const SpawnerAllegence& spawnerAllegence) {
                 return spawnerAllegence.healthPoint();
             }).getOrElse(0.0)),
             _allegence(allegence),
             _rally(rally),
             _lastSpawnFrameCount(lastSpawnFameCount),
-            _totalSpawnedCount(totalSpawnedCount)
+            _totalSpawnedCount(totalSpawnedCount),
+            _lastClaimedFrameCount(lastClaimedFrameCount)
         {}
 
         Spawner(const Vector2D& initialPosition, const xg::Guid& playerId) :
-            Unit(initialPosition),
-            UnitWithHealthPoint(initialPosition, maximumHealthPoint()),
+            Unit(initialPosition, spawnerRadius()),
+            UnitWithHealthPoint(initialPosition, spawnerRadius(), maximumHealthPoint()),
             _allegence(Options::Some(SpawnerAllegence(true, maximumHealthPoint(), playerId))),
             _rally(),
             _lastSpawnFrameCount(0),
-            _totalSpawnedCount(0)
+            _totalSpawnedCount(0),
+            _lastClaimedFrameCount(-gestationFrameLag())
         {}
 
         Spawner(const Vector2D& initialPosition) :
-            Unit(initialPosition),
-            UnitWithHealthPoint(initialPosition, 0),
+            Unit(initialPosition, spawnerRadius()),
+            UnitWithHealthPoint(initialPosition, spawnerRadius(), 0),
             _allegence(Options::None<SpawnerAllegence>()),
             _rally(),
             _lastSpawnFrameCount(0),
-            _totalSpawnedCount(0)
+            _totalSpawnedCount(0),
+            _lastClaimedFrameCount(-gestationFrameLag())
         {}
 
         Spawner(const Spawner& copy):
             Unit(copy),
-            UnitWithHealthPoint(copy.position(), copy._allegence.map<double>([](const SpawnerAllegence& spawnerAllegence) {
-                return spawnerAllegence.healthPoint();
-            }).getOrElse(0.0)),
+            UnitWithHealthPoint(copy),
             _allegence(copy._allegence),
             _rally(copy._rally),
             _lastSpawnFrameCount(copy._lastSpawnFrameCount),
-            _totalSpawnedCount(copy._totalSpawnedCount)
+            _totalSpawnedCount(copy._totalSpawnedCount),
+            _lastClaimedFrameCount(copy._lastClaimedFrameCount)
         {}
 
         Option<SpawnerAllegence> allegence() const
@@ -69,10 +71,12 @@ namespace uw
         void spawnIfCan(const std::function<void(xg::Guid, std::shared_ptr<Singuity>)>& spawned, const double& frameCount)
         {
             _allegence.foreach([this, &spawned, &frameCount](const SpawnerAllegence& allegence) {
-                if (allegence.isClaimed() && _lastSpawnFrameCount + spawnFrameLag() <= frameCount)
+                if (allegence.isClaimed() && _lastClaimedFrameCount + gestationFrameLag() <= frameCount && _lastSpawnFrameCount + spawnFrameLag() <= frameCount)
                 {
                     _lastSpawnFrameCount = frameCount;
                     ++_totalSpawnedCount;
+
+                    gainHealthPoint(33.0, allegence.allegedPlayerId());
 
                     const std::shared_ptr<Singuity> spawnedSinguity = std::make_shared<Singuity>(Singuity::spawn(
                         position(),
@@ -83,6 +87,11 @@ namespace uw
                     spawned(allegence.allegedPlayerId(), spawnedSinguity);
                 }
             });
+        }
+
+        bool isAllegedToAPlayer() const
+        {
+            return _allegence.isDefined();
         }
 
         bool isAllegedToPlayer(const xg::Guid& playerId) const
@@ -113,9 +122,9 @@ namespace uw
             });
         }
 
-        void updateAllegence()
+        void updateAllegence(const long long& frameCount)
         {
-            _allegence = _allegence.flatMap<SpawnerAllegence>([this](const SpawnerAllegence& oldAllegence) {
+            _allegence = _allegence.flatMap<SpawnerAllegence>([this, &frameCount](const SpawnerAllegence& oldAllegence) {
                 if (isDead())
                 {
                     _rally = Options::None<MobileUnitDestination>();
@@ -123,6 +132,7 @@ namespace uw
                 }
                 else if (!oldAllegence.isClaimed() && oldAllegence.healthPoint() >= maximumHealthPoint())
                 {
+                    _lastClaimedFrameCount = frameCount;
                     return Options::Some(SpawnerAllegence(true, maximumHealthPoint(), oldAllegence.allegedPlayerId()));
                 }
                 else
@@ -147,7 +157,7 @@ namespace uw
 
         bool canBeReguvenatedBy(const xg::Guid& playerId) const
         {
-            return isAllegedToPlayer(playerId) && !isAtMaximumHealth() || _allegence.isEmpty();
+            return isAllegedToPlayer(playerId) && !isAtMaximumHealth() && !isClaimed() || _allegence.isEmpty();
         }
 
         bool canBeAttackedBy(const xg::Guid& playerId) const
@@ -164,32 +174,22 @@ namespace uw
         {
             if (canBeReguvenatedBy(playerId))
             {
-                double gainedHealthPoint = healthPoint() + reguvenator->reguvenatingHealth() > maximumHealthPoint()
-                    ? maximumHealthPoint() - healthPoint()
-                    : reguvenator->reguvenatingHealth();
-                UnitWithHealthPoint::gainHealthPoint(gainedHealthPoint);
-                _allegence = _allegence.map<SpawnerAllegence>([&gainedHealthPoint](const SpawnerAllegence& oldAllegence) {
-                    return oldAllegence.gainHealthPoint(gainedHealthPoint);
-                }).orElse([&playerId, &gainedHealthPoint]() {
-                    return SpawnerAllegence(false, gainedHealthPoint, playerId);
-                });
+                Spawner::gainHealthPoint(reguvenator->reguvenatingHealth(), playerId);
                 reguvenator->makeHealthPointNone();
             }
         }
 
-        void attackedBy(const xg::Guid& playerId, std::shared_ptr<Singuity> attacker)
+        void gainHealthPoint(const double& requestedHealthPoint, const xg::Guid& playerId)
         {
-            if (canBeAttackedBy(playerId))
-            {
-                double lostHealthPoint = healthPoint() - attacker->spawnerAttackHealth() < 0.0
-                    ? healthPoint()
-                    : attacker->spawnerAttackHealth();
-                UnitWithHealthPoint::loseHealthPoint(lostHealthPoint);
-                _allegence = _allegence.map<SpawnerAllegence>([&lostHealthPoint](const SpawnerAllegence& oldAllegence) {
-                    return oldAllegence.loseHealthPoint(lostHealthPoint);
-                });
-                attacker->makeHealthPointNone();
-            }
+            double gainedHealthPoint = healthPoint() + requestedHealthPoint > maximumHealthPoint()
+                ? maximumHealthPoint() - healthPoint()
+                : requestedHealthPoint;
+            UnitWithHealthPoint::gainHealthPoint(gainedHealthPoint);
+            _allegence = _allegence.map<SpawnerAllegence>([&gainedHealthPoint](const SpawnerAllegence& oldAllegence) {
+                return oldAllegence.gainHealthPoint(gainedHealthPoint);
+            }).orElse([&playerId, &gainedHealthPoint]() {
+                return SpawnerAllegence(false, gainedHealthPoint, playerId);
+            });
         }
 
         void setRally(const MobileUnitDestination& rally)
@@ -199,30 +199,46 @@ namespace uw
 
         double maximumHealthPoint() const override
         {
-            return 2000.0;
+            return 50000.0;
         }
 
-        unsigned long long lastSpawnFrameCount() const
+        long long lastSpawnFrameCount() const
         {
             return _lastSpawnFrameCount;
         }
 
-        unsigned long long totalSpawnedCount() const
+        long long totalSpawnedCount() const
         {
             return _totalSpawnedCount;
+        }
+
+        long long lastClaimedFrameCount() const
+        {
+            return _lastClaimedFrameCount;
         }
 
     private:
         static std::vector<Vector2D> UNIT_SPAWN_DIRECTION;
 
-        static unsigned long long spawnFrameLag()
+        static long long spawnFrameLag()
         {
             return 30;
         }
 
+        static long long gestationFrameLag()
+        {
+            return 900;
+        }
+
+        static double spawnerRadius()
+        {
+            return 22.0;
+        }
+
         Option<SpawnerAllegence> _allegence;
         Option<MobileUnitDestination> _rally;
-        unsigned long long _lastSpawnFrameCount;
-        unsigned long long _totalSpawnedCount;
+        long long _lastSpawnFrameCount;
+        long long _totalSpawnedCount;
+        long long _lastClaimedFrameCount;
     };
 }

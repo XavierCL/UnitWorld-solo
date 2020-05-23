@@ -8,13 +8,13 @@ namespace uw
     {
     public:
 
-        UnitWithHealthPoint(const xg::Guid& id, const Vector2D& position, const double& healthPoint) :
-            Unit(id, position),
+        UnitWithHealthPoint(const xg::Guid& id, const Vector2D& position, const double& radius, const double& healthPoint) :
+            Unit(id, position, radius),
             _healthPoint(healthPoint)
         {}
 
-        UnitWithHealthPoint(const Vector2D& position, const double& maximumHealthPoint):
-            Unit(position),
+        UnitWithHealthPoint(const Vector2D& position, const double& radius, const double& maximumHealthPoint):
+            Unit(position, radius),
             _healthPoint(maximumHealthPoint)
         {}
 

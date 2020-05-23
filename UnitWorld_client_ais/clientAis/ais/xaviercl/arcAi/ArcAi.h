@@ -527,9 +527,10 @@ namespace uw
             for (const auto spawner : completeGameState->spawners())
             {
                 Singuity referenceSinguity(Vector2D(0, 0));
+                const double hundreadthOfSpawnerMaxHealth = spawner->maximumHealthPoint() / 100.0;
                 if (spawner->isClaimedBy(currentPlayerId))
                 {
-                    enemyStrongholds[spawner->id()] += ceil(spawner->healthPoint() / referenceSinguity.spawnerAttackHealth());
+                    enemyStrongholds[spawner->id()] += ceil(spawner->healthPoint() / hundreadthOfSpawnerMaxHealth);
                 }
                 if (spawner->isAllegedToPlayer(currentPlayerId))
                 {
@@ -537,11 +538,12 @@ namespace uw
                 }
                 else if (spawner->isClaimed())
                 {
-                    enemyStrongholds[spawner->id()] -= ceil(spawner->healthPoint() / referenceSinguity.spawnerAttackHealth());
+                    enemyStrongholds[spawner->id()] -= ceil(spawner->healthPoint() / hundreadthOfSpawnerMaxHealth);
                 }
                 else
                 {
-                    enemyStrongholds[spawner->id()] -= ceil(spawner->maximumHealthPoint() / referenceSinguity.reguvenatingHealth()) + ceil(spawner->healthPoint() / referenceSinguity.spawnerAttackHealth());
+                    // Spawner is alleged to enemy player or neutral
+                    enemyStrongholds[spawner->id()] -= ceil(spawner->maximumHealthPoint() / referenceSinguity.reguvenatingHealth()) + ceil(spawner->healthPoint() / hundreadthOfSpawnerMaxHealth);
                 }
             }
 

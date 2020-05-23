@@ -43,92 +43,6 @@ namespace uw
                     });
                 }).getOrElse([] {return std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<Singuity>>>(); });
 
-            _userControlState->getLastSelectedSpawnerId().foreach([&canvas, spawnersById, this](const xg::Guid selectedSpawnerId) {
-                (spawnersById | find<std::shared_ptr<Spawner>>(selectedSpawnerId)).foreach([&canvas, this](std::shared_ptr<Spawner> spawner) {
-                    const Circle spawnerCircle(_cameraRelativeGameManager->relativeCircleOf(spawner));
-                    const double spawnerSelectionRadius = spawnerCircle.radius() * 1.0454545454545454545454545454545;
-                    sf::CircleShape graphicalSpawner(spawnerSelectionRadius);
-                    graphicalSpawner.setPosition(spawnerCircle.center().x() - spawnerSelectionRadius, spawnerCircle.center().y() - spawnerSelectionRadius);
-                    graphicalSpawner.setFillColor(sf::Color::White);
-                    canvas->draw(graphicalSpawner);
-                });
-            });
-
-            for(const auto& selectedSpawnerId: _userControlState->getSelectedSpawners())
-            {
-                (spawnersById | find<std::shared_ptr<Spawner>>(selectedSpawnerId)).foreach([&canvas, this](std::shared_ptr<Spawner> spawner) {
-                    const Circle spawnerCircle(_cameraRelativeGameManager->relativeCircleOf(spawner));
-                    const double spawnerSelectionRadius = spawnerCircle.radius() * 1.0454545454545454545454545454545;
-                    sf::CircleShape graphicalSpawner(spawnerSelectionRadius);
-                    graphicalSpawner.setPosition(spawnerCircle.center().x() - spawnerSelectionRadius, spawnerCircle.center().y() - spawnerSelectionRadius);
-                    graphicalSpawner.setFillColor(sf::Color::White);
-                    canvas->draw(graphicalSpawner);
-                });
-            }
-
-            // Spawners
-            &completeGameState->spawners() | forEach([&canvas, &playerIndexByPlayerId, this](std::shared_ptr<Spawner> spawner) {
-                auto spanwerOuterAndInnerColors = spawner->allegence().map<std::pair<sf::Color, sf::Color>>([&spawner, &playerIndexByPlayerId, this](SpawnerAllegence allegence) {
-                    auto playerFullColor = (playerIndexByPlayerId
-                        | find<size_t>(allegence.allegedPlayerId()))
-                        .map<sf::Color>([this](auto playerIndex) { return _playerColors[playerIndex]; })
-                        .getOrElse(sf::Color::Black);
-
-                    auto lifeRatio = allegence.healthPoint() / spawner->maximumHealthPoint();
-                    sf::Color playerLifeColor(round(playerFullColor.r * lifeRatio), round(playerFullColor.g * lifeRatio), round(playerFullColor.b * lifeRatio));
-
-                    return allegence.isClaimed()
-                        ? std::make_pair(playerLifeColor, playerFullColor)
-                        : std::make_pair(sf::Color(70, 70, 70), playerLifeColor);
-                }).getOrElse(std::make_pair(sf::Color(70, 70, 70), sf::Color(70, 70, 70)));
-
-                const Circle spawnerCircle(_cameraRelativeGameManager->relativeCircleOf(spawner));
-                const double spawnerInnerRadius = spawnerCircle.radius() * 0.90909090909090909090909090909091;
-                sf::CircleShape graphicalSpawner(spawnerInnerRadius);
-                graphicalSpawner.setPosition(spawnerCircle.center().x() - spawnerInnerRadius, spawnerCircle.center().y() - spawnerInnerRadius);
-                graphicalSpawner.setFillColor(spanwerOuterAndInnerColors.first);
-                graphicalSpawner.setOutlineThickness(spawnerCircle.radius() * 0.09090909090909090909090909090909);
-                graphicalSpawner.setOutlineColor(spanwerOuterAndInnerColors.second);
-                canvas->draw(graphicalSpawner);
-            });
-
-            for (const auto& selectedSpawnerId : _userControlState->getSelectedSpawners())
-            {
-                (spawnersById | find<std::shared_ptr<Spawner>>(selectedSpawnerId)).foreach([&canvas, this, &spawnersById](std::shared_ptr<Spawner> selectedSpawner) {
-                    Option<Vector2D> rallyPosition = selectedSpawner->rally().flatMap<Vector2D>([&spawnersById](const MobileUnitDestination& destination) {
-                        return destination.map<Option<Vector2D>>(
-                            [](const auto& positionDestination) { return Options::Some(positionDestination); },
-                            [&spawnersById](const SpawnerDestination& spawnerDestination) { return (spawnersById | find<std::shared_ptr<Spawner>>(spawnerDestination.spawnerId())).map<Vector2D>([](const std::shared_ptr<Spawner> spawner) { return spawner->position(); }); },
-                            [&spawnersById](const xg::Guid& unconditionalSpawnerDestination) { return (spawnersById | find<std::shared_ptr<Spawner>>(unconditionalSpawnerDestination)).map<Vector2D>([](const std::shared_ptr<Spawner> spawner) { return spawner->position(); }); }
-                        );
-                    });
-
-                    rallyPosition.foreach([this, &canvas, selectedSpawner](const Vector2D& target) {
-
-                        const auto selectedSpawnerRelativePosition = _cameraRelativeGameManager->absolutePositionToRelative(selectedSpawner->position());
-                        const auto targetRelativePosition = _cameraRelativeGameManager->absolutePositionToRelative(target);
-
-                        sf::Vertex line[] =
-                        {
-                            sf::Vertex(sf::Vector2f(selectedSpawnerRelativePosition.x(), selectedSpawnerRelativePosition.y())),
-                            sf::Vertex(sf::Vector2f(targetRelativePosition.x(), targetRelativePosition.y()))
-                        };
-
-                        canvas->draw(line, 2, sf::Lines);
-                    });
-                });
-            }
-            
-            // Last move units position
-            _userControlState->getAbsoluteLastMoveUnitPosition().foreach([&canvas, this](const Vector2D& lastMoveUnitPosition) {
-                const double circleRadius(_cameraRelativeGameManager->absoluteLengthToRelative(2.0));
-                const Vector2D relativeLastMoveUnitPosition(_cameraRelativeGameManager->absolutePositionToRelative(lastMoveUnitPosition));
-                sf::CircleShape cursorDot(circleRadius);
-                cursorDot.setPosition(relativeLastMoveUnitPosition.x() - circleRadius, relativeLastMoveUnitPosition.y() - circleRadius);
-                cursorDot.setFillColor(sf::Color(255, 255, 255));
-                canvas->draw(cursorDot);
-            });
-
             // Selected unit white aura
             sf::CircleShape selectedUnitCircleShape;
             for (const auto selectedUnitId : _userControlState->getSelectedUnits())
@@ -169,6 +83,95 @@ namespace uw
                     canvas->draw(circleShape);
                 }
             }
+
+            // Target spawnerId aura
+            _userControlState->getLastSelectedSpawnerId().foreach([&canvas, spawnersById, this](const xg::Guid selectedSpawnerId) {
+                (spawnersById | find<std::shared_ptr<Spawner>>(selectedSpawnerId)).foreach([&canvas, this](std::shared_ptr<Spawner> spawner) {
+                    const Circle spawnerCircle(_cameraRelativeGameManager->relativeCircleOf(spawner));
+                    const double spawnerSelectionRadius = spawnerCircle.radius() * 1.0454545454545454545454545454545;
+                    sf::CircleShape graphicalSpawner(spawnerSelectionRadius);
+                    graphicalSpawner.setPosition(spawnerCircle.center().x() - spawnerSelectionRadius, spawnerCircle.center().y() - spawnerSelectionRadius);
+                    graphicalSpawner.setFillColor(sf::Color::White);
+                    canvas->draw(graphicalSpawner);
+                });
+            });
+
+            // Selected spawnersId aura
+            for (const auto& selectedSpawnerId : _userControlState->getSelectedSpawners())
+            {
+                (spawnersById | find<std::shared_ptr<Spawner>>(selectedSpawnerId)).foreach([&canvas, this](std::shared_ptr<Spawner> spawner) {
+                    const Circle spawnerCircle(_cameraRelativeGameManager->relativeCircleOf(spawner));
+                    const double spawnerSelectionRadius = spawnerCircle.radius() * 1.0454545454545454545454545454545;
+                    sf::CircleShape graphicalSpawner(spawnerSelectionRadius);
+                    graphicalSpawner.setPosition(spawnerCircle.center().x() - spawnerSelectionRadius, spawnerCircle.center().y() - spawnerSelectionRadius);
+                    graphicalSpawner.setFillColor(sf::Color::White);
+                    canvas->draw(graphicalSpawner);
+                });
+            }
+
+            // Spawners
+            &completeGameState->spawners() | forEach([&canvas, &playerIndexByPlayerId, this](std::shared_ptr<Spawner> spawner) {
+                auto spanwerOuterAndInnerColors = spawner->allegence().map<std::pair<sf::Color, sf::Color>>([&spawner, &playerIndexByPlayerId, this](SpawnerAllegence allegence) {
+                    auto playerFullColor = (playerIndexByPlayerId
+                        | find<size_t>(allegence.allegedPlayerId()))
+                        .map<sf::Color>([this](auto playerIndex) { return _playerColors[playerIndex]; })
+                        .getOrElse(sf::Color::Black);
+
+                    auto lifeRatio = allegence.healthPoint() / spawner->maximumHealthPoint();
+                    sf::Color playerLifeColor(round(playerFullColor.r * lifeRatio), round(playerFullColor.g * lifeRatio), round(playerFullColor.b * lifeRatio));
+
+                    return allegence.isClaimed()
+                        ? std::make_pair(playerLifeColor, playerFullColor)
+                        : std::make_pair(sf::Color(70, 70, 70), playerLifeColor);
+                }).getOrElse(std::make_pair(sf::Color(70, 70, 70), sf::Color(70, 70, 70)));
+
+                const Circle spawnerCircle(_cameraRelativeGameManager->relativeCircleOf(spawner));
+                const double spawnerInnerRadius = spawnerCircle.radius() * 0.90909090909090909090909090909091;
+                sf::CircleShape graphicalSpawner(spawnerInnerRadius);
+                graphicalSpawner.setPosition(spawnerCircle.center().x() - spawnerInnerRadius, spawnerCircle.center().y() - spawnerInnerRadius);
+                graphicalSpawner.setFillColor(spanwerOuterAndInnerColors.first);
+                graphicalSpawner.setOutlineThickness(spawnerCircle.radius() * 0.09090909090909090909090909090909);
+                graphicalSpawner.setOutlineColor(spanwerOuterAndInnerColors.second);
+                canvas->draw(graphicalSpawner);
+            });
+
+            // Spawner rallies
+            for (const auto& selectedSpawnerId : _userControlState->getSelectedSpawners())
+            {
+                (spawnersById | find<std::shared_ptr<Spawner>>(selectedSpawnerId)).foreach([&canvas, this, &spawnersById](std::shared_ptr<Spawner> selectedSpawner) {
+                    Option<Vector2D> rallyPosition = selectedSpawner->rally().flatMap<Vector2D>([&spawnersById](const MobileUnitDestination& destination) {
+                        return destination.map<Option<Vector2D>>(
+                            [](const auto& positionDestination) { return Options::Some(positionDestination); },
+                            [&spawnersById](const SpawnerDestination& spawnerDestination) { return (spawnersById | find<std::shared_ptr<Spawner>>(spawnerDestination.spawnerId())).map<Vector2D>([](const std::shared_ptr<Spawner> spawner) { return spawner->position(); }); },
+                            [&spawnersById](const xg::Guid& unconditionalSpawnerDestination) { return (spawnersById | find<std::shared_ptr<Spawner>>(unconditionalSpawnerDestination)).map<Vector2D>([](const std::shared_ptr<Spawner> spawner) { return spawner->position(); }); }
+                        );
+                    });
+
+                    rallyPosition.foreach([this, &canvas, selectedSpawner](const Vector2D& target) {
+
+                        const auto selectedSpawnerRelativePosition = _cameraRelativeGameManager->absolutePositionToRelative(selectedSpawner->position());
+                        const auto targetRelativePosition = _cameraRelativeGameManager->absolutePositionToRelative(target);
+
+                        sf::Vertex line[] =
+                        {
+                            sf::Vertex(sf::Vector2f(selectedSpawnerRelativePosition.x(), selectedSpawnerRelativePosition.y())),
+                            sf::Vertex(sf::Vector2f(targetRelativePosition.x(), targetRelativePosition.y()))
+                        };
+
+                        canvas->draw(line, 2, sf::Lines);
+                    });
+                });
+            }
+
+            // Last move units position
+            _userControlState->getAbsoluteLastMoveUnitPosition().foreach([&canvas, this](const Vector2D& lastMoveUnitPosition) {
+                const double circleRadius(_cameraRelativeGameManager->absoluteLengthToRelative(2.0));
+                const Vector2D relativeLastMoveUnitPosition(_cameraRelativeGameManager->absolutePositionToRelative(lastMoveUnitPosition));
+                sf::CircleShape cursorDot(circleRadius);
+                cursorDot.setPosition(relativeLastMoveUnitPosition.x() - circleRadius, relativeLastMoveUnitPosition.y() - circleRadius);
+                cursorDot.setFillColor(sf::Color(255, 255, 255));
+                canvas->draw(cursorDot);
+            });
 
             // User selection rectangle
             _userControlState->getAbsoluteSelectionRectangle().foreach([&canvas, this](const Rectangle& userSelection) {

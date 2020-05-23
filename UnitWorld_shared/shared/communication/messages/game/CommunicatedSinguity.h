@@ -11,7 +11,7 @@ namespace uw
     class CommunicatedSinguity
     {
     public:
-        CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedSinguityDestination>& destination, const double& healthPoint, const unsigned long long& lastShootFrameCount);
+        CommunicatedSinguity(const xg::Guid& singuityId, const xg::Guid& playerId, const CommunicatedVector2D& position, const CommunicatedVector2D& speed, const Option<CommunicatedSinguityDestination>& destination, const double& healthPoint, const long long& lastShootFrameCount);
 
         nlohmann::json toJson() const;
 
@@ -24,7 +24,7 @@ namespace uw
         CommunicatedVector2D speed() const;
         Option<CommunicatedSinguityDestination> destination() const;
         double healthPoint() const;
-        unsigned long long lastShootFrameCount() const;
+        long long lastShootFrameCount() const;
 
     private:
 
@@ -43,6 +43,6 @@ namespace uw
         const CommunicatedVector2D _speed;
         const Option<CommunicatedSinguityDestination> _destination;
         const double _healthPoint;
-        const unsigned long long _lastShootFameCount;
+        const long long _lastShootFameCount;
     };
 }
