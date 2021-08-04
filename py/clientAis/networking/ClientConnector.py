@@ -1,7 +1,7 @@
 import socket
 from typing import Any, Callable
 
-from networking.CommunicationHandler import CommunicationHandler
+from clientAis.networking.CommunicationHandler import CommunicationHandler
 
 class ClientConnector:
     def __init__(self, serverIp: str, serverPort: int, clientConnectedCallback: Callable[[CommunicationHandler], Any]):

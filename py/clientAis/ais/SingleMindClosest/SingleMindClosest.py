@@ -1,8 +1,8 @@
 import numpy as np
 from sklearn.neighbors import KDTree
 
-from ais.Artificial import Artificial
-from communications.GameState import GameState
+from clientAis.ais.Artificial import Artificial
+from clientAis.communications.GameState import GameState
 
 class SingleMindClosest(Artificial):
     def frame(self, gameState: GameState, currentPlayerId: str):

@@ -3,9 +3,9 @@ from typing import List, Set, Union
 
 import numpy as np
 
-from communications.JsonHandler import JsonHandler
-from communications.MessageSerializer import MessageSerializer
-from networking.CommunicationHandler import CommunicationHandler
+from clientAis.communications.JsonHandler import JsonHandler
+from clientAis.communications.MessageSerializer import MessageSerializer
+from clientAis.networking.CommunicationHandler import CommunicationHandler
 
 class ServerCommander:
     def __init__(self, serverCommunicator: CommunicationHandler, messageSerializer: MessageSerializer):

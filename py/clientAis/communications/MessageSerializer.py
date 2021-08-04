@@ -1,7 +1,7 @@
 import json
 from typing import List
 
-from communications.JsonHandler import JsonHandler
+from clientAis.communications.JsonHandler import JsonHandler
 
 class MessageSerializer:
     def __init__(self):

@@ -1,9 +1,9 @@
 import threading
 
-from communications.GameState import GameStateMessage
-from communications.MessageSerializer import MessageSerializer
-from games.GameManager import GameManager
-from networking.CommunicationHandler import CommunicationHandler
+from clientAis.communications.GameState import GameStateMessage
+from clientAis.communications.MessageSerializer import MessageSerializer
+from clientAis.games.GameManager import GameManager
+from clientAis.networking.CommunicationHandler import CommunicationHandler
 
 class ServerReceiver:
     def __init__(self, communicationHandler: CommunicationHandler, gameManager: GameManager, messageSerializer: MessageSerializer):

@@ -1,5 +1,5 @@
-from communications.GameState import GameState
-from communications.ServerCommander import ServerCommander
+from clientAis.communications.GameState import GameState
+from clientAis.communications.ServerCommander import ServerCommander
 
 class Artificial:
     def __init__(self, gameController: ServerCommander):
