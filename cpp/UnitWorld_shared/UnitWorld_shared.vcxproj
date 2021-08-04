@@ -194,7 +194,7 @@
     <ClCompile Include="shared\communication\messages\game\CommunicatedVector2D.cpp" />
     <ClCompile Include="shared\communication\messages\CompleteGameStateMessage.cpp" />
     <ClCompile Include="shared\communication\messages\commands\MoveMobileUnitsToPositionMessage.cpp" />
-    <ClCompile Include="shared\communication\messages\commands\MoveMobileUnitsToSpawner.cpp" />
+    <ClCompile Include="shared\communication\messages\commands\MoveMobileUnitsToSpawnerMessage.cpp" />
     <ClCompile Include="shared\communication\MessageWrapper.cpp" />
     <ClCompile Include="shared\configuration\ConfigurationManager.cpp" />
     <ClCompile Include="shared\game\geometry\Rectangle.cpp" />

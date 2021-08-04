@@ -30,13 +30,13 @@ namespace uw
             if (communications.back().empty() || communications.back().front() == '\0')
             {
                 _remainingDeserializationBuffer.clear();
-                communications.pop_back();
             }
             else
             {
                 _remainingDeserializationBuffer = communications.back();
-                communications.pop_back();
             }
+
+            communications.pop_back();
 
             std::vector<std::shared_ptr<MessageWrapper>> messages;
             for (const auto communication : communications)

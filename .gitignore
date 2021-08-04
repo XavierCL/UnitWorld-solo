@@ -21,3 +21,5 @@
 *.exe
 *.cache
 *.enc
+__pycache__/
+.idea/

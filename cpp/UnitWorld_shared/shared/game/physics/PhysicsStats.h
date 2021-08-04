@@ -15,7 +15,7 @@ namespace uw
             ++_currentFrameCount;
             if (_currentFrameCount % frameBeforeLog() == 0)
             {
-                Logger::trace("FrameCount: " + std::to_string(_currentFrameCount) + ". Average Frame Time of past " + std::to_string(frameBeforeLog()) + " ms: " + std::to_string(_summedMillis / frameBeforeLog()));
+                Logger::trace("FrameCount: " + std::to_string(_currentFrameCount) + ". Average Frame Time of past " + std::to_string(frameBeforeLog()) + " ms: " + std::to_string(_summedMillis / frameBeforeLog()) + "ms.");
                 _summedMillis = 0;
             }
         }
