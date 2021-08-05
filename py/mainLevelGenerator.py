@@ -79,10 +79,11 @@ homeSquareIndex = np.random.choice(possibleHomes)
 homeSpawnerConfig = symmetryFunction(arrays.assign(np.zeros((discreteMapSize, discreteMapSize), dtype=bool).reshape(-1), homeSquareIndex, True).reshape(discreteMapSize, -1))
 
 # Generating final spawner array
-gamePositionOffset = (mapSizeInGameUnits - mapSizeInGameUnits * (discreteMapSize - 1) / discreteMapSize) / 2 + 100
+viewPointInGameUnit = mapSizeInGameUnits - 500
+gamePositionOffset = (mapSizeInGameUnits - viewPointInGameUnit * (discreteMapSize - 1) / discreteMapSize) / 2
 
 def discretePositionToGamePosition(pos: int) -> float:
-    return mapSizeInGameUnits * pos / discreteMapSize + gamePositionOffset
+    return viewPointInGameUnit * pos / discreteMapSize + gamePositionOffset
 
 spawnersConfig: List[List[Dict[str, Union[float, int]]]] = [
     [{"x": discretePositionToGamePosition(x), "y": discretePositionToGamePosition(y)} for x, y in zip(*np.nonzero(symmetricSpawnerConfig))]
@@ -133,7 +134,7 @@ def runCppClientGuiPlayerBlocking():
 
 def runCppClientGuiObserverBlocking():
     print("Waiting 3 seconds for called ais to startup before starting observer...")
-    time.sleep(5)
+    time.sleep(4)
 
     subprocess.call(os.path.normpath(os.path.join(lastGamePath, 'UnitWorld_client_gui.exe')), cwd=os.path.normpath(lastGamePath))
 
