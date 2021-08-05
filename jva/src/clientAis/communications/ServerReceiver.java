@@ -1,6 +1,7 @@
 package clientAis.communications;
 
 import clientAis.communications.game_data.GameStateMessage;
+import clientAis.games.GameManager;
 import clientAis.networking.CommunicationHandler;
 import net.minidev.json.JSONObject;
 
@@ -48,7 +49,9 @@ public class ServerReceiver implements Runnable, Closeable {
                 final int messageTimeStamp = message.getAsNumber("timestamp").intValue();
                 if(messageTimeStamp > lastReceivedTimeStamp) {
                     lastReceivedTimeStamp = messageTimeStamp;
-                    final GameStateMessage
+                    final GameStateMessage gameStateMessage = new GameStateMessage(message);
+                    gameManager.setCurrentPlayerId(gameStateMessage.currentPlayer);
+                    gameManager.setNextCompleteGameState(gameStateMessage.gameState);
                 }
             }
         }
