@@ -17,7 +17,7 @@ archivedGamesPath = "./games/archived/"
 lastGamePath = "./games/latest/"
 
 mapSizeInGameUnits = 5000.0
-discreteMapSize = 40
+discreteMapSize = 41
 forcedSpawners = 3
 playerCount = 2
 expectedRandomSpawners = 5
@@ -60,6 +60,7 @@ symmetryFunction = random.choice(
         lambda asymmetric: np.any([asymmetric, asymmetric[:, ::-1]], axis=0),  # y axis
         lambda asymmetric: np.any([asymmetric, asymmetric.T], axis=0),  # 1, 1 diagonal
         lambda asymmetric: np.any([asymmetric, asymmetric[::-1].T[::-1]], axis=0),  # 1, -1 diagonal
+        lambda asymmetric: arrays.assign(asymmetric, tuple((np.array([discreteMapSize - 1, discreteMapSize - 1]) - np.array(np.nonzero(asymmetric)).T).T), True),  # 180 degree rotation
     ]
 )
 
@@ -127,11 +128,14 @@ def runCppClientGuiPlayerBlocking():
 
 def runCppClientGuiObserverBlocking():
     print("Waiting 3 seconds for called ais to startup before starting observer...")
+    time.sleep(3)
+
     subprocess.call(os.path.normpath(os.path.join(lastGamePath, 'UnitWorld_client_gui.exe')), cwd=os.path.normpath(lastGamePath))
 
 runServerBackground()
-# runPythonAiBackground()
-runCppClientGuiPlayerBlocking()
+runPythonAiBackground()
+runCppAiBackground()
+runCppClientGuiObserverBlocking()
 
 for cleanup in cleanupStack[::-1]:
     cleanup()
