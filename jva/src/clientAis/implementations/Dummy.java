@@ -12,5 +12,4 @@ public class Dummy implements Bot {
     public Consumer<ServerCommander> exec(Tuple2<GameState, String> input) {
         return serverCommander -> {};
     }
-
 }

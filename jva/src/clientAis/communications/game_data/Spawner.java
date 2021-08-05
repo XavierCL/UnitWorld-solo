@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public class Spawner {
 
-    public final int id;
+    public final String id;
     public final Vector2 position;
     public final Optional<SpawnerAllegence> allegence;
     public final Optional<MobileDestination> rally;
@@ -16,7 +16,7 @@ public class Spawner {
     public final int lastClaimFrameCount;
 
     public Spawner(JSONObject data) {
-        this.id = data.getAsNumber("i").intValue();
+        this.id = data.getAsString("i");
         this.position = new Vector2((JSONObject) data.get("p"));
         this.allegence = data.getAsString("a").length() == 0 ? Optional.empty() : Optional.of(new SpawnerAllegence((JSONObject) data.get("a")));
         this.rally = data.getAsString("r").length() == 0 ? Optional.empty() : Optional.of(new MobileDestination((JSONObject) data.get("r")));

@@ -69,7 +69,7 @@ public class MainClientAi {
                     Consumer<ServerCommander> consumer = bot.exec(new Tuple2<>(gameState, gameManager.currentPlayerId.get()));
                     consumer.accept(serverCommander);
                 });
-            }), 10, REFRESH_PERIOD_MS);
+            }), 0, REFRESH_PERIOD_MS);
         });
 
     }

@@ -49,7 +49,7 @@ public class ServerReceiver implements Runnable, Closeable {
                 final int messageTimeStamp = message.getAsNumber("timestamp").intValue();
                 if(messageTimeStamp > lastReceivedTimeStamp) {
                     lastReceivedTimeStamp = messageTimeStamp;
-                    final GameStateMessage gameStateMessage = new GameStateMessage(message);
+                    final GameStateMessage gameStateMessage = new GameStateMessage((JSONObject) message.get("data"));
                     gameManager.setCurrentPlayerId(gameStateMessage.currentPlayer);
                     gameManager.setNextCompleteGameState(gameStateMessage.gameState);
                 }

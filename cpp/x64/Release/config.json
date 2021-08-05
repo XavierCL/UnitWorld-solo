@@ -10,7 +10,7 @@
 	"ai-name": "spearAi",
 	"world-absolute-width": 5000.0,
 	"world-absolute-height": 5000.0,
-	"fog-of-war": true,
+	"fog-of-war": false,
     "spawners": [
         [{"x": 1000.0, "y": 600.0},
 		 {"x": 450.0, "y": 700},

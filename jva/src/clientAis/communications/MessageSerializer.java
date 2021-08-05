@@ -23,13 +23,14 @@ public class MessageSerializer {
 
     public List<JSONObject> deserialize(String rawData) {
         remainingDeserializationBuffer += rawData;
-        String[] rawDataPackets = remainingDeserializationBuffer.split("\\n");
+        String[] rawDataPackets = remainingDeserializationBuffer.split("\\\\n", -1);
 
-        if(rawDataPackets[rawData.length()-1].equals("\0")) {
-            remainingDeserializationBuffer = "";
-        }
-        else {
-            remainingDeserializationBuffer = rawDataPackets[rawData.length()-1];
+        if(rawDataPackets.length > 0) {
+            if (rawDataPackets[rawDataPackets.length - 1].equals("\0")) {
+                remainingDeserializationBuffer = "";
+            } else {
+                remainingDeserializationBuffer = rawDataPackets[rawDataPackets.length - 1];
+            }
         }
 
         rawDataPackets = Arrays.copyOfRange(rawDataPackets, 0, rawDataPackets.length-1);

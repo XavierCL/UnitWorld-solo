@@ -14,12 +14,21 @@ public class CommunicationHandler implements Closeable {
     private final Socket socket;
     private final ConnectionCredentials serverCredentials;
     private final char[] bufferData;
+    private final BufferedReader reader;
+    final PrintWriter writer;
 
     public CommunicationHandler(Socket socket, ConnectionCredentials serverCredentials) {
         this.socket = socket;
         this.serverCredentials = serverCredentials;
         this.isClosed = false;
         this.bufferData = new char[BUFFER_SIZE];
+        try {
+            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.writer = new PrintWriter(socket.getOutputStream(), true);
+        }
+        catch (IOException ioException) {
+            throw new RuntimeException(ioException);
+        }
     }
 
     @Override
@@ -29,23 +38,18 @@ public class CommunicationHandler implements Closeable {
 
     public void send(String communicationData) {
         raiseExceptionIfDisconnectedFromServer("send");
-        try {
-            final PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-            writer.print(communicationData);
-        }
-        catch (IOException ioException) {
-            ioException.printStackTrace();
-            close();
-            throw new RuntimeException("Remote socket has been shutdown while sending to it");
-        }
-
+        writer.write(communicationData);
+        writer.flush();
     }
 
     public String receive() {
         raiseExceptionIfDisconnectedFromServer("receive");
         try {
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             final int lengthRead = reader.read(bufferData);
+            if(lengthRead == -1) {
+                close();
+                throw new RuntimeException("Remote socket has been shutdown while receiving from it");
+            }
             final char[] copiedBufferData = Arrays.copyOfRange(bufferData, 0, lengthRead);
             return new String(copiedBufferData);
         }
