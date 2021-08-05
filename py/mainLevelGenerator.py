@@ -10,9 +10,9 @@ import numpy as np
 
 from utils import arrays
 
-gameExecutablesPath = "../../cpp/x64/Release/"
-pythonAiFolder = "../clientAis/"
-pythonExecutablePath = os.path.join(pythonAiFolder, "mainClientAi.py")
+gameExecutablesPath = "../cpp/x64/Release/"
+pythonExecutablePath = "mainClientAi.py"
+javaAiFolder = "../jva/out/production/jva/clientAis/"
 archivedGamesPath = "./games/archived/"
 lastGamePath = "./games/latest/"
 
@@ -79,7 +79,7 @@ homeSquareIndex = np.random.choice(possibleHomes)
 homeSpawnerConfig = symmetryFunction(arrays.assign(np.zeros((discreteMapSize, discreteMapSize), dtype=bool).reshape(-1), homeSquareIndex, True).reshape(discreteMapSize, -1))
 
 # Generating final spawner array
-gamePositionOffset = (mapSizeInGameUnits - mapSizeInGameUnits * (discreteMapSize - 1) / discreteMapSize) / 2
+gamePositionOffset = (mapSizeInGameUnits - mapSizeInGameUnits * (discreteMapSize - 1) / discreteMapSize) / 2 + 100
 
 def discretePositionToGamePosition(pos: int) -> float:
     return mapSizeInGameUnits * pos / discreteMapSize + gamePositionOffset
@@ -114,7 +114,12 @@ def runServerBackground():
     time.sleep(3)
 
 def runPythonAiBackground():
-    aiProcess = subprocess.Popen(f"python {pythonExecutablePath}", cwd=pythonAiFolder)
+    aiProcess = subprocess.Popen(f"python {pythonExecutablePath}")
+    cleanupStack.append(lambda: aiProcess.wait())
+    cleanupStack.append(lambda: aiProcess.kill())
+
+def runJavaAiBackground():
+    aiProcess = subprocess.Popen(f'"C:\\Program Files (x86)\\Java\\jdk-14.0.2\\bin\\java.exe" "-javaagent:C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2020.1.4\\lib\\idea_rt.jar=49386:C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2020.1.4\\bin" -Dfile.encoding=UTF-8 -classpath "D:\\Program Files\\GitHub\\UnitWorld-solo\\jva\\out\\production\\jva;C:\\Users\\John\\.m2\\repository\\com\\jayway\\jsonpath\\json-path\\2.6.0\\json-path-2.6.0.jar;C:\\Users\\John\\.m2\\repository\\net\\minidev\\json-smart\\2.4.7\\json-smart-2.4.7.jar;C:\\Users\\John\\.m2\\repository\\net\\minidev\\accessors-smart\\2.4.7\\accessors-smart-2.4.7.jar;C:\\Users\\John\\.m2\\repository\\org\\ow2\\asm\\asm\\9.1\\asm-9.1.jar;C:\\Users\\John\\.m2\\repository\\org\\slf4j\\slf4j-api\\1.7.30\\slf4j-api-1.7.30.jar" clientAis.MainClientAi', cwd=javaAiFolder)
     cleanupStack.append(lambda: aiProcess.wait())
     cleanupStack.append(lambda: aiProcess.kill())
 
@@ -128,13 +133,14 @@ def runCppClientGuiPlayerBlocking():
 
 def runCppClientGuiObserverBlocking():
     print("Waiting 3 seconds for called ais to startup before starting observer...")
-    time.sleep(3)
+    time.sleep(5)
 
     subprocess.call(os.path.normpath(os.path.join(lastGamePath, 'UnitWorld_client_gui.exe')), cwd=os.path.normpath(lastGamePath))
 
 runServerBackground()
 runPythonAiBackground()
-runCppAiBackground()
+runJavaAiBackground()
+#runCppAiBackground()
 runCppClientGuiObserverBlocking()
 
 for cleanup in cleanupStack[::-1]:
