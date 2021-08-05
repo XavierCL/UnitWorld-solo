@@ -4,6 +4,7 @@ import net.minidev.json.JSONObject;
 import utils.math.vector.Vector2;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MobileDestination {
 
@@ -29,5 +30,53 @@ public class MobileDestination {
         this.pointDestination = pointDestination;
         this.allegedSpawnerDestination = allegedSpawnerDestination;
         this.spawnerDestination = spawnerDestination;
+    }
+
+    public MobileDestination(Vector2 position) {
+        this.pointDestination = Optional.of(position);
+        this.allegedSpawnerDestination = Optional.empty();
+        this.spawnerDestination = Optional.empty();
+    }
+
+    public MobileDestination(AllegedSpawnerDestination allegedSpawnerDestination) {
+        this.pointDestination = Optional.empty();
+        this.allegedSpawnerDestination = Optional.of(allegedSpawnerDestination);
+        this.spawnerDestination = Optional.empty();
+    }
+
+    public MobileDestination(String spawnerId) {
+        this.pointDestination = Optional.empty();
+        this.allegedSpawnerDestination = Optional.empty();
+        this.spawnerDestination = Optional.of(spawnerId);
+    }
+
+    public String serializeToJson() {
+        final JSONObject mobileDestinationJson = new JSONObject();
+
+        pointDestination.ifPresent(point -> {
+            mobileDestinationJson.put("x", point.x);
+            mobileDestinationJson.put("y", point.y);
+        });
+        allegedSpawnerDestination.ifPresent(spawnerDestination -> {
+            final JSONObject allegenceJson = new JSONObject();
+            if(spawnerDestination.spawnerAllegence.isPresent()) {
+                allegenceJson.put("i", spawnerDestination.spawnerAllegence.get().isClaimed);
+                allegenceJson.put("h", spawnerDestination.spawnerAllegence.get().healthPoints);
+                allegenceJson.put("p", spawnerDestination.spawnerAllegence.get().playerId);
+            }
+            else {
+                allegenceJson.put("n", "");
+            }
+
+            final JSONObject spawnerJson = new JSONObject();
+            spawnerJson.put("i", spawnerDestination.spawnerId);
+            spawnerJson.put("a", allegenceJson);
+            mobileDestinationJson.put("s", spawnerJson);
+        });
+        spawnerDestination.ifPresent(destination -> {
+            mobileDestinationJson.put("u", spawnerDestination.get());
+        });
+
+        return mobileDestinationJson.toString();
     }
 }
