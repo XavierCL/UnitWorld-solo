@@ -14,7 +14,6 @@ class propagatingVision(Artificial):
         self.spawnersId: np.ndarray = None
         self.spawners: List[Spawner] = None
         self.spawnerKdtree: KDTree = None
-        self.spawnersNeighbourGraph: List[List[int]] = None
 
     def frame(self, gameState: GameState, currentPlayerId: str):
         self.updateGameStaticInformation(gameState)
@@ -44,25 +43,6 @@ class propagatingVision(Artificial):
             self.spawnersId = sortedSpawnerIds
             self.spawnerKdtree = KDTree(sortedSpawnerPositions)
 
-            # Generating spawner neighbour graph
-            self.spawnersNeighbourGraph = [[] for _ in range(len(gameState.spawners))]
-            potentialNeighbours: List[Tuple[int, int, np.ndarray]] = []
-
-            for i in range(len(gameState.spawners)):
-                for j in range(i, len(gameState.spawners)):
-                    potentialNeighbours.append((i, j, np.mean([self.spawners[i].position, self.spawners[j].position], axis=0)))
-
-            closestSpawnerToMiddlePoints = self.spawnerKdtree.query([position for _, _, position in potentialNeighbours], return_distance=False)
-            neighbours = [(i, j) for closestMiddleSpawner, (i, j, _) in zip(closestSpawnerToMiddlePoints, potentialNeighbours) if
-                          closestMiddleSpawner == i or closestMiddleSpawner == j]
-
-            for i, j in neighbours:
-                self.spawnersNeighbourGraph[i].append(j)
-                self.spawnersNeighbourGraph[j].append(i)
-
-            for i in range(len(self.spawnersNeighbourGraph)):
-                self.spawnersNeighbourGraph[i].sort()
-
     def groupSinguitiesByClosestSpawner(self, gameState: GameState) -> List[List[int]]:
         singuitiesClosestSpawner = self.spawnerKdtree.query([s.position for s in gameState.singuities], return_distance=False)
         spawnerClosestSinguityIndices: List[List[int]] = [[] for _ in range(len(gameState.spawners))]
@@ -80,13 +60,7 @@ class propagatingVision(Artificial):
 
         for spawnerIndex, (spawner, spawnerClosestSinguityIndices) in enumerate(zip(self.spawners, spawnersClosestSinguityIndices)):
             closeSinguities: List[Singuity] = singuitiesArray[spawnerClosestSinguityIndices]
-
-            ownSinguities = [s for s in closeSinguities if s.playerId == currentPlayerId]
-            enemySinguities = [s for s in closeSinguities if s.playerId != currentPlayerId]
-
-            # Judging quality of singuities using position and health
-            selfPresence = np.sum([s.healthPoints / Singuity.MAX_HEALTH_POINT for s in ownSinguities]) / np.sum(np.std([s.position for s in ownSinguities], axis=1))
-            selfPresence -= np.sum([s.healthPoints / Singuity.MAX_HEALTH_POINT for s in enemySinguities]) / np.sum(np.std([s.position for s in enemySinguities], axis=1))
+            selfPresence = self.getSpawnerSelfSinguityPresence(currentPlayerId, closeSinguities)
 
             # Judging quality of spawner using allegence
             if spawner.allegence is None:
@@ -110,7 +84,16 @@ class propagatingVision(Artificial):
 
         return list(propagatedPresence)
 
-    def optimizeSpawnerSinguities(self, currentPlayerId: str, propagatedPresence: List[int], spawnerClosestSinguityIndices: List[List[int]]):
+    def getSpawnerSelfSinguityPresence(self, currentPlayerId: str, singuities: List[Singuity]) -> float:
+        ownSinguities = [s for s in singuities if s.playerId == currentPlayerId]
+        enemySinguities = [s for s in singuities if s.playerId != currentPlayerId]
+
+        selfPresence = np.sum([s.healthPoints / Singuity.MAX_HEALTH_POINT for s in ownSinguities]) / np.sum(np.std([s.position for s in ownSinguities], axis=1))
+        selfPresence -= np.sum([s.healthPoints / Singuity.MAX_HEALTH_POINT for s in enemySinguities]) / np.sum(np.std([s.position for s in enemySinguities], axis=1))
+
+        return selfPresence
+
+    def optimizeSpawnerSinguities(self, gameState: GameState, currentPlayerId: str, propagatedPresence: List[int], spawnerClosestSinguityIndices: List[List[int]]):
         def spawnerIndexToProximityToAdvantageousStateChange(spawnerIndex: int) -> float:
             spawner = self.spawners[spawnerIndex]
             if spawner.allegence is None:
@@ -123,8 +106,22 @@ class propagatingVision(Artificial):
         spawnersProximityToAdvantageousStateChange = np.array([spawnerIndexToProximityToAdvantageousStateChange(spawnerIndex) for spawnerIndex in range(len(self.spawners))])
         spawnersProximityToAdvantageousStateChange *= propagatedPresence
 
-        for spawnerIndex in np.argsort(spawnersProximityToAdvantageousStateChange):
+        spawnerPositions = np.array([s.position for s in self.spawners])
+        singuitiesArray = np.array(gameState.singuities, dtype=object)
 
+        for spawnerIndex in np.argsort(spawnersProximityToAdvantageousStateChange):
+            if self.getSpawnerSelfSinguityPresence(currentPlayerId, list(singuitiesArray[spawnerClosestSinguityIndices[spawnerIndex]])) < 0:
+
+                distances = np.linalg.norm(spawnerPositions - self.spawners[spawnerIndex], axis=1)
+
+                # Skipping first because it's always the current spawner, which already contains its singuities
+                for potentialNeighbourSpawnerIndex in np.argsort(distances)[1:]:
+                    neighbourSinguities = list(singuitiesArray[spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex]])
+                    if self.getSpawnerSelfSinguityPresence(currentPlayerId,neighbourSinguities) > 0:
+                        spawnerClosestSinguityIndices[spawnerIndex].extend([index for index, singuity in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if singuity.playerId==currentPlayerId])
+                        spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex] =[index for index, singuity in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if singuity.playerId!=currentPlayerId]
+
+                        return True, spawnerClosestSinguityIndices
 
         return False, spawnerClosestSinguityIndices
 
