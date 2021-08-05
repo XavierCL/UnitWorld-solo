@@ -4,7 +4,7 @@ import shutil
 import random
 import subprocess
 import time
-from typing import Dict, List, Union
+from typing import Any, Callable, Dict, List, Union
 
 import numpy as np
 
@@ -102,20 +102,36 @@ for gameFileName in gameFileNames:
     shutil.copy(os.path.join(gameExecutablesPath, gameFileName), os.path.join(lastGamePath, gameFileName))
 
 # Run game
-serverProcess = subprocess.Popen(os.path.normpath(os.path.join(lastGamePath, 'UnitWorld_server.exe')), cwd=os.path.normpath(lastGamePath))
-print("Started server. Waiting 3 seconds...")
-time.sleep(3)
+cleanupStack: List[Callable[[], Any]] = []
 
-aiProcess = subprocess.Popen(f"python {pythonExecutablePath}", cwd=pythonAiFolder)
-ai2Process = subprocess.Popen(os.path.normpath(os.path.join(lastGamePath, 'UnitWorld_client_ais.exe')), cwd=os.path.normpath(lastGamePath))
-time.sleep(3)
-subprocess.call(os.path.normpath(os.path.join(lastGamePath, 'UnitWorld_client_gui.exe')), cwd=os.path.normpath(lastGamePath))
+def runServerBackground():
+    serverProcess = subprocess.Popen(os.path.normpath(os.path.join(lastGamePath, 'UnitWorld_server.exe')), cwd=os.path.normpath(lastGamePath))
+    cleanupStack.append(lambda: serverProcess.wait())
+    cleanupStack.append(lambda: serverProcess.kill())
 
-aiProcess.kill()
-aiProcess.wait()
+    print("Started server. Waiting 3 seconds...")
+    time.sleep(3)
 
-ai2Process.kill()
-ai2Process.wait()
+def runPythonAiBackground():
+    aiProcess = subprocess.Popen(f"python {pythonExecutablePath}", cwd=pythonAiFolder)
+    cleanupStack.append(lambda: aiProcess.wait())
+    cleanupStack.append(lambda: aiProcess.kill())
 
-serverProcess.kill()
-serverProcess.wait()
+def runCppAiBackground():
+    aiProcess = subprocess.Popen(os.path.normpath(os.path.join(lastGamePath, 'UnitWorld_client_ais.exe')), cwd=os.path.normpath(lastGamePath))
+    cleanupStack.append(lambda: aiProcess.wait())
+    cleanupStack.append(lambda: aiProcess.kill())
+
+def runCppClientGuiPlayerBlocking():
+    subprocess.call(os.path.normpath(os.path.join(lastGamePath, 'UnitWorld_client_gui.exe')), cwd=os.path.normpath(lastGamePath))
+
+def runCppClientGuiObserverBlocking():
+    print("Waiting 3 seconds for called ais to startup before starting observer...")
+    subprocess.call(os.path.normpath(os.path.join(lastGamePath, 'UnitWorld_client_gui.exe')), cwd=os.path.normpath(lastGamePath))
+
+runServerBackground()
+# runPythonAiBackground()
+runCppClientGuiPlayerBlocking()
+
+for cleanup in cleanupStack[::-1]:
+    cleanup()

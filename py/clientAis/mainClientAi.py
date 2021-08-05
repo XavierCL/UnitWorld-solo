@@ -5,6 +5,7 @@ from typing import Callable, Dict
 from ais.Artificial import Artificial
 from ais.SingleMindClosest.SingleMindClosest import SingleMindClosest
 from ais.Voider.Voider import Voider
+from clientAis.ais.PropagatingVision.PropagatingVision import PropagatingVision
 from networking.ClientConnector import ClientConnector
 from communications.MessageSerializer import MessageSerializer
 from games.GameManager import GameManager
@@ -17,7 +18,7 @@ commandLineOptions = {key: value for key, value in zip(arrays.soft_accessor(sys.
 
 DEFAULT_SERVER_IP = "127.0.0.1"
 DEFAULT_SERVER_PORT = 52124
-DEFAULT_AI_NAME = "singleMindClosest"
+DEFAULT_AI_NAME = "propagatingVision"
 SECOND_BETWEEN_AI_FRAME = 0.5
 
 serverIp = commandLineOptions.get("serverIp") or DEFAULT_SERVER_IP
@@ -26,7 +27,8 @@ aiName = commandLineOptions.get("aiName") or DEFAULT_AI_NAME
 
 ais: Dict[str, Callable[[ServerCommander], Artificial]] = {
     "voider": lambda serverCommander: Voider(serverCommander),
-    "singleMindClosest": lambda serverCommander: SingleMindClosest(serverCommander)
+    "singleMindClosest": lambda serverCommander: SingleMindClosest(serverCommander),
+    "propagatingVision": lambda serverCommander: PropagatingVision(serverCommander)
 }
 
 def clientConnectorCallBack(communicationHandler: CommunicationHandler):

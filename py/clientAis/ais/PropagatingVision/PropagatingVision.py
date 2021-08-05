@@ -1,13 +1,13 @@
-from typing import List, Tuple
+from typing import Any, List, Tuple
 
 import numpy as np
 from sklearn.neighbors import KDTree
 
 from clientAis.ais.Artificial import Artificial
-from clientAis.communications.GameState import GameState, Singuity, Spawner
+from clientAis.communications.GameState import GameState, Singuity, Spawner, SpawnerAllegence
 from clientAis.communications.ServerCommander import ServerCommander
 
-class propagatingVision(Artificial):
+class PropagatingVision(Artificial):
     def __init__(self, serverCommander: ServerCommander):
         super().__init__(serverCommander)
 
@@ -20,14 +20,17 @@ class propagatingVision(Artificial):
         spawnersClosestSinguityIndices = self.groupSinguitiesByClosestSpawner(gameState)
 
         propagatedPresence = self.getPropagatedPresencePerSpawner(gameState, currentPlayerId, spawnersClosestSinguityIndices)
-        spawnerSinguitiesChanged, spawnersClosestSinguityIndices = self.optimizeSpawnerSinguities(propagatedPresence, spawnersClosestSinguityIndices)
+        spawnerSinguitiesChanged, spawnersClosestSinguityIndices = self.optimizeSpawnerSinguities(gameState, currentPlayerId, propagatedPresence, spawnersClosestSinguityIndices)
+
         i = 0
         while spawnerSinguitiesChanged and i < 100:
             propagatedPresence = self.getPropagatedPresencePerSpawner(gameState, currentPlayerId, spawnersClosestSinguityIndices)
-            spawnerSinguitiesChanged, spawnersClosestSinguityIndices = self.optimizeSpawnerSinguities(propagatedPresence, spawnersClosestSinguityIndices)
+            spawnerSinguitiesChanged, spawnersClosestSinguityIndices = self.optimizeSpawnerSinguities(
+                gameState, currentPlayerId, propagatedPresence, spawnersClosestSinguityIndices
+            )
             i += 1
 
-        movingCommands = self.getMovingCommands(spawnersClosestSinguityIndices)
+        movingCommands = self.getMovingCommands(gameState, currentPlayerId, spawnersClosestSinguityIndices, propagatedPresence)
         self.executeMovingCommands(movingCommands)
 
     def updateGameStaticInformation(self, gameState: GameState):
@@ -84,23 +87,25 @@ class propagatingVision(Artificial):
 
         return list(propagatedPresence)
 
-    def getSpawnerSelfSinguityPresence(self, currentPlayerId: str, singuities: List[Singuity]) -> float:
+    def getSpawnerSelfSinguityPresence(self, currentPlayerId: str, singuities: List[Singuity], use_spatial_distribution=True) -> float:
         ownSinguities = [s for s in singuities if s.playerId == currentPlayerId]
         enemySinguities = [s for s in singuities if s.playerId != currentPlayerId]
 
-        selfPresence = np.sum([s.healthPoints / Singuity.MAX_HEALTH_POINT for s in ownSinguities]) / np.sum(np.std([s.position for s in ownSinguities], axis=1))
-        selfPresence -= np.sum([s.healthPoints / Singuity.MAX_HEALTH_POINT for s in enemySinguities]) / np.sum(np.std([s.position for s in enemySinguities], axis=1))
+        selfPresence = np.sum([s.healthPoints / Singuity.MAX_HEALTH_POINT for s in ownSinguities]) / (
+            np.sum(np.std([s.position for s in ownSinguities], axis=1)) if use_spatial_distribution else 1)
+        selfPresence -= np.sum([s.healthPoints / Singuity.MAX_HEALTH_POINT for s in enemySinguities]) / (
+            np.sum(np.std([s.position for s in enemySinguities], axis=1)) if use_spatial_distribution else 1)
 
         return selfPresence
 
-    def optimizeSpawnerSinguities(self, gameState: GameState, currentPlayerId: str, propagatedPresence: List[int], spawnerClosestSinguityIndices: List[List[int]]):
+    def optimizeSpawnerSinguities(self, gameState: GameState, currentPlayerId: str, propagatedPresence: List[float], spawnerClosestSinguityIndices: List[List[int]]):
         def spawnerIndexToProximityToAdvantageousStateChange(spawnerIndex: int) -> float:
             spawner = self.spawners[spawnerIndex]
             if spawner.allegence is None:
                 return 0.5
             elif not spawner.allegence.isClaimed:
                 return 0.5 + spawner.allegence.healthPoints / (Spawner.MAX_HEALTH_POINTS * 2)
-            else: #  spawner.allegence.isClaimed
+            else:  # spawner.allegence.isClaimed
                 return 1 - spawner.allegence.healthPoints / (Spawner.MAX_HEALTH_POINTS * 2)
 
         spawnersProximityToAdvantageousStateChange = np.array([spawnerIndexToProximityToAdvantageousStateChange(spawnerIndex) for spawnerIndex in range(len(self.spawners))])
@@ -117,62 +122,76 @@ class propagatingVision(Artificial):
                 # Skipping first because it's always the current spawner, which already contains its singuities
                 for potentialNeighbourSpawnerIndex in np.argsort(distances)[1:]:
                     neighbourSinguities = list(singuitiesArray[spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex]])
-                    if self.getSpawnerSelfSinguityPresence(currentPlayerId,neighbourSinguities) > 0:
-                        spawnerClosestSinguityIndices[spawnerIndex].extend([index for index, singuity in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if singuity.playerId==currentPlayerId])
-                        spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex] =[index for index, singuity in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if singuity.playerId!=currentPlayerId]
+                    if self.getSpawnerSelfSinguityPresence(currentPlayerId, neighbourSinguities) > 0:
+                        spawnerClosestSinguityIndices[spawnerIndex].extend(
+                            [index for index, singuity in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if
+                             singuity.playerId == currentPlayerId]
+                            )
+                        spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex] = [index for index, singuity in
+                                                                                         zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if
+                                                                                         singuity.playerId != currentPlayerId]
 
                         return True, spawnerClosestSinguityIndices
 
         return False, spawnerClosestSinguityIndices
 
-    def getMovingCommands(self, spawnersClosestSinguityIndices):
+    def getMovingCommands(self, gameState: GameState, currentPlayerId: str, spawnersClosestSinguityIndices: List[List[int]], propagatedPresence: List[float]):
         movingCommands = []
 
+        singuitiesArray = np.array(gameState.singuities, dtype=object)
+
         for spawnerIndex in range(len(self.spawners)):
-            assignedSinguities = spawnersClosestSinguityIndices[spawnerIndex]
-            spawner = sortedSpawners[spawnerIndex]
+            assignedSinguityIndices: List[int] = spawnersClosestSinguityIndices[spawnerIndex]
+            assignedSinguities: List[Singuity] = singuitiesArray[assignedSinguityIndices]
+            ownAssignedSinguities = [s for s in assignedSinguities if s.playerId == currentPlayerId]
+            spawner: Spawner = self.spawners[spawnerIndex]
+            allegence: SpawnerAllegence = spawner.allegence
 
-            if spawner.allegence is None or (not spawner.allegence.isClaimed and spawner.allegence.playerId == currentPlayerId) or spawner.allegence.playerId != currentPlayerId:
-                if singuities.count > spawner.needed or stronghold > 0:
-                    movingCommands.append((moveToSpawner, singuities, spawner))
+            if allegence is None or (not allegence.isClaimed and allegence.playerId == currentPlayerId) or allegence.playerId != currentPlayerId:
+                requiredUnits = Spawner.REQUIRED_CAPTURING_SINGUITIES if allegence is None else (Spawner.REQUIRED_CAPTURING_SINGUITIES * (
+                            Spawner.MAX_HEALTH_POINTS - allegence.healthPoints) / Spawner.MAX_HEALTH_POINTS if allegence.playerId == currentPlayerId else Spawner.REQUIRED_CAPTURING_SINGUITIES)
 
-                elif potential > 0:
-                    movingCommands.append((moveToLocation, singuities, singuities.mean))
+                if len([s for s in singuitiesArray[assignedSinguityIndices] if s.playerId == currentPlayerId]) > requiredUnits and self.getSpawnerSelfSinguityPresence(
+                        currentPlayerId, assignedSinguities, use_spatial_distribution=True
+                        ) > 0:
+                    movingCommands.append(("moveToSpawner", ownAssignedSinguities, spawner))
+
+                elif self.getSpawnerSelfSinguityPresence(currentPlayerId, assignedSinguities, use_spatial_distribution=False) > 0:
+                    movingCommands.append(("moveToLocation", ownAssignedSinguities, np.mean([s.position for s in ownAssignedSinguities], axis=0)))
 
                 else:
-                    movingCommands.append((moveToSpawner, singuities, self.getClosestOwnSpawner(singuities.mean)))
+                    movingCommands.append(
+                        ("moveToSpawner", ownAssignedSinguities, self.getClosestOwnSpawner(np.mean([s.position for s in ownAssignedSinguities], axis=0), propagatedPresence))
+                        )
 
             else:
-                if stronghold > 0:
-                    movingCommands.append((moveToSpawner, singuities, spawner))
+                if self.getSpawnerSelfSinguityPresence(currentPlayerId, assignedSinguities, use_spatial_distribution=True) > 0:
+                    movingCommands.append(("moveToSpawner", ownAssignedSinguities, spawner))
 
-                elif potential > 0:
-                    movingCommands.append((moveToLocation, singuities, singuities.mean))
+                elif self.getSpawnerSelfSinguityPresence(currentPlayerId, assignedSinguities, use_spatial_distribution=False) > 0:
+                    movingCommands.append(("moveToPosition", ownAssignedSinguities, np.mean([s.position for s in ownAssignedSinguities], axis=0)))
 
                 else:
-                    movingCommands.append((moveToSpawner, singuities, self.getClosestOwnSpawner(singuities.mean)))
+                    movingCommands.append(
+                        ("moveToSpawner", ownAssignedSinguities, self.getClosestOwnSpawner(np.mean([s.position for s in ownAssignedSinguities], axis=0), propagatedPresence))
+                        )
 
         return movingCommands
 
-    def getClosestOwnSpawner(self, position):
-        todo
-        query
-        positive
-        strongholds
-        todo
-        query
-        positive
-        potentials
-        todo
-        return least
-        negative
-        stronghold
+    def getClosestOwnSpawner(self, position: np.array, propagatedPresence: List[float]) -> Spawner:
+        distances = np.linalg.norm(np.array([s.position for s in self.spawners]) - position, axis=1)
+        for nextClosestSpawnerIndex in np.argsort(distances):
+            if propagatedPresence[nextClosestSpawnerIndex] > 0:
+                return self.spawners[nextClosestSpawnerIndex]
 
-    def executeMovingCommands(self, movingCommands):
-        for command, *operands in movingCommands:
+        maximalPresenceSpawners = np.nonzero(propagatedPresence == np.max(propagatedPresence))[0]
+        return self.spawners[maximalPresenceSpawners[np.argmin(distances[maximalPresenceSpawners])]]
+
+    def executeMovingCommands(self, movingCommands: List[Tuple[str, List[Singuity], Any]]):
+        for command, singuities, operand in movingCommands:
             if command == "moveToSpawner":
-                singuities, spawner = operands
+                spawner: Spawner = operand
                 self.serverCommander.moveUnitsToSpawner([s.id for s in singuities], spawner.id)
             elif command == "moveToPosition":
-                singuities, location = operands
+                location: np.ndarray = operand
                 self.serverCommander.moveUnitsToPosition([s.id for s in singuities], location)
