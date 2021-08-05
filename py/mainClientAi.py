@@ -2,16 +2,16 @@ import sys
 import time
 from typing import Callable, Dict
 
-from ais.Artificial import Artificial
-from ais.SingleMindClosest.SingleMindClosest import SingleMindClosest
-from ais.Voider.Voider import Voider
+from clientAis.ais.Artificial import Artificial
+from clientAis.ais.SingleMindClosest.SingleMindClosest import SingleMindClosest
+from clientAis.ais.Voider.Voider import Voider
 from clientAis.ais.PropagatingVision.PropagatingVision import PropagatingVision
-from networking.ClientConnector import ClientConnector
-from communications.MessageSerializer import MessageSerializer
-from games.GameManager import GameManager
-from networking.CommunicationHandler import CommunicationHandler
-from communications.ServerCommander import ServerCommander
-from communications.ServerReceiver import ServerReceiver
+from clientAis.networking.ClientConnector import ClientConnector
+from clientAis.communications.MessageSerializer import MessageSerializer
+from clientAis.games.GameManager import GameManager
+from clientAis.networking.CommunicationHandler import CommunicationHandler
+from clientAis.communications.ServerCommander import ServerCommander
+from clientAis.communications.ServerReceiver import ServerReceiver
 from utils import arrays
 
 commandLineOptions = {key: value for key, value in zip(arrays.soft_accessor(sys.argv, 1, None, 2), arrays.soft_accessor(sys.argv, 2, None, 3))}
