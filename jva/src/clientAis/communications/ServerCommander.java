@@ -6,8 +6,6 @@ import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import utils.math.vector.Vector2;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 public class ServerCommander {
