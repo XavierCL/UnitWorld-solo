@@ -77,7 +77,9 @@ class PropagatingVision(Artificial):
             selfPresences[spawnerIndex] = selfPresence
 
         propagatedPresence = np.zeros(len(self.spawners))
-        distanceToSimilarityHp = 50
+
+        # The greater, the less impact the distance has to lower the score
+        distanceToSimilarityHp = 5
         spawnerPositions = np.array([s.position for s in self.spawners])
 
         for spawnerIndex in range(len(self.spawners)):
@@ -120,7 +122,7 @@ class PropagatingVision(Artificial):
                 distances = np.linalg.norm(spawnerPositions - self.spawners[spawnerIndex].position, axis=1)
 
                 # Skipping first because it's always the current spawner, which already contains its singuities
-                for potentialNeighbourSpawnerIndex in np.argsort(distances)[1:]:
+                for potentialNeighbourSpawnerIndex in np.argsort(distances)[1::]:
                     neighbourSinguities = list(singuitiesArray[spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex]])
                     if self.getSpawnerSelfSinguityPresence(currentPlayerId, neighbourSinguities) > 0:
                         spawnerClosestSinguityIndices[spawnerIndex].extend(
