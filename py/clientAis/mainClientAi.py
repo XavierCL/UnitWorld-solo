@@ -5,6 +5,7 @@ from typing import Callable, Dict
 from ais.Artificial import Artificial
 from ais.SingleMindClosest.SingleMindClosest import SingleMindClosest
 from ais.Voider.Voider import Voider
+from clientAis.ais.PropagatingVision.PropagatingVision import PropagatingVision
 from networking.ClientConnector import ClientConnector
 from communications.MessageSerializer import MessageSerializer
 from games.GameManager import GameManager
@@ -26,7 +27,8 @@ aiName = commandLineOptions.get("aiName") or DEFAULT_AI_NAME
 
 ais: Dict[str, Callable[[ServerCommander], Artificial]] = {
     "voider": lambda serverCommander: Voider(serverCommander),
-    "singleMindClosest": lambda serverCommander: SingleMindClosest(serverCommander)
+    "singleMindClosest": lambda serverCommander: SingleMindClosest(serverCommander),
+    "propagatingVision": lambda serverCommander: PropagatingVision(serverCommander)
 }
 
 def clientConnectorCallBack(communicationHandler: CommunicationHandler):

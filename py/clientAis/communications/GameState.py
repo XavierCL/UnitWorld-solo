@@ -1,4 +1,6 @@
-from typing import List, Union
+from typing import List
+
+import numpy as np
 
 class Player:
     def __init__(self, data: dict):
@@ -13,37 +15,42 @@ class SpawnerAllegence:
 class AllegedSpawnerDestination:
     def __init__(self, data: dict):
         self.spawnerId: str = data["i"]
-        self.spawnerAllegence: Union[SpawnerAllegence, None] = None if data["a"] == "n" else SpawnerAllegence(data["a"])
+        self.spawnerAllegence: SpawnerAllegence = None if data["a"] == "n" else SpawnerAllegence(data["a"])
 
 class MobileDestination:
     def __init__(self, data: dict):
-        self.pointDestination: Union[List[int], None] = None
-        self.allegedSpawnerDestination: Union[AllegedSpawnerDestination, None] = None
-        self.spawnerDestination: Union[str, None] = None
+        self.pointDestination: np.ndarray = None
+        self.allegedSpawnerDestination: AllegedSpawnerDestination = None
+        self.spawnerDestination: str = None
 
         if "p" in data:
-            self.pointDestination = [data["p"]["x"], data["p"]["y"]]
+            self.pointDestination = np.array([data["p"]["x"], data["p"]["y"]])
         elif "s" in data:
             self.allegedSpawnerDestination = AllegedSpawnerDestination(data["s"])
-        else:  # "i" in data
-            self.spawnerDestination = data["i"]
+        else:  # "u" in data
+            self.spawnerDestination = data["u"]
 
 class Singuity:
+    MAX_HEALTH_POINT = 20
+
     def __init__(self, data: dict):
         self.id: str = data["i"]
         self.playerId: str = data["p"]
-        self.position: List[float] = [data["o"]["x"], data["o"]["y"]]
-        self.speed: List[float] = [data["s"]["x"], data["s"]["y"]]
-        self.destination: Union[MobileDestination, None] = None if data["d"] == "n" else MobileDestination(data["d"])
+        self.position: np.ndarray = np.array([data["o"]["x"], data["o"]["y"]])
+        self.speed: np.ndarray = np.array([data["s"]["x"], data["s"]["y"]])
+        self.destination: MobileDestination = None if data["d"] == "n" else MobileDestination(data["d"])
         self.healthPoints: float = data["h"]
         self.lastShootFrame: int = data["l"]
 
 class Spawner:
+    MAX_HEALTH_POINTS = 50_000
+    REQUIRED_CAPTURING_SINGUITIES = 100
+
     def __init__(self, data: dict):
         self.id: str = data["i"]
-        self.position: List[float] = [data["p"]["x"], data["p"]["y"]]
-        self.allegence: Union[SpawnerAllegence, None] = None if len(data["a"]) == 0 else SpawnerAllegence(data["a"])
-        self.rally: Union[MobileDestination, None] = None if len(data["r"]) == 0 else MobileDestination(data["r"])
+        self.position: np.ndarray = np.array([data["p"]["x"], data["p"]["y"]])
+        self.allegence: SpawnerAllegence = None if len(data["a"]) == 0 else SpawnerAllegence(data["a"])
+        self.rally: MobileDestination = None if len(data["r"]) == 0 else MobileDestination(data["r"])
         self.lastSpawnFrame: int = data["l"]
         self.totalSpawnCount: int = data["t"]
         self.lastClaimFrameCount: int = data["c"]
