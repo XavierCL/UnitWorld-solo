@@ -4,7 +4,7 @@ from sklearn.neighbors import KDTree
 from clientAis.ais.Artificial import Artificial
 from clientAis.communications.GameState import GameState
 
-class SingleMindClosest(Artificial):
+class SingleMindClosestAi(Artificial):
     def frame(self, gameState: GameState, currentPlayerId: str):
         notOwnSpawners = [s for s in gameState.spawners if s.allegence is None or not s.allegence.isClaimed or (s.allegence.isClaimed and s.allegence.playerId != currentPlayerId)]
 

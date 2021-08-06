@@ -9,7 +9,7 @@ from clientAis.communications.GameState import GameState, Singuity, Spawner, Spa
 from clientAis.communications.ServerCommander import ServerCommander
 from utils import arrays
 
-class PropagatingVision(Artificial):
+class PropagatingVisionAi(Artificial):
     def __init__(self, serverCommander: ServerCommander):
         super().__init__(serverCommander)
 
@@ -69,15 +69,12 @@ class PropagatingVision(Artificial):
         propagatedPresence = np.zeros(len(self.spawners))
 
         spawnerPositions = np.array([s.position for s in self.spawners])
-        singuitiesPosition = [np.mean([s.position for s in singuitiesArray[singuityIndices]], axis=0) for singuityIndices in spawnersClosestSinguityIndices]
+        singuitiesPosition = [np.mean([s.position for s in singuitiesArray[singuityIndices]], axis=0) if len(singuityIndices) > 0 else spawnerPositions[spawnerIndex] for spawnerIndex, singuityIndices in enumerate(spawnersClosestSinguityIndices)]
 
         for spawnerIndex in range(len(self.spawners)):
             distances = np.linalg.norm(spawnerPositions - singuitiesPosition[spawnerIndex], axis=1)
             similarities = 100 / (distances + 100)
             propagatedPresence += selfPresences[spawnerIndex] * similarities
-
-        if math.isnan(propagatedPresence[0].item()):
-            temp1 = 0
 
         return list(propagatedPresence)
 
@@ -115,7 +112,7 @@ class PropagatingVision(Artificial):
             spawnerRequiredCounts[spawnerIndex] = int(self.spawners[spawnerIndex].remainingSinguitiesToClaim(currentPlayerId) * 1.5)
 
             if self.getSpawnerSelfSinguityPresence(currentPlayerId, list(singuitiesArray[spawnerClosestSinguityIndices[spawnerIndex]])) < 0\
-                    or self.spawners[spawnerIndex].remainingSinguitiesToClaim(currentPlayerId) > len(spawnerClosestSinguityIndices[spawnerIndex]):
+                    or self.spawners[spawnerIndex].remainingSinguitiesToClaim(currentPlayerId) > len([s for s in singuitiesArray[spawnerClosestSinguityIndices[spawnerIndex]] if s.playerId == currentPlayerId]):
 
                 distances = np.linalg.norm(spawnerPositions - self.spawners[spawnerIndex].position, axis=1)
 
@@ -130,8 +127,10 @@ class PropagatingVision(Artificial):
                         enemyNeighbourSinguities = [(singuityIndex, singuity) for singuityIndex, singuity in
                                                     zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if singuity.playerId != currentPlayerId]
 
+                        ownUnusableNeighbourSinguities = arrays.soft_accessor([(singuityIndex, singuity) for singuityIndex, singuity in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if singuity.playerId == currentPlayerId], 0, spawnerRequiredCounts[potentialNeighbourSpawnerIndex])
+
                         spawnerClosestSinguityIndices[spawnerIndex].extend([index for index, _ in ownUsableNeighbourSinguities])
-                        spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex] = [index for index, _ in enemyNeighbourSinguities]
+                        spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex] = [index for index, _ in enemyNeighbourSinguities + ownUnusableNeighbourSinguities]
 
                         return True, spawnerClosestSinguityIndices
 
@@ -154,12 +153,16 @@ class PropagatingVision(Artificial):
             allegence: SpawnerAllegence = spawner.allegence
 
             if allegence is None or (not allegence.isClaimed and allegence.playerId == currentPlayerId) or allegence.playerId != currentPlayerId:
-                requiredUnits = Spawner.REQUIRED_CAPTURING_SINGUITIES if allegence is None else (Spawner.REQUIRED_CAPTURING_SINGUITIES * (
-                            Spawner.MAX_HEALTH_POINTS - allegence.healthPoints) / Spawner.MAX_HEALTH_POINTS if allegence.playerId == currentPlayerId else Spawner.REQUIRED_CAPTURING_SINGUITIES)
+                requiredUnits = Spawner.REQUIRED_CAPTURING_SINGUITIES\
+                    if allegence is None\
+                    else (
+                    Spawner.REQUIRED_CAPTURING_SINGUITIES * (Spawner.MAX_HEALTH_POINTS - allegence.healthPoints) / Spawner.MAX_HEALTH_POINTS
+                    if allegence.playerId == currentPlayerId
+                    else Spawner.REQUIRED_CAPTURING_SINGUITIES
+                )
 
-                if len([s for s in singuitiesArray[assignedSinguityIndices] if s.playerId == currentPlayerId]) > requiredUnits and self.getSpawnerSelfSinguityPresence(
-                        currentPlayerId, assignedSinguities, use_spatial_distribution=True
-                        ) > 0:
+                if len([s for s in singuitiesArray[assignedSinguityIndices] if s.playerId == currentPlayerId]) > requiredUnits\
+                        and self.getSpawnerSelfSinguityPresence(currentPlayerId, assignedSinguities, use_spatial_distribution=True) > 0:
                     movingCommands.append(("moveToSpawner", ownAssignedSinguities, spawner))
 
                 elif self.getSpawnerSelfSinguityPresence(currentPlayerId, assignedSinguities, use_spatial_distribution=False) > 0:

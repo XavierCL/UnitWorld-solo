@@ -51,10 +51,10 @@ class MapHandler:
         # Making sure the map is fair by forcing symmetry
         symmetryFunction = random.choice(
             [
-                lambda asymmetric: np.any([asymmetric, asymmetric[::-1]], axis=0),  # x axis
-                lambda asymmetric: np.any([asymmetric, asymmetric[:, ::-1]], axis=0),  # y axis
-                lambda asymmetric: np.any([asymmetric, asymmetric.T], axis=0),  # 1, 1 diagonal
-                lambda asymmetric: np.any([asymmetric, asymmetric[::-1].T[::-1]], axis=0),  # 1, -1 diagonal
+                # lambda asymmetric: np.any([asymmetric, asymmetric[::-1]], axis=0),  # x axis
+                # lambda asymmetric: np.any([asymmetric, asymmetric[:, ::-1]], axis=0),  # y axis
+                # lambda asymmetric: np.any([asymmetric, asymmetric.T], axis=0),  # 1, 1 diagonal
+                # lambda asymmetric: np.any([asymmetric, asymmetric[::-1].T[::-1]], axis=0),  # 1, -1 diagonal
                 lambda asymmetric: arrays.assign(asymmetric, tuple((np.array([discreteMapSize - 1, discreteMapSize - 1]) - np.array(np.nonzero(asymmetric)).T).T), True),  # 180 degree rotation
             ]
         )
@@ -86,7 +86,7 @@ class MapHandler:
             [{"x": discretePositionToGamePosition(x), "y": discretePositionToGamePosition(y)} for x, y in zip(*np.nonzero(symmetricSpawnerConfig))]
         ]
 
-        spawnersConfig = spawnersConfig + [[{"x": discretePositionToGamePosition(x), "y": discretePositionToGamePosition(y), "singuities": 100}] for x, y in
+        spawnersConfig = spawnersConfig + [[{"x": discretePositionToGamePosition(x), "y": discretePositionToGamePosition(y), "singuities": 150}] for x, y in
                                            zip(*np.nonzero(homeSpawnerConfig))]
 
         self.generatedMap["spawners"] = spawnersConfig

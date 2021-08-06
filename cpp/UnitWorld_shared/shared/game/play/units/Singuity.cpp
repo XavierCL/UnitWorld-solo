@@ -57,7 +57,7 @@ double Singuity::maximumHealthPoint() const
 
 long long Singuity::shootFramelag() const
 {
-    return 10;
+    return 6;
 }
 
 double Singuity::firePower() const

@@ -43,6 +43,47 @@ namespace uw
                     });
                 }).getOrElse([] {return std::make_shared<std::unordered_map<xg::Guid, std::shared_ptr<Singuity>>>(); });
 
+            // Selected unit white aura
+            sf::CircleShape selectedUnitCircleShape;
+            for (const auto selectedUnitId : _userControlState->getSelectedUnits())
+            {
+                (currentPlayerSinguities | findSafe<std::shared_ptr<Singuity>>(selectedUnitId)).foreach([&selectedUnitCircleShape, &canvas, this](std::shared_ptr<Singuity> singuity) {
+                    Circle singuityCircle = _cameraRelativeGameManager->relativeCircleOf(singuity);
+                    const double circleRadius(singuityCircle.radius() * 1.25);
+
+                    setCircleProperties(selectedUnitCircleShape, circleRadius, singuityCircle.center(), sf::Color::White, 0.0, sf::Color::White);
+
+                    canvas->draw(selectedUnitCircleShape);
+                });
+            }
+
+            // Units
+            for (auto player : completeGameState->players())
+            {
+                sf::Color drawingSinguitiesColor = (playerIndexByPlayerId
+                    | find<size_t>(player->id()))
+                    .map<sf::Color>([this](auto playerIndex) { return _playerColors[playerIndex]; })
+                    .getOrElse(sf::Color::Black);
+
+                auto playerSinguities = player->singuities();
+
+                sf::CircleShape circleShape;
+                for (size_t index = 0; index < playerSinguities->size(); ++index)
+                {
+                    auto singuity = playerSinguities->operator[](index);
+                    Circle singuityCircle = _cameraRelativeGameManager->relativeCircleOf(singuity);
+
+                    auto lifeRatio = singuity->healthPoint() / singuity->maximumHealthPoint();
+                    sf::Color lifeColor(round(drawingSinguitiesColor.r * lifeRatio), round(drawingSinguitiesColor.g * lifeRatio), round(drawingSinguitiesColor.b * lifeRatio));
+
+                    const auto innerSinguityRadius(singuityCircle.radius() * 0.75);
+
+                    setCircleProperties(circleShape, innerSinguityRadius, singuityCircle.center(), lifeColor, singuityCircle.radius() * 0.25, drawingSinguitiesColor);
+
+                    canvas->draw(circleShape);
+                }
+            }
+
             // Target spawnerId aura
             _userControlState->getLastSelectedSpawnerId().foreach([&canvas, spawnersById, this](const xg::Guid selectedSpawnerId) {
                 (spawnersById | find<std::shared_ptr<Spawner>>(selectedSpawnerId)).foreach([&canvas, this](std::shared_ptr<Spawner> spawner) {
@@ -93,47 +134,6 @@ namespace uw
                 graphicalSpawner.setOutlineColor(spanwerOuterAndInnerColors.second);
                 canvas->draw(graphicalSpawner);
             });
-
-            // Selected unit white aura
-            sf::CircleShape selectedUnitCircleShape;
-            for (const auto selectedUnitId : _userControlState->getSelectedUnits())
-            {
-                (currentPlayerSinguities | findSafe<std::shared_ptr<Singuity>>(selectedUnitId)).foreach([&selectedUnitCircleShape, &canvas, this](std::shared_ptr<Singuity> singuity) {
-                    Circle singuityCircle = _cameraRelativeGameManager->relativeCircleOf(singuity);
-                    const double circleRadius(singuityCircle.radius() * 1.25);
-
-                    setCircleProperties(selectedUnitCircleShape, circleRadius, singuityCircle.center(), sf::Color::White, 0.0, sf::Color::White);
-
-                    canvas->draw(selectedUnitCircleShape);
-                });
-            }
-
-            // Units
-            for (auto player : completeGameState->players())
-            {
-                sf::Color drawingSinguitiesColor = (playerIndexByPlayerId
-                    | find<size_t>(player->id()))
-                    .map<sf::Color>([this](auto playerIndex) { return _playerColors[playerIndex]; })
-                    .getOrElse(sf::Color::Black);
-
-                auto playerSinguities = player->singuities();
-
-                sf::CircleShape circleShape;
-                for (size_t index = 0; index < playerSinguities->size(); ++index)
-                {
-                    auto singuity = playerSinguities->operator[](index);
-                    Circle singuityCircle = _cameraRelativeGameManager->relativeCircleOf(singuity);
-
-                    auto lifeRatio = singuity->healthPoint() / singuity->maximumHealthPoint();
-                    sf::Color lifeColor(round(drawingSinguitiesColor.r * lifeRatio), round(drawingSinguitiesColor.g * lifeRatio), round(drawingSinguitiesColor.b * lifeRatio));
-
-                    const auto innerSinguityRadius(singuityCircle.radius() * 0.75);
-
-                    setCircleProperties(circleShape, innerSinguityRadius, singuityCircle.center(), lifeColor, singuityCircle.radius() * 0.25, drawingSinguitiesColor);
-
-                    canvas->draw(circleShape);
-                }
-            }
 
             // Spawner rallies
             for (const auto& selectedSpawnerId : _userControlState->getSelectedSpawners())

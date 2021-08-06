@@ -20,8 +20,9 @@ class GameLauncher:
         print(f"Started server. Waiting {sleepTimeInSeconds} seconds...")
         time.sleep(sleepTimeInSeconds)
 
-    def runPythonAiBackground(self):
-        aiProcess = subprocess.Popen(f"python {self.pythonExecutablePath}")
+    def runPythonAiBackground(self, aiName=None):
+        arguments = "" if aiName is None else f"aiName {aiName}"
+        aiProcess = subprocess.Popen(f"python {self.pythonExecutablePath} {arguments}")
         self.cleanupStack.append(lambda: aiProcess.wait())
         self.cleanupStack.append(lambda: aiProcess.kill())
 
@@ -42,7 +43,7 @@ class GameLauncher:
         subprocess.call(os.path.normpath(os.path.join(self.lastGamePath, 'UnitWorld_client_gui.exe')), cwd=os.path.normpath(self.lastGamePath))
 
     def runCppClientGuiObserverBlocking(self):
-        sleepTimeInSeconds = 4
+        sleepTimeInSeconds = 10
         print(f"Waiting {sleepTimeInSeconds} seconds for called ais to startup before starting observer...")
         time.sleep(sleepTimeInSeconds)
 
