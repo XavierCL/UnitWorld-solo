@@ -125,10 +125,12 @@ class PropagatingVision(Artificial):
                 for potentialNeighbourSpawnerIndex in np.argsort(distances)[1::]:
                     neighbourSinguities = list(singuitiesArray[spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex]])
                     if self.getSpawnerSelfSinguityPresence(currentPlayerId, neighbourSinguities) > 0:
-                        spawnerClosestSinguityIndices[spawnerIndex].extend(
-                            [index for index, singuity in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if
-                             singuity.playerId == currentPlayerId]
-                            )
+                        spawnerClosestSinguityIndices[spawnerIndex].extend([
+                            index
+                            for index, singuity
+                            in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities)
+                            if singuity.playerId == currentPlayerId
+                        ])
                         spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex] = [index for index, singuity in
                                                                                          zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if
                                                                                          singuity.playerId != currentPlayerId]

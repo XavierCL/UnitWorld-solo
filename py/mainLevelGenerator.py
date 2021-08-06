@@ -111,8 +111,9 @@ def runServerBackground():
     cleanupStack.append(lambda: serverProcess.wait())
     cleanupStack.append(lambda: serverProcess.kill())
 
-    print("Started server. Waiting 3 seconds...")
-    time.sleep(3)
+    sleepTimeInSeconds = 3
+    print(f"Started server. Waiting {sleepTimeInSeconds} seconds...")
+    time.sleep(sleepTimeInSeconds)
 
 def runPythonAiBackground():
     aiProcess = subprocess.Popen(f"python {pythonExecutablePath}")
@@ -133,16 +134,14 @@ def runCppClientGuiPlayerBlocking():
     subprocess.call(os.path.normpath(os.path.join(lastGamePath, 'UnitWorld_client_gui.exe')), cwd=os.path.normpath(lastGamePath))
 
 def runCppClientGuiObserverBlocking():
-    print("Waiting 3 seconds for called ais to startup before starting observer...")
-    time.sleep(4)
+    sleepTimeInSeconds = 4
+    print(f"Waiting {sleepTimeInSeconds} seconds for called ais to startup before starting observer...")
+    time.sleep(sleepTimeInSeconds)
 
     subprocess.call(os.path.normpath(os.path.join(lastGamePath, 'UnitWorld_client_gui.exe')), cwd=os.path.normpath(lastGamePath))
 
 runServerBackground()
-runPythonAiBackground()
-runJavaAiBackground()
-#runCppAiBackground()
-runCppClientGuiObserverBlocking()
+runCppClientGuiPlayerBlocking()
 
 for cleanup in cleanupStack[::-1]:
     cleanup()
