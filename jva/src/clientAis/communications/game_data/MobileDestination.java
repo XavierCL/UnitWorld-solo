@@ -24,7 +24,7 @@ public class MobileDestination {
             allegedSpawnerDestination = Optional.of(new AllegedSpawnerDestination((JSONObject) data.get("s")));
         }
         else { // if(data.containsKey("i")) {
-            spawnerDestination = Optional.of(data.getAsString("i"));
+            spawnerDestination = Optional.of(data.getAsString("u"));
         }
 
         this.pointDestination = pointDestination;

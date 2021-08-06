@@ -6,6 +6,7 @@ import java.util.function.Function;
 
 public interface Node<T, U> {
 
-    Optional<U> accept(Function<T, Boolean> nodeValidator, Function<U, Boolean> leafValidator, Consumer<U> visitor);
+    void accept(Function<T, Boolean> nodeValidator, Function<U, Boolean> leafValidator, Consumer<U> visitor);
     T getValue();
+    void setValue(T nodeObject);
 }

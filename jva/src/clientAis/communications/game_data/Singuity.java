@@ -24,4 +24,14 @@ public class Singuity {
         this.healthPoints = data.getAsNumber("h").floatValue();
         this.lastShootFrame = data.getAsNumber("l").intValue();
     }
+
+    public Singuity(Vector2 position) {
+        this.id = "";
+        this.playerId = "";
+        this.position = position;
+        this.velocity = new Vector2();
+        this.destination = Optional.empty();
+        this.healthPoints = 0;
+        this.lastShootFrame = 0;
+    }
 }

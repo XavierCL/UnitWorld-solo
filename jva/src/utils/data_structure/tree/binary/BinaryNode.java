@@ -9,25 +9,22 @@ public class BinaryNode<T, U> implements Node<T, U> {
     public Node<T, U> left;
     public Node<T, U> right;
 
-    private final T nodeObject;
+    private T nodeObject;
 
-    public BinaryNode(T nodeObject) {
-        this.nodeObject = nodeObject;
-    }
+    public BinaryNode() {}
 
     public T getValue() {
         return nodeObject;
     }
+    public void setValue(T nodeObject) {
+        this.nodeObject = nodeObject;
+    }
 
     @Override
-    public Optional<U> accept(Function<T, Boolean> nodeValidator, Function<U, Boolean> leafValidator, Consumer<U> visitor) {
+    public void accept(Function<T, Boolean> nodeValidator, Function<U, Boolean> leafValidator, Consumer<U> visitor) {
         if(nodeValidator.apply(getValue())) {
-            left.accept(nodeValidator, leafValidator, visitor)
-                    .ifPresent(visitor);
-            right.accept(nodeValidator, leafValidator, visitor)
-                    .ifPresent(visitor);
+            left.accept(nodeValidator, leafValidator, visitor);
+            right.accept(nodeValidator, leafValidator, visitor);
         }
-
-        return Optional.empty();
     }
 }
