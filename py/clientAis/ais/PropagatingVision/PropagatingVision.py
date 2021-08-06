@@ -62,24 +62,12 @@ class PropagatingVision(Artificial):
         singuitiesArray = np.array(gameState.singuities, dtype=object)
 
         for spawnerIndex, (spawner, spawnerClosestSinguityIndices) in enumerate(zip(self.spawners, spawnersClosestSinguityIndices)):
-            closeSinguities: List[Singuity] = singuitiesArray[spawnerClosestSinguityIndices]
-            selfPresence = self.getSpawnerSelfSinguityPresence(currentPlayerId, closeSinguities)
-
-            # Judging quality of spawner using allegence
-            if spawner.allegence is None:
-                selfPresence -= Spawner.REQUIRED_CAPTURING_SINGUITIES
-            elif spawner.allegence.playerId != currentPlayerId:
-                selfPresence -= Spawner.REQUIRED_CAPTURING_SINGUITIES
-                selfPresence -= Spawner.REQUIRED_CAPTURING_SINGUITIES * spawner.allegence.healthPoints / Spawner.MAX_HEALTH_POINTS
-            else:
-                selfPresence += Spawner.REQUIRED_CAPTURING_SINGUITIES * spawner.allegence.healthPoints / Spawner.MAX_HEALTH_POINTS
-
-            selfPresences[spawnerIndex] = selfPresence
+            selfPresences[spawnerIndex] = self.getSpawnerSelfSinguityPresence(currentPlayerId, singuitiesArray[spawnerClosestSinguityIndices])
 
         propagatedPresence = np.zeros(len(self.spawners))
 
         # The greater, the less impact the distance has to lower the score
-        distanceToSimilarityHp = 5
+        distanceToSimilarityHp = 50
         spawnerPositions = np.array([s.position for s in self.spawners])
 
         for spawnerIndex in range(len(self.spawners)):
@@ -100,6 +88,9 @@ class PropagatingVision(Artificial):
 
         return selfPresence
 
+    def getSinguityCountToChangeState(self, spawner: Spawner, currentPlayerId: str, surroundingUnits: List[Singuity]) -> int:
+        todo
+
     def optimizeSpawnerSinguities(self, gameState: GameState, currentPlayerId: str, propagatedPresence: List[float], spawnerClosestSinguityIndices: List[List[int]]):
         def spawnerIndexToProximityToAdvantageousStateChange(spawnerIndex: int) -> float:
             spawner = self.spawners[spawnerIndex]
@@ -117,7 +108,10 @@ class PropagatingVision(Artificial):
         singuitiesArray = np.array(gameState.singuities, dtype=object)
 
         for spawnerIndex in np.argsort(spawnersProximityToAdvantageousStateChange)[::-1]:
-            if self.getSpawnerSelfSinguityPresence(currentPlayerId, list(singuitiesArray[spawnerClosestSinguityIndices[spawnerIndex]])) <= 0:
+            (todo infinite loop because the spawner that has singuities gives its singuities to close empty spawner, and needs singuities at next iteration)
+            (todo check potential required units instead of hardcoded required or actual stronghold)
+            if self.getSpawnerSelfSinguityPresence(currentPlayerId, list(singuitiesArray[spawnerClosestSinguityIndices[spawnerIndex]])) <= 0\
+                    or self.spawners[spawnerIndex].remainingSinguitiesToClaim(currentPlayerId) > len(spawnerClosestSinguityIndices[spawnerIndex]):
 
                 distances = np.linalg.norm(spawnerPositions - self.spawners[spawnerIndex].position, axis=1)
 
@@ -165,23 +159,23 @@ class PropagatingVision(Artificial):
                     movingCommands.append(("moveToSpawner", ownAssignedSinguities, spawner))
 
                 elif self.getSpawnerSelfSinguityPresence(currentPlayerId, assignedSinguities, use_spatial_distribution=False) > 0:
-                    movingCommands.append(("moveToLocation", ownAssignedSinguities, np.mean([s.position for s in ownAssignedSinguities], axis=0)))
+                    movingCommands.append(("moveToPosition", ownAssignedSinguities, np.mean([s.position for s in ownAssignedSinguities], axis=0)))
 
                 else:
                     movingCommands.append(
-                        ("moveToSpawner", ownAssignedSinguities, self.getClosestOwnSpawner(np.mean([s.position for s in ownAssignedSinguities], axis=0), propagatedPresence))
-                        )
+                        ("moveToPosition", ownAssignedSinguities, self.getClosestOwnSpawner(np.mean([s.position for s in ownAssignedSinguities], axis=0), propagatedPresence).position)
+                    )
 
             else:
                 if self.getSpawnerSelfSinguityPresence(currentPlayerId, assignedSinguities, use_spatial_distribution=True) > 0:
-                    movingCommands.append(("moveToSpawner", ownAssignedSinguities, spawner))
+                    movingCommands.append(("moveToPosition", ownAssignedSinguities, spawner.position))
 
                 elif self.getSpawnerSelfSinguityPresence(currentPlayerId, assignedSinguities, use_spatial_distribution=False) > 0:
                     movingCommands.append(("moveToPosition", ownAssignedSinguities, np.mean([s.position for s in ownAssignedSinguities], axis=0)))
 
                 else:
                     movingCommands.append(
-                        ("moveToSpawner", ownAssignedSinguities, self.getClosestOwnSpawner(np.mean([s.position for s in ownAssignedSinguities], axis=0), propagatedPresence))
+                        ("moveToPosition", ownAssignedSinguities, self.getClosestOwnSpawner(np.mean([s.position for s in ownAssignedSinguities], axis=0), propagatedPresence).position)
                     )
 
         return movingCommands
@@ -203,3 +197,5 @@ class PropagatingVision(Artificial):
             elif command == "moveToPosition":
                 location: np.ndarray = operand
                 self.serverCommander.moveUnitsToPosition([s.id for s in singuities], location)
+            else:
+                raise Exception("Movement type does not exist")
