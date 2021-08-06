@@ -1,3 +1,4 @@
+import math
 from typing import Any, List, Tuple
 
 import numpy as np
@@ -6,6 +7,7 @@ from sklearn.neighbors import KDTree
 from clientAis.ais.Artificial import Artificial
 from clientAis.communications.GameState import GameState, Singuity, Spawner, SpawnerAllegence
 from clientAis.communications.ServerCommander import ServerCommander
+from utils import arrays
 
 class PropagatingVision(Artificial):
     def __init__(self, serverCommander: ServerCommander):
@@ -23,7 +25,7 @@ class PropagatingVision(Artificial):
         spawnerSinguitiesChanged, spawnersClosestSinguityIndices = self.optimizeSpawnerSinguities(gameState, currentPlayerId, propagatedPresence, spawnersClosestSinguityIndices)
 
         i = 0
-        while spawnerSinguitiesChanged and i < 100:
+        while spawnerSinguitiesChanged and i < len(self.spawners)**2:
             propagatedPresence = self.getPropagatedPresencePerSpawner(gameState, currentPlayerId, spawnersClosestSinguityIndices)
             spawnerSinguitiesChanged, spawnersClosestSinguityIndices = self.optimizeSpawnerSinguities(
                 gameState, currentPlayerId, propagatedPresence, spawnersClosestSinguityIndices
@@ -39,7 +41,7 @@ class PropagatingVision(Artificial):
         self.spawners: List[Spawner] = list(np.array(gameState.spawners, dtype=object)[sortedSpawnerIndices])
         sortedSpawnerIds = spawnerIds[sortedSpawnerIndices]
 
-        if self.spawnersId is None or np.any(self.spawnersId != sortedSpawnerIds):
+        if self.spawnersId is None or len(self.spawnersId) != len(sortedSpawnerIds) or np.any(self.spawnersId != sortedSpawnerIds):
             sortedSpawnerPositions = np.array([s.position for s in gameState.spawners])[sortedSpawnerIndices]
 
             # Generating spawner ordering and kdtree
@@ -66,14 +68,16 @@ class PropagatingVision(Artificial):
 
         propagatedPresence = np.zeros(len(self.spawners))
 
-        # The greater, the less impact the distance has to lower the score
-        distanceToSimilarityHp = 50
         spawnerPositions = np.array([s.position for s in self.spawners])
+        singuitiesPosition = [np.mean([s.position for s in singuitiesArray[singuityIndices]], axis=0) for singuityIndices in spawnersClosestSinguityIndices]
 
         for spawnerIndex in range(len(self.spawners)):
-            distances = np.linalg.norm(spawnerPositions - self.spawners[spawnerIndex].position, axis=1)
-            similarities = distanceToSimilarityHp / (distances + distanceToSimilarityHp)
+            distances = np.linalg.norm(spawnerPositions - singuitiesPosition[spawnerIndex], axis=1)
+            similarities = 100 / (distances + 100)
             propagatedPresence += selfPresences[spawnerIndex] * similarities
+
+        if math.isnan(propagatedPresence[0].item()):
+            temp1 = 0
 
         return list(propagatedPresence)
 
@@ -82,14 +86,11 @@ class PropagatingVision(Artificial):
         enemySinguities = [s for s in singuities if s.playerId != currentPlayerId]
 
         selfPresence = 0 if len(ownSinguities) == 0 else (np.sum([s.healthPoints / Singuity.MAX_HEALTH_POINT for s in ownSinguities]) / (
-            np.sum(np.std([s.position for s in ownSinguities], axis=1)) + 1 if use_spatial_distribution else 1))
+            np.linalg.norm(np.std([s.position for s in ownSinguities], axis=0)) + 1 if use_spatial_distribution else 1))
         selfPresence -= 0 if len(enemySinguities) == 0 else (np.sum([s.healthPoints / Singuity.MAX_HEALTH_POINT for s in enemySinguities]) / (
-            np.sum(np.std([s.position for s in enemySinguities], axis=1)) + 1 if use_spatial_distribution else 1))
+            np.linalg.norm(np.std([s.position for s in enemySinguities], axis=0)) + 1 if use_spatial_distribution else 1))
 
         return selfPresence
-
-    def getSinguityCountToChangeState(self, spawner: Spawner, currentPlayerId: str, surroundingUnits: List[Singuity]) -> int:
-        todo
 
     def optimizeSpawnerSinguities(self, gameState: GameState, currentPlayerId: str, propagatedPresence: List[float], spawnerClosestSinguityIndices: List[List[int]]):
         def spawnerIndexToProximityToAdvantageousStateChange(spawnerIndex: int) -> float:
@@ -107,27 +108,30 @@ class PropagatingVision(Artificial):
         spawnerPositions = np.array([s.position for s in self.spawners])
         singuitiesArray = np.array(gameState.singuities, dtype=object)
 
+        spawnerRequiredCounts = np.zeros(len(self.spawners), dtype=np.int32)
+
         for spawnerIndex in np.argsort(spawnersProximityToAdvantageousStateChange)[::-1]:
-            (todo infinite loop because the spawner that has singuities gives its singuities to close empty spawner, and needs singuities at next iteration)
-            (todo check potential required units instead of hardcoded required or actual stronghold)
-            if self.getSpawnerSelfSinguityPresence(currentPlayerId, list(singuitiesArray[spawnerClosestSinguityIndices[spawnerIndex]])) <= 0\
+
+            spawnerRequiredCounts[spawnerIndex] = int(self.spawners[spawnerIndex].remainingSinguitiesToClaim(currentPlayerId) * 1.5)
+
+            if self.getSpawnerSelfSinguityPresence(currentPlayerId, list(singuitiesArray[spawnerClosestSinguityIndices[spawnerIndex]])) < 0\
                     or self.spawners[spawnerIndex].remainingSinguitiesToClaim(currentPlayerId) > len(spawnerClosestSinguityIndices[spawnerIndex]):
 
                 distances = np.linalg.norm(spawnerPositions - self.spawners[spawnerIndex].position, axis=1)
 
                 # Skipping first because it's always the current spawner, which already contains its singuities
                 for potentialNeighbourSpawnerIndex in np.argsort(distances)[1::]:
-                    neighbourSinguities = list(singuitiesArray[spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex]])
-                    if self.getSpawnerSelfSinguityPresence(currentPlayerId, neighbourSinguities) > 0:
-                        spawnerClosestSinguityIndices[spawnerIndex].extend([
-                            index
-                            for index, singuity
-                            in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities)
-                            if singuity.playerId == currentPlayerId
-                        ])
-                        spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex] = [index for index, singuity in
-                                                                                         zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if
-                                                                                         singuity.playerId != currentPlayerId]
+
+                    neighbourSinguities: List[Singuity] = singuitiesArray[spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex]]
+                    ownUsableNeighbourSinguities = arrays.soft_accessor([(singuityIndex, singuity) for singuityIndex, singuity in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if singuity.playerId == currentPlayerId], spawnerRequiredCounts[potentialNeighbourSpawnerIndex])
+
+                    if self.getSpawnerSelfSinguityPresence(currentPlayerId, neighbourSinguities) > 0 and len(ownUsableNeighbourSinguities) > 0:
+
+                        enemyNeighbourSinguities = [(singuityIndex, singuity) for singuityIndex, singuity in
+                                                    zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if singuity.playerId != currentPlayerId]
+
+                        spawnerClosestSinguityIndices[spawnerIndex].extend([index for index, _ in ownUsableNeighbourSinguities])
+                        spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex] = [index for index, _ in enemyNeighbourSinguities]
 
                         return True, spawnerClosestSinguityIndices
 

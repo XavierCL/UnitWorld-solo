@@ -18,7 +18,7 @@ commandLineOptions = {key: value for key, value in zip(arrays.soft_accessor(sys.
 
 DEFAULT_SERVER_IP = "127.0.0.1"
 DEFAULT_SERVER_PORT = 52124
-DEFAULT_AI_NAME = "singleMindClosest"
+DEFAULT_AI_NAME = "propagatingVision"
 SECOND_BETWEEN_AI_FRAME = 0.5
 
 serverIp = commandLineOptions.get("serverIp") or DEFAULT_SERVER_IP
