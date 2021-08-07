@@ -4,13 +4,15 @@ import clientAis.cli.CommandLineParser;
 import clientAis.communications.MessageSerializer;
 import clientAis.communications.ServerCommander;
 import clientAis.communications.ServerReceiver;
+import clientAis.communications.game_data.GameState;
+import clientAis.dynamic_data.DataPacket;
 import clientAis.games.GameManager;
 import clientAis.implementations.Bot;
-import clientAis.implementations.ClosestSpawner;
-import clientAis.implementations.Dummy;
-import clientAis.implementations.GoMiddle;
+import clientAis.implementations.closest_spawner.ClosestSpawner;
+import clientAis.implementations.Dummy.Dummy;
+import clientAis.implementations.GoMiddle.GoMiddle;
+import clientAis.implementations.singuity_grouping.SinguityGrouping;
 import clientAis.networking.ClientConnector;
-import utils.data_structure.tupple.Tuple2;
 import utils.timer.LambdaTimerTaskHelper;
 
 import java.util.*;
@@ -30,7 +32,10 @@ public class MainClientAi {
         addBotImplementation(new Dummy());
         addBotImplementation(new GoMiddle());
         addBotImplementation(new ClosestSpawner());
+        addBotImplementation(new SinguityGrouping());
     }
+
+    private static Optional<DataPacket> previousInputOpt = Optional.empty();
 
     private static void addBotImplementation(Bot bot) {
         BOT_IMPLEMENTATIONS.put(bot.getClass().getName(), bot);
@@ -75,14 +80,20 @@ public class MainClientAi {
                         lastAiGameStateVersion.set(gameManager.gameState.get().frameCount);
                     }
                     final long timeBeforeRunningBot = System.currentTimeMillis();
-                    Consumer<ServerCommander> consumer = bot.exec(new Tuple2<>(gameState, currentPlayerId));
+                    runBot(bot, currentPlayerId, gameState, serverCommander);
                     final long timeAfterRunningBot = System.currentTimeMillis();
                     final long deltaTime = timeAfterRunningBot - timeBeforeRunningBot;
-                    consumer.accept(serverCommander);
                     System.out.println("FrameId: " + gameState.frameCount + "\tExecution time: " + deltaTime + " ms");
                 }));
             }), 0, REFRESH_PERIOD_MS);
         });
 
+    }
+
+    private static void runBot(Bot bot, String currentPlayerId, GameState gameState, ServerCommander serverCommander) {
+        final DataPacket input = new DataPacket(gameState, currentPlayerId, previousInputOpt);
+        final Consumer<ServerCommander> consumer = bot.exec(input);
+        previousInputOpt = Optional.of(input);
+        consumer.accept(serverCommander);
     }
 }

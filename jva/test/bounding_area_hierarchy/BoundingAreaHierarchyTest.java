@@ -2,7 +2,7 @@ package bounding_area_hierarchy;
 
 import clientAis.communications.game_data.Singuity;
 import org.junit.jupiter.api.Test;
-import utils.data_structure.bah_singuity.BoundingAreaHierarchy;
+import utils.data_structure.bounding_area_hierarchy.BoundingAreaHierarchy;
 import utils.math.vector.Vector2;
 import utils.shape.Circle;
 
@@ -18,7 +18,7 @@ public class BoundingAreaHierarchyTest {
         final List<Singuity> singuities = new ArrayList<>();
         singuities.add(new Singuity(new Vector2(0, 0)));
 
-        final BoundingAreaHierarchy boundingAreaHierarchy = new BoundingAreaHierarchy(singuities);
+        final BoundingAreaHierarchy<Singuity> boundingAreaHierarchy = new BoundingAreaHierarchy<>(singuities, singuity -> singuity.position);
 
         final Circle queryArea = new Circle(new Vector2(30, 40), 100);
         List<Singuity> inboundSinguities = boundingAreaHierarchy.query(queryArea);
@@ -31,7 +31,7 @@ public class BoundingAreaHierarchyTest {
         final List<Singuity> singuities = new ArrayList<>();
         singuities.add(new Singuity(new Vector2(0, 0)));
 
-        final BoundingAreaHierarchy boundingAreaHierarchy = new BoundingAreaHierarchy(singuities);
+        final BoundingAreaHierarchy<Singuity> boundingAreaHierarchy = new BoundingAreaHierarchy<>(singuities, singuity -> singuity.position);
 
         final Circle queryArea = new Circle(new Vector2(30, 40), 10);
         List<Singuity> inboundSinguities = boundingAreaHierarchy.query(queryArea);
@@ -46,7 +46,7 @@ public class BoundingAreaHierarchyTest {
         singuities.add(inboundSinguity);
         singuities.add(new Singuity(new Vector2(1000, 1000)));
 
-        final BoundingAreaHierarchy boundingAreaHierarchy = new BoundingAreaHierarchy(singuities);
+        final BoundingAreaHierarchy<Singuity> boundingAreaHierarchy = new BoundingAreaHierarchy<>(singuities, singuity -> singuity.position);
 
         final Circle queryArea = new Circle(new Vector2(10, 10), 20);
         List<Singuity> inboundSinguities = boundingAreaHierarchy.query(queryArea);
@@ -63,7 +63,7 @@ public class BoundingAreaHierarchyTest {
         singuities.add(new Singuity(new Vector2(1000, 1000)));
         singuities.add(new Singuity(new Vector2(-1000, -1000)));
 
-        final BoundingAreaHierarchy boundingAreaHierarchy = new BoundingAreaHierarchy(singuities);
+        final BoundingAreaHierarchy<Singuity> boundingAreaHierarchy = new BoundingAreaHierarchy<>(singuities, singuity -> singuity.position);
 
         final Circle queryArea = new Circle(new Vector2(10, 10), 20);
         List<Singuity> inboundSinguities = boundingAreaHierarchy.query(queryArea);
@@ -90,7 +90,7 @@ public class BoundingAreaHierarchyTest {
 
         singuities.addAll(inQueryZoneSinguities);
 
-        final BoundingAreaHierarchy boundingAreaHierarchy = new BoundingAreaHierarchy(singuities);
+        final BoundingAreaHierarchy<Singuity> boundingAreaHierarchy = new BoundingAreaHierarchy<>(singuities, singuity -> singuity.position);
 
         final Circle queryArea = new Circle(new Vector2(4000, 3300), 10000);
         List<Singuity> inboundSinguities = boundingAreaHierarchy.query(queryArea);
@@ -106,7 +106,7 @@ public class BoundingAreaHierarchyTest {
             singuities.add(new Singuity(new Vector2(Math.random()*10000, Math.random()*10000)));
         });
 
-        final BoundingAreaHierarchy boundingAreaHierarchy = new BoundingAreaHierarchy(singuities);
+        final BoundingAreaHierarchy<Singuity> boundingAreaHierarchy = new BoundingAreaHierarchy<>(singuities, singuity -> singuity.position);
 
         final Circle queryArea = new Circle(new Vector2(4000, 3300), 1000);
 

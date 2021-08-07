@@ -1,6 +1,6 @@
 package utils.shape;
 
-import utils.data_structure.bah_singuity.AxisAlignedBoundingBox;
+import utils.data_structure.bounding_area_hierarchy.AxisAlignedBoundingBox;
 import utils.math.vector.Vector2;
 
 public class Circle {

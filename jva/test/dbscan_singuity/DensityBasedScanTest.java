@@ -2,26 +2,29 @@ package dbscan_singuity;
 
 import clientAis.communications.game_data.Singuity;
 import org.junit.jupiter.api.Test;
-import utils.data_structure.cluster_singuity.SinguityCluster;
-import utils.data_structure.cluster_singuity.SinguityDensityBasedScan;
+import utils.data_structure.cluster.DataCluster;
+import utils.data_structure.cluster.DensityBasedScan;
 import utils.math.vector.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
-public class SinguityDensityBasedScanTest {
+public class DensityBasedScanTest {
 
     @Test
     public void ScanRunsAndDoesn_tCrash() {
         List<Singuity> singuities = new ArrayList<>();
         singuities.add(new Singuity(new Vector2(200, 300), "0"));
 
-        SinguityDensityBasedScan singuityDensityBasedScan = new SinguityDensityBasedScan(singuities);
-        List<SinguityCluster> singuityClusters = singuityDensityBasedScan.findClusters(10);
+        DensityBasedScan<Singuity, String> densityBasedScan = new DensityBasedScan<>(singuities,
+                singuity -> singuity.position,
+                singuity -> singuity.id);
+        Set<DataCluster<String>> dataClusters = densityBasedScan.findClusters(10);
 
-        assert(singuityClusters.get(0).singuityIds.size() == 1);
+        assert(dataClusters.stream().findFirst().get().elements.size() == 1);
     }
 
     @Test
@@ -37,12 +40,15 @@ public class SinguityDensityBasedScanTest {
         singuities.add(new Singuity(new Vector2(2119, 2200), "6"));
         singuities.add(new Singuity(new Vector2(2300, 2500), "7"));
 
-        SinguityDensityBasedScan singuityDensityBasedScan = new SinguityDensityBasedScan(singuities);
-        List<SinguityCluster> singuityClusters = singuityDensityBasedScan.findClusters(400);
+        DensityBasedScan<Singuity, String> densityBasedScan = new DensityBasedScan<>(singuities,
+                singuity -> singuity.position,
+                singuity -> singuity.id);
+        Set<DataCluster<String>> dataClusters = densityBasedScan.findClusters(400);
 
-        assert(singuityClusters.size() == 2);
-        assert(singuityClusters.get(0).singuityIds.size() == 4);
-        assert(singuityClusters.get(1).singuityIds.size() == 4);
+        assert(dataClusters.size() == 2);
+        dataClusters.forEach(stringDataCluster -> {
+            assert(stringDataCluster.elements.size() == 4);
+        });
     }
 
     @Test
@@ -53,12 +59,14 @@ public class SinguityDensityBasedScanTest {
             singuities.add(new Singuity(new Vector2(Math.random()*10000, Math.random()*10000), String.valueOf(i)));
         });
 
-        SinguityDensityBasedScan singuityDensityBasedScan = new SinguityDensityBasedScan(singuities);
+        DensityBasedScan<Singuity, String> densityBasedScan = new DensityBasedScan<>(singuities,
+                singuity -> singuity.position,
+                singuity -> singuity.id);
 
         long x1 = System.currentTimeMillis();
-        AtomicReference<List<SinguityCluster>> atomicReference = new AtomicReference<>();
+        AtomicReference<Set<DataCluster<String>>> atomicReference = new AtomicReference<>();
         IntStream.range(0, 1000).forEach(i -> {
-            atomicReference.set(singuityDensityBasedScan.findClusters(1000));
+            atomicReference.set(densityBasedScan.findClusters(1000));
         });
         long x2 = System.currentTimeMillis();
 

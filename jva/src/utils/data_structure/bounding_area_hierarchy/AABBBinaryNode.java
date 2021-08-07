@@ -1,20 +1,23 @@
-package utils.data_structure.bah_singuity;
+package utils.data_structure.bounding_area_hierarchy;
 
-import clientAis.communications.game_data.Singuity;
 import utils.data_structure.tree.binary.BinaryNode;
+import utils.math.vector.Vector2;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-class AABBSinguityBinaryNode extends BinaryNode<AxisAlignedBoundingBox, Singuity> {
+class AABBBinaryNode<T> extends BinaryNode<AxisAlignedBoundingBox, T> {
 
-    private final Map<Long, Singuity> mortonSinguityMap;
+    private final Map<Long, T> mortonMap;
+    private final Function<T, Vector2> leafObjectPositionMapper;
 
-    public AABBSinguityBinaryNode(List<Long> mortonCode, Map<Long, Singuity> mortonSinguityMap) {
-        this.mortonSinguityMap = mortonSinguityMap;
+    public AABBBinaryNode(List<Long> mortonCode, Map<Long, T> mortonMap, Function<T, Vector2> leafObjectPositionMapper) {
+        this.mortonMap = mortonMap;
+        this.leafObjectPositionMapper = leafObjectPositionMapper;
         super.setValue(buildBinaryHierarchy(mortonCode));
     }
 
@@ -29,16 +32,16 @@ class AABBSinguityBinaryNode extends BinaryNode<AxisAlignedBoundingBox, Singuity
                 .collect(Collectors.toList());
 
         if(rightCodes.size() > 1) {
-            super.right = new AABBSinguityBinaryNode(rightCodes, mortonSinguityMap);
+            super.right = new AABBBinaryNode<>(rightCodes, mortonMap, leafObjectPositionMapper);
         }
         else if(rightCodes.size() == 1) {
-            super.right = new AABBSinguityLeafNode(mortonSinguityMap.get(rightCodes.get(0)));
+            super.right = new AABBLeafNode<>(mortonMap.get(rightCodes.get(0)), leafObjectPositionMapper);
         }
         if(leftCodes.size() > 1) {
-            super.left = new AABBSinguityBinaryNode(leftCodes, mortonSinguityMap);
+            super.left = new AABBBinaryNode<>(leftCodes, mortonMap, leafObjectPositionMapper);
         }
         else if(leftCodes.size() == 1) {
-            super.left = new AABBSinguityLeafNode(mortonSinguityMap.get(leftCodes.get(0)));
+            super.left = new AABBLeafNode<>(mortonMap.get(leftCodes.get(0)), leafObjectPositionMapper);
         }
 
         return new AxisAlignedBoundingBox(right.getValue(), left.getValue());
