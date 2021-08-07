@@ -17,7 +17,7 @@ public class MortonMapper {
         elements.forEach(element -> {
             final Vector2Int transformedPositionForMortonEncoding = objectPositionMapper.apply(element)
                     .plus(new Vector2(7500, 7500))
-                    .scaled(100)
+                    .scaled(10000)
                     .toVector2Int();
             mortonMap.put(MortonEncoder2D.encode(transformedPositionForMortonEncoding), element);
         });

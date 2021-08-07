@@ -1,17 +1,17 @@
-package utils.data_structure.tree.binary;
+package utils.data_structure.tree.binary.basic;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class BinaryNode<T, U> implements Node<T, U> {
-
-    public Node<T, U> left;
-    public Node<T, U> right;
+public class LeafNode<T, U> implements Node<T, U> {
 
     private T nodeObject;
+    private final U leafObject;
 
-    public BinaryNode() {}
+    public LeafNode(T nodeObject, U leafObject) {
+        this.nodeObject = nodeObject;
+        this.leafObject = leafObject;
+    }
 
     public T getValue() {
         return nodeObject;
@@ -22,9 +22,8 @@ public class BinaryNode<T, U> implements Node<T, U> {
 
     @Override
     public void accept(Function<T, Boolean> nodeValidator, Function<U, Boolean> leafValidator, Consumer<U> visitor) {
-        if(nodeValidator.apply(getValue())) {
-            left.accept(nodeValidator, leafValidator, visitor);
-            right.accept(nodeValidator, leafValidator, visitor);
+        if(leafValidator.apply(leafObject)) {
+            visitor.accept(leafObject);
         }
     }
 }

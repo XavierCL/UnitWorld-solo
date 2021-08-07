@@ -2,7 +2,7 @@ package bounding_area_hierarchy;
 
 import clientAis.communications.game_data.Singuity;
 import org.junit.jupiter.api.Test;
-import utils.data_structure.bounding_area_hierarchy.BoundingAreaHierarchy;
+import utils.data_structure.bounding_area_hierarchy.basic.BoundingAreaHierarchy;
 import utils.math.vector.Vector2;
 import utils.shape.Circle;
 

@@ -40,12 +40,17 @@ public class DensityBasedScanTest {
         singuities.add(new Singuity(new Vector2(2119, 2200), "6"));
         singuities.add(new Singuity(new Vector2(2300, 2500), "7"));
 
+        singuities.add(new Singuity(new Vector2(8200, 2300), "8"));
+        singuities.add(new Singuity(new Vector2(8210, 2250), "9"));
+        singuities.add(new Singuity(new Vector2(8119, 2200), "10"));
+        singuities.add(new Singuity(new Vector2(8300, 2500), "11"));
+
         DensityBasedScan<Singuity, String> densityBasedScan = new DensityBasedScan<>(singuities,
                 singuity -> singuity.position,
                 singuity -> singuity.id);
         Set<DataCluster<String>> dataClusters = densityBasedScan.findClusters(400);
 
-        assert(dataClusters.size() == 2);
+        assert(dataClusters.size() == 3);
         dataClusters.forEach(stringDataCluster -> {
             assert(stringDataCluster.elements.size() == 4);
         });

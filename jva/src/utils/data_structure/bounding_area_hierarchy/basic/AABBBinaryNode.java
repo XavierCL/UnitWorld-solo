@@ -1,6 +1,6 @@
-package utils.data_structure.bounding_area_hierarchy;
+package utils.data_structure.bounding_area_hierarchy.basic;
 
-import utils.data_structure.tree.binary.BinaryNode;
+import utils.data_structure.tree.binary.basic.BinaryNode;
 import utils.math.vector.Vector2;
 
 import java.util.List;

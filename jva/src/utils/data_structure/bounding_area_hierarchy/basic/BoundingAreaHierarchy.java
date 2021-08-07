@@ -1,7 +1,7 @@
-package utils.data_structure.bounding_area_hierarchy;
+package utils.data_structure.bounding_area_hierarchy.basic;
 
 import utils.data_structure.morton_encoding.MortonMapper;
-import utils.data_structure.tree.binary.Node;
+import utils.data_structure.tree.binary.basic.Node;
 import utils.math.vector.Vector2;
 import utils.shape.Circle;
 
@@ -17,15 +17,15 @@ public class BoundingAreaHierarchy<T> {
     public BoundingAreaHierarchy(List<T> elements, Function<T, Vector2> leafObjectPositionMapper) {
         this.leafObjectPositionMapper = leafObjectPositionMapper;
 
-        final Map<Long, T> mortonEncodedSinguities = MortonMapper.mapElements(elements, leafObjectPositionMapper);
-        final List<Long> sortedMortonCodes = new ArrayList<>(mortonEncodedSinguities.keySet())
+        final Map<Long, T> mortonEncodedElement = MortonMapper.mapElements(elements, leafObjectPositionMapper);
+        final List<Long> sortedMortonCodes = new ArrayList<>(mortonEncodedElement.keySet())
                 .stream()
                 .sorted(Comparator.comparingLong((key -> key)))
                 .collect(Collectors.toList());
 
 
         if(sortedMortonCodes.size() > 1) {
-            this.root = Optional.of(new AABBBinaryNode<T>(sortedMortonCodes, mortonEncodedSinguities, leafObjectPositionMapper));
+            this.root = Optional.of(new AABBBinaryNode<>(sortedMortonCodes, mortonEncodedElement, leafObjectPositionMapper));
         }
         else if(sortedMortonCodes.size() == 1) {
             this.root = Optional.of(new AABBLeafNode<>(elements.get(0), leafObjectPositionMapper));
@@ -36,14 +36,14 @@ public class BoundingAreaHierarchy<T> {
     }
 
     public List<T> query(final Circle collidingRegion) {
-        final List<T> collidingSinguities = new ArrayList<>();
+        final List<T> collidingElements = new ArrayList<>();
         final AxisAlignedBoundingBox regionAabb = collidingRegion.toAabb();
 
         root.ifPresent(node -> node.accept(
                 regionAabb::collidesWith,
-                singuity -> collidingRegion.contains(leafObjectPositionMapper.apply(singuity)),
-                collidingSinguities::add));
+                element -> collidingRegion.contains(leafObjectPositionMapper.apply(element)),
+                collidingElements::add));
 
-        return collidingSinguities;
+        return collidingElements;
     }
 }
