@@ -8,6 +8,7 @@ import utils.shape.Circle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 public class BoundingAreaHierarchyTest {
@@ -91,11 +92,34 @@ public class BoundingAreaHierarchyTest {
 
         final BoundingAreaHierarchy boundingAreaHierarchy = new BoundingAreaHierarchy(singuities);
 
-        final Circle queryArea = new Circle(new Vector2(4000, 3300), 1000);
+        final Circle queryArea = new Circle(new Vector2(4000, 3300), 10000);
         List<Singuity> inboundSinguities = boundingAreaHierarchy.query(queryArea);
 
-        System.out.println(inboundSinguities.size());
         assert(inboundSinguities.containsAll(inQueryZoneSinguities));
+    }
+
+    @Test
+    public void AHundredThousandRandomQueriesJustToSeeHowLongItTakes() {
+        final List<Singuity> singuities = new ArrayList<>(100000);
+
+        IntStream.range(0, 100000).forEach(i -> {
+            singuities.add(new Singuity(new Vector2(Math.random()*10000, Math.random()*10000)));
+        });
+
+        final BoundingAreaHierarchy boundingAreaHierarchy = new BoundingAreaHierarchy(singuities);
+
+        final Circle queryArea = new Circle(new Vector2(4000, 3300), 1000);
+
+        long x1 = System.currentTimeMillis();
+
+        AtomicReference<List<Singuity>> atomicReference = new AtomicReference<>();
+        IntStream.range(0, 1000).forEach(j -> {
+            atomicReference.set(boundingAreaHierarchy.query(queryArea));
+        });
+
+        long x2 = System.currentTimeMillis();
+
+        assert(true);
     }
 
 }

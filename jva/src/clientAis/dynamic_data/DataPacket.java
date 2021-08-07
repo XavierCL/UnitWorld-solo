@@ -3,6 +3,8 @@ package clientAis.dynamic_data;
 import clientAis.communications.game_data.GameState;
 import clientAis.communications.game_data.Singuity;
 import clientAis.communications.game_data.Spawner;
+import utils.data_structure.cluster_singuity.SinguityCluster;
+import utils.data_structure.cluster_singuity.SinguityDensityBasedScan;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +13,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DataPacket {
+
+    public static final double DENSITY_SCAN_RADIUS = 20;
 
     public final GameState gameState;
 
@@ -25,6 +29,9 @@ public class DataPacket {
     public final List<String> adverseSpawners;
     public final List<String> allSpawners;
     public final List<String> freeSpawners;
+
+    public final List<SinguityCluster> ownedClusters;
+    public final List<SinguityCluster> adverseClusters;
 
     public DataPacket(final GameState gameState, final String currentPlayerId) {
         this.gameState = gameState;
@@ -64,5 +71,15 @@ public class DataPacket {
                 .filter(spawner -> !ownedSpawners.contains(spawner)
                         && !adverseSpawners.contains(spawner))
                 .collect(Collectors.toList());
+
+        SinguityDensityBasedScan ownedSinguityDensityScanner = new SinguityDensityBasedScan(ownedSinguities.stream()
+                .map(singuityIdMap::get)
+                .collect(Collectors.toList()));
+        this.ownedClusters = ownedSinguityDensityScanner.findClusters(DENSITY_SCAN_RADIUS);
+
+        SinguityDensityBasedScan adverseSinguityDensityScanner = new SinguityDensityBasedScan(adverseSinguities.stream()
+                .map(singuityIdMap::get)
+                .collect(Collectors.toList()));
+        this.adverseClusters = ownedSinguityDensityScanner.findClusters(DENSITY_SCAN_RADIUS);
     }
 }

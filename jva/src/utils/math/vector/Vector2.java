@@ -159,7 +159,7 @@ public class Vector2 implements Serializable {
 
     @Override
     public String toString() {
-        return "[ x:" + this.x + ", y:" + this.y + " ]";
+        return "[ " + this.x + ", " + this.y + " ]";
     }
 
     public Vector2 inverse() {

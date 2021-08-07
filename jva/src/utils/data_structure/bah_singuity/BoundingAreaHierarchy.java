@@ -13,10 +13,14 @@ public class BoundingAreaHierarchy {
     private final Optional<Node<AxisAlignedBoundingBox, Singuity>> root;
 
     public BoundingAreaHierarchy(List<Singuity> singuities) {
+
         final Map<Long, Singuity> mortonEncodedSinguities = MortonMapper.mapSinguities(singuities);
-        final List<Long> sortedMortonCodes = mortonEncodedSinguities.keySet().stream()
+        final List<Long> sortedMortonCodes = new ArrayList<>(mortonEncodedSinguities.keySet())
+                .stream()
                 .sorted(Comparator.comparingLong((key -> key)))
                 .collect(Collectors.toList());
+
+
         if(sortedMortonCodes.size() > 1) {
             this.root = Optional.of(new AABBSinguityBinaryNode(sortedMortonCodes, mortonEncodedSinguities));
         }
@@ -30,9 +34,10 @@ public class BoundingAreaHierarchy {
 
     public List<Singuity> query(final Circle collidingRegion) {
         final List<Singuity> collidingSinguities = new ArrayList<>();
+        final AxisAlignedBoundingBox regionAabb = collidingRegion.toAabb();
 
-        root.ifPresent(node -> node.accept(aabb ->
-                collidingRegion.toAabb().collidesWith(aabb),
+        root.ifPresent(node -> node.accept(
+                regionAabb::collidesWith,
                 singuity -> collidingRegion.contains(singuity.position),
                 collidingSinguities::add));
 

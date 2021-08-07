@@ -11,7 +11,7 @@ import java.util.Map;
 public class MortonMapper {
 
     public static Map<Long, Singuity> mapSinguities(List<Singuity> singuities){
-        final Map<Long, Singuity> mortonMap = new HashMap<>();
+        final Map<Long, Singuity> mortonMap = new HashMap<>(singuities.size());
         singuities.forEach(singuity -> {
             final Vector2Int transformedPositionForMortonEncoding = singuity.position
                     .plus(new Vector2(7500, 7500))
