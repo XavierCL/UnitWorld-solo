@@ -8,9 +8,12 @@ public class LeafNode<T, U> implements Node<T, U> {
     private T nodeObject;
     private final U leafObject;
 
-    public LeafNode(T nodeObject, U leafObject) {
+    private final Runnable visitedBehaviour;
+
+    public LeafNode(T nodeObject, U leafObject, Runnable visitedBehaviour) {
         this.nodeObject = nodeObject;
         this.leafObject = leafObject;
+        this.visitedBehaviour = visitedBehaviour;
     }
 
     public T getValue() {
@@ -24,6 +27,7 @@ public class LeafNode<T, U> implements Node<T, U> {
     public void accept(Function<T, Boolean> nodeValidator, Function<U, Boolean> leafValidator, Consumer<U> visitor) {
         if(leafValidator.apply(leafObject)) {
             visitor.accept(leafObject);
+            visitedBehaviour.run();
         }
     }
 }

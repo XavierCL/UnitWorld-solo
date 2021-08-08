@@ -16,10 +16,10 @@ class AABBBNQueryRemoval<T> extends BNQueryRemoval<AxisAlignedBoundingBox, T> {
     private final Map<Long, T> mortonMap;
     private final Function<T, Vector2> leafObjectPositionMapper;
 
-    public AABBBNQueryRemoval(List<Long> mortonCode, Map<Long, T> mortonMap, Function<T, Vector2> leafObjectPositionMapper) {
+    public AABBBNQueryRemoval(List<Long> mortonCodes, Map<Long, T> mortonMap, Function<T, Vector2> leafObjectPositionMapper) {
         this.mortonMap = mortonMap;
         this.leafObjectPositionMapper = leafObjectPositionMapper;
-        super.setValue(buildBinaryHierarchy(mortonCode));
+        super.setValue(buildBinaryHierarchy(mortonCodes));
     }
 
     private AxisAlignedBoundingBox buildBinaryHierarchy(List<Long> mortonCodes) {
@@ -33,23 +33,19 @@ class AABBBNQueryRemoval<T> extends BNQueryRemoval<AxisAlignedBoundingBox, T> {
                 .collect(Collectors.toList());
 
         if(rightCodes.size() > 1) {
-            super.right = new AABBBNQueryRemoval<>(rightCodes, mortonMap, leafObjectPositionMapper);
-            super.right.setParent(this);
+            super.setRight(new AABBBNQueryRemoval<>(rightCodes, mortonMap, leafObjectPositionMapper));
         }
         else if(rightCodes.size() == 1) {
-            super.right = new AABBLNQueryRemoval<T>(mortonMap.get(rightCodes.get(0)), leafObjectPositionMapper);
-            super.right.setParent(this);
+            super.setRight(new AABBLNQueryRemoval<T>(mortonMap.get(rightCodes.get(0)), leafObjectPositionMapper));
         }
         if(leftCodes.size() > 1) {
-            super.left = new AABBBNQueryRemoval<>(leftCodes, mortonMap, leafObjectPositionMapper);
-            super.left.setParent(this);
+            super.setLeft(new AABBBNQueryRemoval<>(leftCodes, mortonMap, leafObjectPositionMapper));
         }
         else if(leftCodes.size() == 1) {
-            super.left = new AABBLNQueryRemoval<>(mortonMap.get(leftCodes.get(0)), leafObjectPositionMapper);
-            super.left.setParent(this);
+            super.setLeft(new AABBLNQueryRemoval<>(mortonMap.get(leftCodes.get(0)), leafObjectPositionMapper));
         }
 
-        return new AxisAlignedBoundingBox(right.getValue(), left.getValue());
+        return new AxisAlignedBoundingBox(super.getRight().getValue(), super.getLeft().getValue());
     }
 
     private int biggestVaryingBitNumber(List<Long> values) {

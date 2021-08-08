@@ -89,7 +89,7 @@ spawnersConfig: List[List[Dict[str, Union[float, int]]]] = [
     [{"x": discretePositionToGamePosition(x), "y": discretePositionToGamePosition(y)} for x, y in zip(*np.nonzero(symmetricSpawnerConfig))]
 ]
 
-spawnersConfig = spawnersConfig + [[{"x": discretePositionToGamePosition(x), "y": discretePositionToGamePosition(y), "singuities": 100}] for x, y in
+spawnersConfig = spawnersConfig + [[{"x": discretePositionToGamePosition(x), "y": discretePositionToGamePosition(y), "singuities": 2000}] for x, y in
                                    zip(*np.nonzero(homeSpawnerConfig))]
 
 baseMap["spawners"] = spawnersConfig

@@ -11,7 +11,7 @@ import clientAis.implementations.Bot;
 import clientAis.implementations.closest_spawner.ClosestSpawner;
 import clientAis.implementations.Dummy.Dummy;
 import clientAis.implementations.GoMiddle.GoMiddle;
-import clientAis.implementations.singuity_grouping.SinguityGrouping;
+import clientAis.implementations.mindless_chase.MindlessChase;
 import clientAis.networking.ClientConnector;
 import utils.timer.LambdaTimerTaskHelper;
 
@@ -23,16 +23,16 @@ public class MainClientAi {
 
     public static final String DEFAULT_SERVER_IP = "127.0.0.1";
     public static final String DEFAULT_SERVER_PORT = "52124";
-    public static final String DEFAULT_AI_NAME = ClosestSpawner.class.getName();
-    public static final double SECOND_BETWEEN_AI_FRAME = 0.5;
-    public static final long REFRESH_PERIOD_MS = (int)(1000.0/SECOND_BETWEEN_AI_FRAME);
+    public static final String DEFAULT_AI_NAME = MindlessChase.class.getName();
+    public static final double SECOND_BETWEEN_AI_FRAME = 0.1;
+    public static final long REFRESH_PERIOD_MS = (int)(SECOND_BETWEEN_AI_FRAME*1000);
 
     private static final Map<String, Bot> BOT_IMPLEMENTATIONS = new HashMap<>();
     static {
         addBotImplementation(new Dummy());
         addBotImplementation(new GoMiddle());
         addBotImplementation(new ClosestSpawner());
-        addBotImplementation(new SinguityGrouping());
+        addBotImplementation(new MindlessChase());
     }
 
     private static Optional<DataPacket> previousInputOpt = Optional.empty();

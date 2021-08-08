@@ -1,44 +1,42 @@
 package utils.data_structure.tree.binary.query_removal;
 
+import utils.data_structure.tree.binary.basic.LeafNode;
+import utils.data_structure.tree.binary.basic.ParentedNode;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class LNQueryRemoval<T, U> implements NodeQueryRemoval<T, U> {
+public class LNQueryRemoval<T, U> implements ParentedNode<T, U> {
 
     public Optional<BNQueryRemoval<T, U>> parent;
 
-    private T nodeObject;
-    private final U leafObject;
+    public final LeafNode<T, U> leafNode;
 
     public LNQueryRemoval(T nodeObject, U leafObject) {
-        this.nodeObject = nodeObject;
-        this.leafObject = leafObject;
         this.parent = Optional.empty();
+        this.leafNode = new LeafNode<>(nodeObject, leafObject, () -> {
+            parent.ifPresent(parent -> parent.getParent().ifPresent(grandParent -> {
+                if(grandParent.getLeft() == parent) {
+                    grandParent.setLeft(parent.getLeft() == this ? parent.getRight() : parent.getLeft());
+                }
+                else {
+                    grandParent.setRight(parent.getLeft() == this ? parent.getRight() : parent.getLeft());
+                }
+            }));
+        });
     }
 
     public T getValue() {
-        return nodeObject;
+        return leafNode.getValue();
     }
     public void setValue(T nodeObject) {
-        this.nodeObject = nodeObject;
+        this.leafNode.setValue(nodeObject);
     }
 
     @Override
     public void accept(Function<T, Boolean> nodeValidator, Function<U, Boolean> leafValidator, Consumer<U> visitor) {
-        if(leafValidator.apply(leafObject)) {
-            visitor.accept(leafObject);
-            parent.ifPresent(parent -> parent.getParent().ifPresent(grandParent -> {
-                if(grandParent.left == parent) {
-                    grandParent.left = parent.left == this ? parent.right : parent.left;
-                    grandParent.left.setParent(grandParent);
-                }
-                else {
-                    grandParent.right = parent.left == this ? parent.right : parent.left;
-                    grandParent.right.setParent(grandParent);
-                }
-            }));
-        }
+        leafNode.accept(nodeValidator, leafValidator, visitor);
     }
 
     @Override

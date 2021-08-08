@@ -14,6 +14,7 @@ public class BoundingAreaHierarchy<T> {
     private final Optional<Node<AxisAlignedBoundingBox, T>> root;
     private final Function<T, Vector2> leafObjectPositionMapper;
 
+
     public BoundingAreaHierarchy(List<T> elements, Function<T, Vector2> leafObjectPositionMapper) {
         this.leafObjectPositionMapper = leafObjectPositionMapper;
 

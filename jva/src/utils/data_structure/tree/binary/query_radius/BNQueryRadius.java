@@ -1,25 +1,18 @@
-package utils.data_structure.tree.binary.query_removal;
+package utils.data_structure.tree.binary.query_radius;
 
 import utils.data_structure.tree.binary.basic.BinaryNode;
 import utils.data_structure.tree.binary.basic.DynamicChildBinaryNode;
 import utils.data_structure.tree.binary.basic.Node;
-import utils.data_structure.tree.binary.basic.ParentedNode;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class BNQueryRemoval<T, U> implements
-        ParentedNode<T, U>,
-        BinaryNode<T, U, Node<T, U>> {
+public class BNQueryRadius<T, U> implements BinaryNode<T, U, Node<T, U>> {
 
-    public Optional<BNQueryRemoval<T, U>> parent;
+    private final DynamicChildBinaryNode<T, U, Node<T, U>> binaryNode;
 
-    public DynamicChildBinaryNode<T, U, ParentedNode<T, U>> binaryNode;
-
-    public BNQueryRemoval() {
-        this.parent = Optional.empty();
-        this.binaryNode = new DynamicChildBinaryNode<>(child -> child.setParent(this));
+    public BNQueryRadius() {
+        this.binaryNode = new DynamicChildBinaryNode<>(child -> {});
     }
 
     public T getValue() {
@@ -32,16 +25,6 @@ public class BNQueryRemoval<T, U> implements
     @Override
     public void accept(Function<T, Boolean> nodeValidator, Function<U, Boolean> leafValidator, Consumer<U> visitor) {
         binaryNode.accept(nodeValidator, leafValidator, visitor);
-    }
-
-    @Override
-    public Optional<BNQueryRemoval<T, U>> getParent() {
-        return parent;
-    }
-
-    @Override
-    public void setParent(BNQueryRemoval<T, U> node) {
-        parent = Optional.of(node);
     }
 
     @Override
