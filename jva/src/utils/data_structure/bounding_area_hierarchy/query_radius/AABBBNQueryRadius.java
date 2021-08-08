@@ -1,5 +1,6 @@
-package utils.data_structure.bounding_area_hierarchy.basic;
+package utils.data_structure.bounding_area_hierarchy.query_radius;
 
+import utils.data_structure.bounding_area_hierarchy.AxisAlignedBoundingBox;
 import utils.data_structure.tree.binary.query_radius.BNQueryRadius;
 import utils.math.vector.Vector2;
 
@@ -10,12 +11,12 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-class AABBBinaryNode<T> extends BNQueryRadius<AxisAlignedBoundingBox, T> {
+class AABBBNQueryRadius<T> extends BNQueryRadius<AxisAlignedBoundingBox, T> {
 
     private final Map<Long, T> mortonMap;
     private final Function<T, Vector2> leafObjectPositionMapper;
 
-    public AABBBinaryNode(List<Long> mortonCode, Map<Long, T> mortonMap, Function<T, Vector2> leafObjectPositionMapper) {
+    public AABBBNQueryRadius(List<Long> mortonCode, Map<Long, T> mortonMap, Function<T, Vector2> leafObjectPositionMapper) {
         super();
         this.mortonMap = mortonMap;
         this.leafObjectPositionMapper = leafObjectPositionMapper;
@@ -33,16 +34,16 @@ class AABBBinaryNode<T> extends BNQueryRadius<AxisAlignedBoundingBox, T> {
                 .collect(Collectors.toList());
 
         if(rightCodes.size() > 1) {
-            super.setRight(new AABBBinaryNode<>(rightCodes, mortonMap, leafObjectPositionMapper));
+            super.setRight(new AABBBNQueryRadius<>(rightCodes, mortonMap, leafObjectPositionMapper));
         }
         else if(rightCodes.size() == 1) {
-            super.setRight(new AABBLeafNode<>(mortonMap.get(rightCodes.get(0)), leafObjectPositionMapper));
+            super.setRight(new AABBLNQueryRadius<>(mortonMap.get(rightCodes.get(0)), leafObjectPositionMapper));
         }
         if(leftCodes.size() > 1) {
-            super.setLeft(new AABBBinaryNode<>(leftCodes, mortonMap, leafObjectPositionMapper));
+            super.setLeft(new AABBBNQueryRadius<>(leftCodes, mortonMap, leafObjectPositionMapper));
         }
         else if(leftCodes.size() == 1) {
-            super.setLeft(new AABBLeafNode<>(mortonMap.get(leftCodes.get(0)), leafObjectPositionMapper));
+            super.setLeft(new AABBLNQueryRadius<>(mortonMap.get(leftCodes.get(0)), leafObjectPositionMapper));
         }
 
         return new AxisAlignedBoundingBox(super.getRight().getValue(), super.getLeft().getValue());

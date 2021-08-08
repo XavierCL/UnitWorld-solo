@@ -1,4 +1,4 @@
-package clientAis.implementations.Dummy;
+package clientAis.implementations.dummy;
 
 import clientAis.communications.ServerCommander;
 import clientAis.dynamic_data.DataPacket;

@@ -1,6 +1,6 @@
 package utils.data_structure.tree.binary.query_radius;
 
-import utils.data_structure.tree.binary.basic.LeafNode;
+import utils.data_structure.tree.binary.basic.DynamicChildLeafNode;
 import utils.data_structure.tree.binary.basic.Node;
 
 import java.util.function.Consumer;
@@ -8,10 +8,10 @@ import java.util.function.Function;
 
 public class LNQueryRadius<T, U> implements Node<T, U> {
 
-    private final LeafNode<T, U> leafNode;
+    private final DynamicChildLeafNode<T, U> leafNode;
 
     public LNQueryRadius(T nodeObject, U leafObject) {
-        this.leafNode = new LeafNode<>(nodeObject, leafObject, () -> {});
+        this.leafNode = new DynamicChildLeafNode<>(nodeObject, leafObject, () -> {});
     }
 
     public T getValue() {

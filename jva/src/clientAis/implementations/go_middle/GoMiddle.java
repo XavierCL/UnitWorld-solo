@@ -1,4 +1,4 @@
-package clientAis.implementations.GoMiddle;
+package clientAis.implementations.go_middle;
 
 import clientAis.communications.ServerCommander;
 import clientAis.dynamic_data.DataPacket;

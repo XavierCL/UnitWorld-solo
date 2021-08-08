@@ -22,7 +22,7 @@ public class DensityBasedScanTest {
         DensityBasedScan<Singuity, String> densityBasedScan = new DensityBasedScan<>(singuities,
                 singuity -> singuity.position,
                 singuity -> singuity.id);
-        Set<DataCluster<String>> dataClusters = densityBasedScan.findClusters(10);
+        Set<DataCluster<String>> dataClusters = densityBasedScan.query(10d);
 
         assert(dataClusters.stream().findFirst().get().elements.size() == 1);
     }
@@ -48,7 +48,7 @@ public class DensityBasedScanTest {
         DensityBasedScan<Singuity, String> densityBasedScan = new DensityBasedScan<>(singuities,
                 singuity -> singuity.position,
                 singuity -> singuity.id);
-        Set<DataCluster<String>> dataClusters = densityBasedScan.findClusters(400);
+        Set<DataCluster<String>> dataClusters = densityBasedScan.query(400d);
 
         assert(dataClusters.size() == 3);
         dataClusters.forEach(stringDataCluster -> {
@@ -71,7 +71,7 @@ public class DensityBasedScanTest {
         long x1 = System.currentTimeMillis();
         AtomicReference<Set<DataCluster<String>>> atomicReference = new AtomicReference<>();
         IntStream.range(0, 1000).forEach(i -> {
-            atomicReference.set(densityBasedScan.findClusters(1000));
+            atomicReference.set(densityBasedScan.query(1000d));
         });
         long x2 = System.currentTimeMillis();
 

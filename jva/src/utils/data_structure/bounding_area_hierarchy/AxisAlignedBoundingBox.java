@@ -1,4 +1,4 @@
-package utils.data_structure.bounding_area_hierarchy.basic;
+package utils.data_structure.bounding_area_hierarchy;
 
 import utils.math.vector.Vector2;
 

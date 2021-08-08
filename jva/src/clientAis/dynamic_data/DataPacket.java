@@ -94,12 +94,12 @@ public class DataPacket {
                 .collect(Collectors.toList()),
                 singuity -> singuity.position,
                 singuity -> singuity.id);
-        this.ownedClusters = ownedSinguityDensityScanner.findClusters(DENSITY_SCAN_RADIUS);
+        this.ownedClusters = ownedSinguityDensityScanner.query(DENSITY_SCAN_RADIUS);
         final DensityBasedScan<Singuity, String> adverseSinguityDensityScanner = new DensityBasedScan<>(adverseSinguities.stream()
                 .map(singuityIdMap::get)
                 .collect(Collectors.toList()),
                 singuity -> singuity.position,
                 singuity -> singuity.id);
-        this.adverseClusters = adverseSinguityDensityScanner.findClusters(DENSITY_SCAN_RADIUS);
+        this.adverseClusters = adverseSinguityDensityScanner.query(DENSITY_SCAN_RADIUS);
     }
 }

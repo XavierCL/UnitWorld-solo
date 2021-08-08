@@ -1,6 +1,7 @@
 package utils.data_structure.bounding_area_hierarchy.query_removal;
 
-import utils.data_structure.bounding_area_hierarchy.basic.AxisAlignedBoundingBox;
+import utils.data_structure.bounding_area_hierarchy.AxisAlignedBoundingBox;
+import utils.data_structure.bounding_area_hierarchy.basic.Queryable;
 import utils.data_structure.morton_encoding.MortonMapper;
 import utils.data_structure.tree.binary.basic.ParentedNode;
 import utils.math.vector.Vector2;
@@ -10,7 +11,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class BAHQueryRemoval<T> {
+public class BAHQueryRemoval<T> implements Queryable<Circle, List<T>> {
 
     protected final Optional<ParentedNode<AxisAlignedBoundingBox, T>> root;
     protected final Function<T, Vector2> leafObjectPositionMapper;
@@ -36,6 +37,7 @@ public class BAHQueryRemoval<T> {
         }
     }
 
+    @Override
     public List<T> query(final Circle collidingRegion) {
         final List<T> collidingElements = new ArrayList<>();
         final AxisAlignedBoundingBox regionAabb = collidingRegion.toAabb();

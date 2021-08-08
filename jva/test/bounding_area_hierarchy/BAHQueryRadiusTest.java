@@ -2,7 +2,7 @@ package bounding_area_hierarchy;
 
 import clientAis.communications.game_data.Singuity;
 import org.junit.jupiter.api.Test;
-import utils.data_structure.bounding_area_hierarchy.basic.BoundingAreaHierarchy;
+import utils.data_structure.bounding_area_hierarchy.query_radius.BAHQueryRadius;
 import utils.math.vector.Vector2;
 import utils.shape.Circle;
 
@@ -11,17 +11,17 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
-public class BoundingAreaHierarchyTest {
+public class BAHQueryRadiusTest {
 
     @Test
     public void SingleSinguityInCenterWithBigEnoughQueryArea() {
         final List<Singuity> singuities = new ArrayList<>();
         singuities.add(new Singuity(new Vector2(0, 0)));
 
-        final BoundingAreaHierarchy<Singuity> boundingAreaHierarchy = new BoundingAreaHierarchy<>(singuities, singuity -> singuity.position);
+        final BAHQueryRadius<Singuity> BAHQueryRadius = new BAHQueryRadius<>(singuities, singuity -> singuity.position);
 
         final Circle queryArea = new Circle(new Vector2(30, 40), 100);
-        List<Singuity> inboundSinguities = boundingAreaHierarchy.query(queryArea);
+        List<Singuity> inboundSinguities = BAHQueryRadius.query(queryArea);
 
         assert(singuities.get(0) == inboundSinguities.get(0));
     }
@@ -31,10 +31,10 @@ public class BoundingAreaHierarchyTest {
         final List<Singuity> singuities = new ArrayList<>();
         singuities.add(new Singuity(new Vector2(0, 0)));
 
-        final BoundingAreaHierarchy<Singuity> boundingAreaHierarchy = new BoundingAreaHierarchy<>(singuities, singuity -> singuity.position);
+        final BAHQueryRadius<Singuity> BAHQueryRadius = new BAHQueryRadius<>(singuities, singuity -> singuity.position);
 
         final Circle queryArea = new Circle(new Vector2(30, 40), 10);
-        List<Singuity> inboundSinguities = boundingAreaHierarchy.query(queryArea);
+        List<Singuity> inboundSinguities = BAHQueryRadius.query(queryArea);
 
         assert(inboundSinguities.isEmpty());
     }
@@ -46,10 +46,10 @@ public class BoundingAreaHierarchyTest {
         singuities.add(inboundSinguity);
         singuities.add(new Singuity(new Vector2(1000, 1000)));
 
-        final BoundingAreaHierarchy<Singuity> boundingAreaHierarchy = new BoundingAreaHierarchy<>(singuities, singuity -> singuity.position);
+        final BAHQueryRadius<Singuity> BAHQueryRadius = new BAHQueryRadius<>(singuities, singuity -> singuity.position);
 
         final Circle queryArea = new Circle(new Vector2(10, 10), 20);
-        List<Singuity> inboundSinguities = boundingAreaHierarchy.query(queryArea);
+        List<Singuity> inboundSinguities = BAHQueryRadius.query(queryArea);
 
         assert(inboundSinguities.get(0) == inboundSinguity);
         assert(inboundSinguities.size() == 1);
@@ -63,10 +63,10 @@ public class BoundingAreaHierarchyTest {
         singuities.add(new Singuity(new Vector2(1000, 1000)));
         singuities.add(new Singuity(new Vector2(-1000, -1000)));
 
-        final BoundingAreaHierarchy<Singuity> boundingAreaHierarchy = new BoundingAreaHierarchy<>(singuities, singuity -> singuity.position);
+        final BAHQueryRadius<Singuity> BAHQueryRadius = new BAHQueryRadius<>(singuities, singuity -> singuity.position);
 
         final Circle queryArea = new Circle(new Vector2(10, 10), 20);
-        List<Singuity> inboundSinguities = boundingAreaHierarchy.query(queryArea);
+        List<Singuity> inboundSinguities = BAHQueryRadius.query(queryArea);
 
         assert(inboundSinguities.get(0) == inboundSinguity);
         assert(inboundSinguities.size() == 1);
@@ -90,10 +90,10 @@ public class BoundingAreaHierarchyTest {
 
         singuities.addAll(inQueryZoneSinguities);
 
-        final BoundingAreaHierarchy<Singuity> boundingAreaHierarchy = new BoundingAreaHierarchy<>(singuities, singuity -> singuity.position);
+        final BAHQueryRadius<Singuity> BAHQueryRadius = new BAHQueryRadius<>(singuities, singuity -> singuity.position);
 
         final Circle queryArea = new Circle(new Vector2(4000, 3300), 10000);
-        List<Singuity> inboundSinguities = boundingAreaHierarchy.query(queryArea);
+        List<Singuity> inboundSinguities = BAHQueryRadius.query(queryArea);
 
         assert(inboundSinguities.containsAll(inQueryZoneSinguities));
     }
@@ -106,7 +106,7 @@ public class BoundingAreaHierarchyTest {
             singuities.add(new Singuity(new Vector2(Math.random()*10000, Math.random()*10000)));
         });
 
-        final BoundingAreaHierarchy<Singuity> boundingAreaHierarchy = new BoundingAreaHierarchy<>(singuities, singuity -> singuity.position);
+        final BAHQueryRadius<Singuity> BAHQueryRadius = new BAHQueryRadius<>(singuities, singuity -> singuity.position);
 
         final Circle queryArea = new Circle(new Vector2(4000, 3300), 1000);
 
@@ -114,7 +114,7 @@ public class BoundingAreaHierarchyTest {
 
         AtomicReference<List<Singuity>> atomicReference = new AtomicReference<>();
         IntStream.range(0, 1000).forEach(j -> {
-            atomicReference.set(boundingAreaHierarchy.query(queryArea));
+            atomicReference.set(BAHQueryRadius.query(queryArea));
         });
 
         long x2 = System.currentTimeMillis();

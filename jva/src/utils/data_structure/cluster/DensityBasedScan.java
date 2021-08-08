@@ -1,5 +1,6 @@
 package utils.data_structure.cluster;
 
+import utils.data_structure.bounding_area_hierarchy.basic.Queryable;
 import utils.data_structure.bounding_area_hierarchy.query_removal.BAHQueryRemoval;
 import utils.math.vector.Vector2;
 import utils.shape.Circle;
@@ -7,7 +8,7 @@ import utils.shape.Circle;
 import java.util.*;
 import java.util.function.Function;
 
-public class DensityBasedScan<T, ID> {
+public class DensityBasedScan<T, ID> implements Queryable<Double, Set<DataCluster<ID>>> {
 
     private final BAHQueryRemoval<T> bahQueryRemoval;
     private final List<T> elements;
@@ -23,7 +24,8 @@ public class DensityBasedScan<T, ID> {
         this.elementIdMapper = elementIdMapper;
     }
 
-    public Set<DataCluster<ID>> findClusters(final double radiusSize) {
+    @Override
+    public Set<DataCluster<ID>> query(final Double radiusSize) {
         this.scanRadiusSize = radiusSize;
         final List<DataCluster<ID>> dataClusters = new ArrayList<>();
         final Set<T> remainingSinguities = new LinkedHashSet<>(elements);
