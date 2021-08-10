@@ -1,11 +1,10 @@
-import math
 from typing import Any, List, Tuple
 
 import numpy as np
 from sklearn.neighbors import KDTree
 
 from clientAis.ais.Artificial import Artificial
-from clientAis.communications.GameState import GameState, Singuity, Spawner, SpawnerAllegence
+from clientAis.games.GameState import GameState, Singuity, Spawner, SpawnerAllegence
 from clientAis.communications.ServerCommander import ServerCommander
 from utils import arrays
 

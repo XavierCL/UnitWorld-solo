@@ -1,4 +1,4 @@
-from clientAis.communications.GameState import GameState
+from clientAis.games.GameState import GameState
 from clientAis.communications.ServerCommander import ServerCommander
 
 class Artificial:

@@ -33,6 +33,8 @@ class MobileDestination:
 
 class Singuity:
     MAX_HEALTH_POINT = 20
+    ATTACK_STRENGTH = 5
+    ATTACK_FRAME_LAG = 10
 
     def __init__(self, data: dict):
         self.id: str = data["i"]
@@ -46,6 +48,7 @@ class Singuity:
 class Spawner:
     MAX_HEALTH_POINTS = 50_000
     REQUIRED_CAPTURING_SINGUITIES = 100
+    GESTATION_FRAME_LAG = 900
 
     def __init__(self, data: dict):
         self.id: str = data["i"]
@@ -56,10 +59,10 @@ class Spawner:
         self.totalSpawnCount: int = data["t"]
         self.lastClaimFrameCount: int = data["c"]
 
-    def remainingSinguitiesToClaim(self, currentPlayerId):
+    def remainingSinguitiesToClaim(self, playerId):
         if self.allegence is None:
             return Spawner.REQUIRED_CAPTURING_SINGUITIES
-        elif self.allegence.playerId == currentPlayerId:
+        elif self.allegence.playerId == playerId:
             if self.allegence.isClaimed:
                 return 0
             else:

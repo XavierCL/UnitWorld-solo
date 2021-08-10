@@ -2,11 +2,8 @@ import sys
 import time
 from typing import Callable, Dict
 
-import numpy as np
-from sklearn.cluster import AgglomerativeClustering, DBSCAN
-from sklearn.neighbors import KDTree
-
 from clientAis.ais.Artificial import Artificial
+from clientAis.ais.discreteV1.DiscreteV1Ai import DiscreteV1Ai
 from clientAis.ais.packing.PackingAi import PackingAi
 from clientAis.ais.packingAhead.PackingAheadAi import PackingAheadAi
 from clientAis.ais.packingBehind.PackingBehindAi import PackingBehindAi
@@ -41,6 +38,7 @@ ais: Dict[str, Callable[[ServerCommander], Artificial]] = {
     "quickAttack": lambda serverCommander: QuickAttackAi(serverCommander),
     "packingAhead": lambda serverCommander: PackingAheadAi(serverCommander),
     "packingBehind": lambda serverCommander: PackingBehindAi(serverCommander),
+    "discreteV1": lambda serverCommander: DiscreteV1Ai(serverCommander)
 }
 
 def clientConnectorCallBack(communicationHandler: CommunicationHandler):

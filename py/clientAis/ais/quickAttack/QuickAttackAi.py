@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.neighbors import KDTree
 
 from clientAis.ais.Artificial import Artificial
-from clientAis.communications.GameState import GameState, Spawner
+from clientAis.games.GameState import GameState, Spawner
 
 class QuickAttackAi(Artificial):
     def frame(self, gameState: GameState, currentPlayerId: str):

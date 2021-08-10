@@ -1,6 +1,6 @@
 import threading
 
-from clientAis.communications.GameState import GameStateMessage
+from clientAis.games.GameState import GameStateMessage
 from clientAis.communications.MessageSerializer import MessageSerializer
 from clientAis.games.GameManager import GameManager
 from clientAis.networking.CommunicationHandler import CommunicationHandler

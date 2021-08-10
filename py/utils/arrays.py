@@ -1,4 +1,4 @@
-from typing import List, TypeVar, Union
+from typing import Callable, Iterable, List, TypeVar, Union
 
 import numpy as np
 
@@ -28,3 +28,10 @@ def assign(arr: np.ndarray, indices, values) -> np.ndarray:
     arr = np.copy(arr)
     arr[indices] = values
     return arr
+
+def first(arr: Iterable[Nested], predicate: Callable[[Nested], bool]) -> Nested:
+    for value in arr:
+        if predicate(value):
+            return value
+
+    raise Exception("Could not find first value within array")
