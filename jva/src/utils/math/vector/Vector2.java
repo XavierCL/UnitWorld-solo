@@ -3,6 +3,9 @@ package utils.math.vector;
 import net.minidev.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class Vector2 implements Serializable {
 
@@ -164,5 +167,18 @@ public class Vector2 implements Serializable {
 
     public Vector2 inverse() {
         return new Vector2(1/x, 1/y);
+    }
+
+    public static Optional<Vector2> centerOfMass(final Collection<Vector2> vectors) {
+        return vectors.stream()
+                .reduce(Vector2::plus)
+                .map(v -> v.scaled(1.0/vectors.size()));
+    }
+
+    public static <U> Optional<Vector2> centerOfMass(final Collection<U> objects, Function<U, Vector2> vectorMapper) {
+        return objects.stream()
+                .map(vectorMapper)
+                .reduce(Vector2::plus)
+                .map(v -> v.scaled(1.0/objects.size()));
     }
 }
