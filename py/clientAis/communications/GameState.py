@@ -1,3 +1,4 @@
+import math
 from typing import List
 
 import numpy as np
@@ -54,6 +55,17 @@ class Spawner:
         self.lastSpawnFrame: int = data["l"]
         self.totalSpawnCount: int = data["t"]
         self.lastClaimFrameCount: int = data["c"]
+
+    def remainingSinguitiesToClaim(self, currentPlayerId):
+        if self.allegence is None:
+            return Spawner.REQUIRED_CAPTURING_SINGUITIES
+        elif self.allegence.playerId == currentPlayerId:
+            if self.allegence.isClaimed:
+                return 0
+            else:
+                return int(math.ceil(Spawner.REQUIRED_CAPTURING_SINGUITIES - Spawner.REQUIRED_CAPTURING_SINGUITIES * self.allegence.healthPoints / Spawner.MAX_HEALTH_POINTS))
+        else:
+            return Spawner.REQUIRED_CAPTURING_SINGUITIES
 
 class GameState:
     def __init__(self, data: dict):

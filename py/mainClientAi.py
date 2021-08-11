@@ -2,10 +2,18 @@ import sys
 import time
 from typing import Callable, Dict
 
+import numpy as np
+from sklearn.cluster import AgglomerativeClustering, DBSCAN
+from sklearn.neighbors import KDTree
+
 from clientAis.ais.Artificial import Artificial
-from clientAis.ais.SingleMindClosest.SingleMindClosest import SingleMindClosest
-from clientAis.ais.Voider.Voider import Voider
-from clientAis.ais.PropagatingVision.PropagatingVision import PropagatingVision
+from clientAis.ais.packing.PackingAi import PackingAi
+from clientAis.ais.packingAhead.PackingAheadAi import PackingAheadAi
+from clientAis.ais.packingBehind.PackingBehindAi import PackingBehindAi
+from clientAis.ais.quickAttack.QuickAttackAi import QuickAttackAi
+from clientAis.ais.singleMindClosest.SingleMindClosestAi import SingleMindClosestAi
+from clientAis.ais.Voider.VoiderAi import VoiderAi
+from clientAis.ais.propagatingVision.PropagatingVisionAi import PropagatingVisionAi
 from clientAis.networking.ClientConnector import ClientConnector
 from clientAis.communications.MessageSerializer import MessageSerializer
 from clientAis.games.GameManager import GameManager
@@ -18,7 +26,7 @@ commandLineOptions = {key: value for key, value in zip(arrays.soft_accessor(sys.
 
 DEFAULT_SERVER_IP = "127.0.0.1"
 DEFAULT_SERVER_PORT = 52124
-DEFAULT_AI_NAME = "singleMindClosest"
+DEFAULT_AI_NAME = "packing"
 SECOND_BETWEEN_AI_FRAME = 0.5
 
 serverIp = commandLineOptions.get("serverIp") or DEFAULT_SERVER_IP
@@ -26,9 +34,13 @@ serverPort = int(commandLineOptions.get("serverPort") or DEFAULT_SERVER_PORT)
 aiName = commandLineOptions.get("aiName") or DEFAULT_AI_NAME
 
 ais: Dict[str, Callable[[ServerCommander], Artificial]] = {
-    "voider": lambda serverCommander: Voider(serverCommander),
-    "singleMindClosest": lambda serverCommander: SingleMindClosest(serverCommander),
-    "propagatingVision": lambda serverCommander: PropagatingVision(serverCommander)
+    "voider": lambda serverCommander: VoiderAi(serverCommander),
+    "singleMindClosest": lambda serverCommander: SingleMindClosestAi(serverCommander),
+    "propagatingVision": lambda serverCommander: PropagatingVisionAi(serverCommander),
+    "packing": lambda serverCommander: PackingAi(serverCommander),
+    "quickAttack": lambda serverCommander: QuickAttackAi(serverCommander),
+    "packingAhead": lambda serverCommander: PackingAheadAi(serverCommander),
+    "packingBehind": lambda serverCommander: PackingBehindAi(serverCommander),
 }
 
 def clientConnectorCallBack(communicationHandler: CommunicationHandler):
