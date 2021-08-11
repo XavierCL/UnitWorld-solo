@@ -11,7 +11,6 @@ import utils.minion.MinionState;
 import utils.minion.MinionWielder;
 
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -32,7 +31,7 @@ public class AttackEnemySpawner extends MinionState {
                 .map(id -> input.value1.singuityIdMap.get(id)).collect(Collectors.toSet());
         final Set<Spawner> attackableSpawners = input.value1.adverseSpawners.stream()
                 .map(id -> input.value1.spawnerIdMap.get(id)).collect(Collectors.toSet());
-        final Optional<Vector2> centerOfMassOpt = computeCenterOfMass(singuities);
+        final Optional<Vector2> centerOfMassOpt = Vector2.centerOfMass(singuities, singuity -> singuity.position);
         centerOfMassOpt.ifPresent(centerOfMass -> {
             closestSpawnerOpt.set(attackableSpawners.stream()
                     .min(Comparator.comparingDouble(spawner -> spawner.position.minus(centerOfMass).magnitudeSquared()))
@@ -49,14 +48,6 @@ public class AttackEnemySpawner extends MinionState {
     public Consumer<ServerCommander> exec(final Tuple2<DataPacket, Minion> input) {
         return serverCommander -> closestSpawnerOpt.get().ifPresent(closestSpawner ->
                 serverCommander.moveUnitsToPosition(input.value2.singuities, input.value1.spawnerIdMap.get(closestSpawner).position));
-    }
-
-    private Optional<Vector2> computeCenterOfMass(final Set<Singuity> singuities) {
-        return singuities.stream()
-                .filter(Objects::nonNull)
-                .map(singuity -> singuity.position)
-                .reduce(Vector2::plus)
-                .map(v -> v.scaled(1.0/singuities.size()));
     }
 
     @Override

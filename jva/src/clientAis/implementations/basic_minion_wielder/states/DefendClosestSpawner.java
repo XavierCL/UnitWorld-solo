@@ -12,7 +12,6 @@ import utils.minion.MinionState;
 import utils.minion.MinionWielder;
 
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -46,7 +45,7 @@ public class DefendClosestSpawner extends MinionState {
         final Optional<DataCluster<String>> biggestThreat = input.value1.adverseClusters.stream()
                 .reduce((c1, c2) -> c1.elements.size() > c2.elements.size() ? c1 : c2);
 
-        Optional<Vector2> threateningPosition = computeCenterOfMass(singuities);
+        Optional<Vector2> threateningPosition = Vector2.centerOfMass(singuities, singuity -> singuity.position);
         if(biggestThreat.isPresent()) {
             threateningPosition = Vector2.centerOfMass(biggestThreat.get().elements.stream().map(input.value1.singuityIdMap::get).collect(Collectors.toSet()), s -> s.position);
         }
@@ -61,19 +60,11 @@ public class DefendClosestSpawner extends MinionState {
                 serverCommander.moveUnitsToPosition(input.value2.singuities, closestSpawner.position));
     }
 
-    private Optional<Vector2> computeCenterOfMass(final Set<Singuity> singuities) {
-        return singuities.stream()
-                .filter(Objects::nonNull)
-                .map(singuity -> singuity.position)
-                .reduce(Vector2::plus)
-                .map(v -> v.scaled(1.0/singuities.size()));
-    }
-
     @Override
     public MinionState next(final Tuple2<DataPacket, Minion> input) {
         if(input.value2.singuities.size() > (100 + (50 * input.value1.ownedSpawners.size()))) {
             final MinionState challengeClosestSpawner = new ChallengeClosestSpawner(getMinionWielder());
-            final Minion splitted = input.value2.split(challengeClosestSpawner, 110);
+            final Minion splitted = input.value2.split(challengeClosestSpawner, 100);
             getMinionWielder().addMinion(splitted);
         }
         // attack if enemy made a mistake

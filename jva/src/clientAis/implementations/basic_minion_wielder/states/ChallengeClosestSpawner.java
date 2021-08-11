@@ -11,7 +11,6 @@ import utils.minion.MinionState;
 import utils.minion.MinionWielder;
 
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -32,7 +31,7 @@ public class ChallengeClosestSpawner extends MinionState {
                 .map(id -> input.value1.singuityIdMap.get(id)).collect(Collectors.toSet());
         final Set<Spawner> challengableSpawners = input.value1.freeSpawners.stream()
                 .map(id -> input.value1.spawnerIdMap.get(id)).collect(Collectors.toSet());
-        final Optional<Vector2> centerOfMassOpt = computeCenterOfMass(singuities);
+        final Optional<Vector2> centerOfMassOpt = Vector2.centerOfMass(singuities, singuity -> singuity.position);
         centerOfMassOpt.ifPresent(centerOfMass -> {
             closestSpawnerOpt.set(challengableSpawners.stream()
                     .min(Comparator.comparingDouble(spawner -> spawner.position.minus(centerOfMass).magnitudeSquared()))
@@ -47,13 +46,6 @@ public class ChallengeClosestSpawner extends MinionState {
 
     @Override
     public Consumer<ServerCommander> exec(final Tuple2<DataPacket, Minion> input) {
-        final Set<Singuity> singuities = input.value2.singuities.stream()
-                .map(id -> input.value1.singuityIdMap.get(id)).collect(Collectors.toSet());
-        final Set<Spawner> challengableSpawners = input.value1.freeSpawners.stream()
-                .map(id -> input.value1.spawnerIdMap.get(id)).collect(Collectors.toSet());
-
-        final Optional<Vector2> centerOfMassOpt = computeCenterOfMass(singuities);
-
         closestSpawnerOpt.get().ifPresent(spawner -> {
             if(input.value1.ownedSpawners.contains(spawner)) {
                 closestSpawnerOpt.set(Optional.empty());
@@ -65,14 +57,6 @@ public class ChallengeClosestSpawner extends MinionState {
 
         return serverCommander -> closestSpawnerOpt.get().ifPresent(closestSpawner ->
                 serverCommander.moveUnitsToSpawner(input.value2.singuities, closestSpawner));
-    }
-
-    private Optional<Vector2> computeCenterOfMass(final Set<Singuity> singuities) {
-        return singuities.stream()
-                .filter(Objects::nonNull)
-                .map(singuity -> singuity.position)
-                .reduce(Vector2::plus)
-                .map(v -> v.scaled(1.0/singuities.size()));
     }
 
     @Override
