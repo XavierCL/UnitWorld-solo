@@ -7,9 +7,9 @@ import clientAis.dynamic_data.DataPacket;
 import utils.data_structure.cluster.DataCluster;
 import utils.data_structure.tupple.Tuple2;
 import utils.math.vector.Vector2;
-import utils.minion.Minion;
-import utils.minion.MinionState;
-import utils.minion.MinionWielder;
+import utils.unit_world.minion.Minion;
+import utils.unit_world.minion.MinionState;
+import utils.unit_world.minion.MinionWielder;
 import utils.state_machine.State;
 
 import java.util.Comparator;
@@ -79,5 +79,10 @@ public class DefendClosestSpawner extends MinionState {
     @Override
     public void debug(final Tuple2<DataPacket, Minion> input) {
 
+    }
+
+    @Override
+    public String getName() {
+        return "defend";
     }
 }

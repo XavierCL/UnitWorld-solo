@@ -52,4 +52,8 @@ public class Minion implements Behaviour<DataPacket, Consumer<ServerCommander>> 
 
         return newSinguitySet;
     }
+
+    public String getRunningStateName() {
+        return stateMachine.getRunningStateName();
+    }
 }

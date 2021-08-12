@@ -1,4 +1,4 @@
-package clientAis.implementations.basic_minion_wielder.states;
+package clientAis.implementations.threat_level_defender.states;
 
 import clientAis.communications.ServerCommander;
 import clientAis.communications.game_data.Singuity;
@@ -6,9 +6,9 @@ import clientAis.communications.game_data.Spawner;
 import clientAis.dynamic_data.DataPacket;
 import utils.data_structure.tupple.Tuple2;
 import utils.math.vector.Vector2;
-import utils.minion.Minion;
-import utils.minion.MinionState;
-import utils.minion.MinionWielder;
+import utils.unit_world.minion.Minion;
+import utils.unit_world.minion.MinionState;
+import utils.unit_world.minion.MinionWielder;
 
 import java.util.Comparator;
 import java.util.Optional;
@@ -70,5 +70,10 @@ public class ChallengeClosestSpawner extends MinionState {
     @Override
     public void debug(final Tuple2<DataPacket, Minion> input) {
 
+    }
+
+    @Override
+    public String getName() {
+        return "challenge";
     }
 }

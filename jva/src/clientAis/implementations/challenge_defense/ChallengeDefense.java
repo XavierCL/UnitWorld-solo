@@ -4,8 +4,8 @@ import clientAis.communications.ServerCommander;
 import clientAis.dynamic_data.DataPacket;
 import clientAis.implementations.Bot;
 import clientAis.implementations.challenge_defense.states.ChallengeClosestSpawner;
-import utils.minion.Minion;
-import utils.minion.MinionWielder;
+import utils.unit_world.minion.Minion;
+import utils.unit_world.minion.MinionWielder;
 
 import java.util.*;
 import java.util.function.Consumer;

@@ -21,7 +21,7 @@ public class SpawnerThreatEvaluator {
             adverseClusters.forEach(adverseCluster -> {
                 final Optional<Vector2> centerOfMassOpt = Vector2.centerOfMass(adverseCluster.elements, singuity -> singuity.position);
                 centerOfMassOpt.ifPresent(centerOfMass -> {
-                    final Double clusterThreat = adverseCluster.elements.size() / spawner.position.minus(centerOfMass).magnitudeSquared();
+                    final Double clusterThreat = adverseCluster.elements.size() / (spawner.position.minus(centerOfMass).magnitudeSquared() * 50);
                     threat.set(threat.get() + clusterThreat);
                 });
             });

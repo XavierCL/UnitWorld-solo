@@ -8,8 +8,8 @@ import clientAis.implementations.Bot;
 import clientAis.implementations.basic_minion_wielder.states.DefendClosestSpawner;
 import utils.data_structure.cluster.DataCluster;
 import utils.math.vector.Vector2;
-import utils.minion.Minion;
-import utils.minion.MinionWielder;
+import utils.unit_world.minion.Minion;
+import utils.unit_world.minion.MinionWielder;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -36,8 +36,6 @@ public class BasicMinionWielder implements Bot, MinionWielder {
                 .collect(Collectors.toSet());
 
         updateMinionList();
-
-        System.out.println(minions.size());
 
         return serverCommander -> commandList.forEach(serverCommanderConsumer ->
                 serverCommanderConsumer.accept(serverCommander));

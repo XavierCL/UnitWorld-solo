@@ -7,9 +7,9 @@ import clientAis.dynamic_data.DataPacket;
 import utils.data_structure.cluster.DataCluster;
 import utils.data_structure.tupple.Tuple2;
 import utils.math.vector.Vector2;
-import utils.minion.Minion;
-import utils.minion.MinionState;
-import utils.minion.MinionWielder;
+import utils.unit_world.minion.Minion;
+import utils.unit_world.minion.MinionState;
+import utils.unit_world.minion.MinionWielder;
 
 import java.util.Comparator;
 import java.util.Optional;
@@ -62,15 +62,18 @@ public class DefendClosestSpawner extends MinionState {
 
     @Override
     public MinionState next(final Tuple2<DataPacket, Minion> input) {
-        if(input.value2.singuities.size() > (100 + (50 * input.value1.ownedSpawners.size()))) {
+        if(input.value2.singuities.size() > (100 + (20 * input.value1.ownedSpawners.size()))
+                && input.value1.freeSpawners.size() > 0) {
             final MinionState challengeClosestSpawner = new ChallengeClosestSpawner(getMinionWielder());
             final Minion splitted = input.value2.split(challengeClosestSpawner, 100);
             getMinionWielder().addMinion(splitted);
         }
         // attack if enemy made a mistake
-        if(input.value2.singuities.size() > input.value1.adverseSinguities.size()*4
+        if(input.value2.singuities.size() > input.value1.adverseSinguities.size()*3.5
                 && input.value2.singuities.size() > 150) {
-            return new AttackEnemySpawner(getMinionWielder());
+            final MinionState challengeClosestSpawner = new AttackEnemySpawner(getMinionWielder());
+            final Minion splitted = input.value2.split(challengeClosestSpawner, input.value2.singuities.size()-10);
+            getMinionWielder().addMinion(splitted);
         }
         return this;
     }
@@ -78,5 +81,10 @@ public class DefendClosestSpawner extends MinionState {
     @Override
     public void debug(final Tuple2<DataPacket, Minion> input) {
 
+    }
+
+    @Override
+    public String getName() {
+        return "defend";
     }
 }

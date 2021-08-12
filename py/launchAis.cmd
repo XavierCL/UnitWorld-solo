@@ -1,1 +1,1 @@
-python mainLevelGenerator.py
+python mainGameLauncher.py

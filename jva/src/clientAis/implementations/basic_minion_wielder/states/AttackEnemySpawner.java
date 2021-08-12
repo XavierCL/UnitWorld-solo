@@ -6,9 +6,9 @@ import clientAis.communications.game_data.Spawner;
 import clientAis.dynamic_data.DataPacket;
 import utils.data_structure.tupple.Tuple2;
 import utils.math.vector.Vector2;
-import utils.minion.Minion;
-import utils.minion.MinionState;
-import utils.minion.MinionWielder;
+import utils.unit_world.minion.Minion;
+import utils.unit_world.minion.MinionState;
+import utils.unit_world.minion.MinionWielder;
 
 import java.util.Comparator;
 import java.util.Optional;
@@ -54,11 +54,11 @@ public class AttackEnemySpawner extends MinionState {
     public MinionState next(final Tuple2<DataPacket, Minion> input) {
         if(closestSpawnerOpt.get().isPresent()) {
             if(input.value1.freeSpawners.contains(closestSpawnerOpt.get().get())) {
-                return new DefendClosestSpawner(getMinionWielder());
+                getMinionWielder().removeMinion(input.value2);
             }
         }
         if(input.value2.singuities.size() < 50) {
-            return new DefendClosestSpawner(getMinionWielder());
+            getMinionWielder().removeMinion(input.value2);
         }
         return this;
     }
@@ -66,5 +66,10 @@ public class AttackEnemySpawner extends MinionState {
     @Override
     public void debug(final Tuple2<DataPacket, Minion> input) {
 
+    }
+
+    @Override
+    public String getName() {
+        return "attack";
     }
 }

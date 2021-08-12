@@ -5,7 +5,9 @@ import clientAis.communications.game_data.Singuity;
 import clientAis.communications.game_data.Spawner;
 import utils.data_structure.cluster.DataCluster;
 import utils.data_structure.cluster.DensityBasedScan;
-import utils.game_data_resources.SinguityResourceHandler;
+import utils.unit_world.game_data_resources.MemoryResource;
+import utils.unit_world.game_data_resources.singuity.SinguityResourceHandler;
+import utils.unit_world.game_data_resources.spawner.OwnedSpawnerResourceHandler;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,7 +16,8 @@ public class DataPacket {
 
     public static final double DENSITY_SCAN_RADIUS = 20;
 
-    public static final SinguityResourceHandler singuityResourceHandler = new SinguityResourceHandler();
+    public static final MemoryResource<String> singuityResourceHandler = new SinguityResourceHandler();
+    public static final MemoryResource<String> ownedSpawnerResourceHandler = new OwnedSpawnerResourceHandler();
 
     public final GameState gameState;
     public final String playerId;
@@ -100,6 +103,8 @@ public class DataPacket {
         attackableSpawners.addAll(adverseSpawners);
         attackableSpawners.addAll(freeSpawners);
 
+        // owned spawner resource handler
+        DataPacket.ownedSpawnerResourceHandler.actualize(ownedSpawners);
 
         // setup clusters
         final DensityBasedScan<Singuity, String> ownedSinguityDensityScanner = new DensityBasedScan<>(ownedSinguities.stream()

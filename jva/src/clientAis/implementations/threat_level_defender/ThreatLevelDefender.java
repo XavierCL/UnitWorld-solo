@@ -30,13 +30,23 @@ public class ThreatLevelDefender implements Bot, MinionWielder {
                 .map(minion -> minion.exec(input))
                 .collect(Collectors.toSet());
 
-        updateMinionList();
+        updateMinionList(input);
 
         return serverCommander -> commandList.forEach(serverCommanderConsumer ->
                 serverCommanderConsumer.accept(serverCommander));
     }
 
-    private void updateMinionList() {
+    private void updateMinionList(DataPacket input) {
+        final Set<Minion> defenders = minions.stream()
+                .filter(minion -> minion.getRunningStateName().equals("defend"))
+                .collect(Collectors.toSet());
+        if(defenders.size() < input.ownedSpawners.size()) {
+            minionsToAdd.add(new Minion(new DefendClosestSpawner(this)));
+        }
+        else if(defenders.size() > input.ownedSpawners.size()) {
+            minionsToRemove.add(defenders.stream().findFirst().get());
+        }
+
         minions.addAll(minionsToAdd);
         minions.stream()
                 .filter(minion -> minions.size() > 1)
