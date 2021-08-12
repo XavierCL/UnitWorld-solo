@@ -35,6 +35,7 @@ class Singuity:
     MAX_HEALTH_POINT = 20
     ATTACK_STRENGTH = 5
     ATTACK_FRAME_LAG = 10
+    MAXIMUM_UNITS_PER_FRAME = 4
 
     def __init__(self, data: dict):
         self.id: str = data["i"]
@@ -49,6 +50,7 @@ class Spawner:
     MAX_HEALTH_POINTS = 50_000
     REQUIRED_CAPTURING_SINGUITIES = 100
     GESTATION_FRAME_LAG = 900
+    SPAWN_FRAME_LAG = 30
 
     def __init__(self, data: dict):
         self.id: str = data["i"]

@@ -24,6 +24,5 @@ for gameFileName in gameFileNames:
 
 gameLauncher = GameLauncher(lastGamePath, pythonExecutablePath, javaAiFolder)
 gameLauncher.runServerBackground()
-gameLauncher.runPythonAiBackground(aiName="packingAhead")
-gameLauncher.runPythonAiBackground(aiName="packing")
-gameLauncher.runCppClientGuiObserverBlocking()
+# gameLauncher.runPythonAiBackground(aiName="packingAhead")
+gameLauncher.runCppClientGuiPlayerBlocking()

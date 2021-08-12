@@ -23,7 +23,7 @@ commandLineOptions = {key: value for key, value in zip(arrays.soft_accessor(sys.
 
 DEFAULT_SERVER_IP = "127.0.0.1"
 DEFAULT_SERVER_PORT = 52124
-DEFAULT_AI_NAME = "packing"
+DEFAULT_AI_NAME = "discreteV1"
 SECOND_BETWEEN_AI_FRAME = 0.5
 
 serverIp = commandLineOptions.get("serverIp") or DEFAULT_SERVER_IP
