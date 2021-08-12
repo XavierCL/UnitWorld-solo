@@ -1,4 +1,6 @@
-package utils.game_data_resources;
+package utils.unit_world.game_data_resources.singuity;
+
+import utils.unit_world.game_data_resources.MemoryResource;
 
 import java.util.*;
 import java.util.function.*;

@@ -1,4 +1,4 @@
-package utils.minion;
+package utils.unit_world.minion;
 
 import java.util.Set;
 

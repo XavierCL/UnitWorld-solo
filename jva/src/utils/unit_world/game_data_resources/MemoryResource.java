@@ -1,4 +1,4 @@
-package utils.game_data_resources;
+package utils.unit_world.game_data_resources;
 
 import java.util.function.Function;
 import java.util.Set;
