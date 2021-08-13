@@ -1,7 +1,7 @@
 from typing import Dict, List
 
-from clientAis.ais.discreteV1.DiscreteGameState import DiscreteGameState, DiscretePlayer, DiscreteSpawner, DiscreteSpawnerAllegence
-from clientAis.ais.discreteV1.DiscreteMove import DiscreteMove
+from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState, DiscretePlayer, DiscreteSpawner, DiscreteSpawnerAllegence
+from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
 from clientAis.ais.discreteV1.Move import Move
 from clientAis.games.GameState import Spawner
 from utils import arrays
@@ -16,7 +16,7 @@ class PlanExecuter:
 
     @staticmethod
     def executeSpawnerMove(spawner: DiscreteSpawner, move: DiscreteMove, player: DiscretePlayer, currentFrame: int) -> DiscreteSpawner:
-        if move.spawnerId is not None and move.spawnerId == move.spawnerId:
+        if move.spawnerId is not None and move.spawnerId == spawner.id:
             remainingSinguities = spawner.remainingSinguitiesToCapture(player.id)
             if player.singuityCount >= remainingSinguities:
                 return DiscreteSpawner(spawner.id, spawner.position, DiscreteSpawnerAllegence(True, player.id, Spawner.MAX_HEALTH_POINTS), currentFrame + move.totalFrameCount)

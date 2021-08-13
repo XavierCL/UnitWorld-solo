@@ -1,7 +1,7 @@
-from typing import List, Tuple
+from typing import List
 
-from clientAis.ais.discreteV1.DiscreteGameState import DiscreteGameState
-from clientAis.ais.discreteV1.DiscreteMove import DiscreteMove
+from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
+from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
 
 class DiscretePlanGenerator:
     def generatePlans(self, gameState: DiscreteGameState, playerId: str) -> List[List[DiscreteMove]]:

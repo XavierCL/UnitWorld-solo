@@ -1,9 +1,9 @@
 from typing import Tuple
 
 from clientAis.ais.discreteV1.DiscreteGameScorer import DiscreteGameScorer
-from clientAis.ais.discreteV1.DiscreteGameState import DiscreteGameState
-from clientAis.ais.discreteV1.DiscretePlanGenerator import DiscretePlanGenerator
-from clientAis.ais.discreteV1.PlanExecuter import PlanExecuter
+from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
+from clientAis.ais.discreteV1.Plans.DiscretePlanGenerator import DiscretePlanGenerator
+from clientAis.ais.discreteV1.Plans.PlanExecuter import PlanExecuter
 
 class DiscreteGameSearcher:
     def __init__(self, moveGenerator: DiscretePlanGenerator, gameScorer: DiscreteGameScorer, depth: int):
@@ -47,7 +47,7 @@ class DiscreteGameSearcher:
         for plan in plans[1:]:
             outcomeGameState = PlanExecuter.executeGameStatePlan(gameState, plan)
             score, frameCount = self.getRecursiveBestPlanScore(outcomeGameState, depth - 1)
-            frameCount += max([move.totalFrameCount for move in plans[0]])
+            frameCount += max([move.totalFrameCount for move in plan])
 
             if score > bestScore or score == bestScore and frameCount < bestFrameCount:
                 bestScore = score

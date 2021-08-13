@@ -3,8 +3,8 @@ from typing import List
 from clientAis.ais.Artificial import Artificial
 from clientAis.ais.discreteV1.DiscreteGameScorer import DiscreteGameScorer
 from clientAis.ais.discreteV1.DiscreteGameSearcher import DiscreteGameSearcher
-from clientAis.ais.discreteV1.DiscreteGameState import DiscreteGameState
-from clientAis.ais.discreteV1.DiscretePlanGenerator import DiscretePlanGenerator
+from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
+from clientAis.ais.discreteV1.Plans.DiscretePlanGenerator import DiscretePlanGenerator
 from clientAis.ais.discreteV1.Move import Move
 from clientAis.games.GameState import GameState
 from clientAis.communications.ServerCommander import ServerCommander

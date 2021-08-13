@@ -1,6 +1,6 @@
 import numpy as np
 
-from clientAis.ais.discreteV1.DiscreteGameState import DiscreteGameState
+from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
 from clientAis.games.GameState import Spawner
 
 class DiscreteGameScorer:

@@ -4,7 +4,7 @@ from typing import Optional
 
 import numpy as np
 
-from clientAis.ais.discreteV1.DiscreteGameState import DiscreteGameState, DiscretePlayer, DiscreteSpawner
+from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState, DiscretePlayer, DiscreteSpawner
 from clientAis.ais.discreteV1.PhysicsEstimator import PhysicsEstimator
 
 class DiscreteMove:
