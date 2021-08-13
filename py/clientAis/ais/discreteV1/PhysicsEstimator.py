@@ -6,6 +6,7 @@ from clientAis.games.GameState import Singuity, Spawner
 
 class PhysicsEstimator:
     SINGUITY_ATTACK_PER_FRAME = Singuity.ATTACK_STRENGTH / Singuity.ATTACK_FRAME_LAG
+    SPAWNER_SPAWN_PER_FRAME = 1 / Spawner.SPAWN_FRAME_LAG
 
     @staticmethod
     def estimateMovementDuration(singuitiesPosition, targetPosition) -> int:
@@ -32,7 +33,7 @@ class PhysicsEstimator:
         return remainingHealth
 
     @staticmethod
-    def estimateSpawnerToZeroHealthDurationIntegral(singuityCount: int, spawnerHealthPoints: float, ownSpawnerGestationFrames: List[int]) -> int:
+    def estimateSpawnerToZeroHealthDurationIntegral(singuityCount: int, spawnerHealthPoints: float, ownSpawnerGestationFrames: List[int], returnNewSinguityCount = False) -> Union[int, Tuple[int, int]]:
         if spawnerHealthPoints == 0:
             return 0
 
@@ -53,4 +54,8 @@ class PhysicsEstimator:
             spawnerHealthPoints = newEnemySpawnerHealthPoints
             singuityCount = newOwnSinguityCount
 
-        return frameCount + PhysicsEstimator.estimateSpawnerToZeroHealthDuration(singuityCount, spawnerHealthPoints, len(ownSpawnerGestationFrames))
+        remainingDuration = PhysicsEstimator.estimateSpawnerToZeroHealthDuration(singuityCount, spawnerHealthPoints, len(ownSpawnerGestationFrames))
+
+        if returnNewSinguityCount:
+            return singuityCount + remainingDuration * PhysicsEstimator.SPAWNER_SPAWN_PER_FRAME, frameCount + remainingDuration
+        return frameCount + remainingDuration

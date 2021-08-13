@@ -5,13 +5,11 @@ from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
 
 class DiscretePlanGenerator:
     def generatePlans(self, gameState: DiscreteGameState, playerId: str) -> List[List[DiscreteMove]]:
-        currentPlayer = gameState.playerDictionary[playerId]
-
         moves = []
         for spawner in gameState.spawners:
-            moves.append(DiscreteMove.fromSpawner(gameState, currentPlayer, spawner))
+            moves.append(DiscreteMove.fromSpawner(playerId, spawner.id))
 
         for _, discretePlayer in gameState.playerDictionary.items():
-            moves.append(DiscreteMove.fromPosition(currentPlayer, discretePlayer.singuitiesMeanPosition))
+            moves.append(DiscreteMove.fromPosition(playerId, discretePlayer.singuitiesMeanPosition))
 
         return [[move] for move in moves]
