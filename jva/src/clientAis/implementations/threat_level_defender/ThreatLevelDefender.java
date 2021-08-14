@@ -37,15 +37,6 @@ public class ThreatLevelDefender implements Bot, MinionWielder {
     }
 
     private void updateMinionList(DataPacket input) {
-        final Set<Minion> defenders = minions.stream()
-                .filter(minion -> minion.getRunningStateName().equals("defend"))
-                .collect(Collectors.toSet());
-        if(defenders.size() < input.ownedSpawners.size()) {
-            minionsToAdd.add(new Minion(new DefendClosestSpawner(this)));
-        }
-        else if(defenders.size() > input.ownedSpawners.size()) {
-            minionsToRemove.add(defenders.stream().findFirst().get());
-        }
 
         minions.addAll(minionsToAdd);
         minions.stream()
@@ -58,6 +49,20 @@ public class ThreatLevelDefender implements Bot, MinionWielder {
 
         minionsToAdd.clear();
         minionsToRemove.clear();
+
+        final Set<Minion> defenders = minions.stream()
+                .filter(minion -> minion.getRunningStateName().equals("defend"))
+                .collect(Collectors.toSet());
+        while(defenders.size() < input.ownedSpawners.size()) {
+            defenders.add(new Minion(new DefendClosestSpawner(this)));
+            System.out.println("trying to add defender");
+        }
+        minions.addAll(defenders);
+        while(defenders.size() > input.ownedSpawners.size()) {
+            final Minion minionToRemove = defenders.stream().findFirst().get();
+            defenders.remove(minionToRemove);
+            minions.remove(minionToRemove);
+        }
     }
 
     @Override
