@@ -12,8 +12,8 @@ class DiscreteMove:
         self.minimumMoveTime = minimumMoveTime
 
     @staticmethod
-    def fromSpawner(playerId: str, spawnerId: str) -> DiscreteMove:
-        return DiscreteMove(playerId, spawnerId, None, None)
+    def fromSpawner(playerId: str, spawnerId: str, timeSpentAtSpawner: Optional[int] = None) -> DiscreteMove:
+        return DiscreteMove(playerId, spawnerId, None, timeSpentAtSpawner)
 
     @staticmethod
     def fromPosition(playerId: str, position: np.ndarray, timeSpentAtPosition: Optional[int] = None) -> DiscreteMove:
