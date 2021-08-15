@@ -4,7 +4,8 @@ from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
 from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
 
 class DiscretePlanGenerator:
-    def generatePlans(self, gameState: DiscreteGameState, playerId: str) -> List[List[DiscreteMove]]:
+    @staticmethod
+    def generatePlans(gameState: DiscreteGameState, playerId: str) -> List[List[DiscreteMove]]:
         shortestAllowedMovementDuration = 300
 
         moves = []

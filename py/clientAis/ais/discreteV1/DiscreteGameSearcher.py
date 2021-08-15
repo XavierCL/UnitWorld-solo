@@ -75,14 +75,17 @@ class DiscreteGameNode:
 
         return bestScore
 
+    def developChildren(self) -> List[DiscreteGameNode]:
+        plans = DiscretePlanGenerator.generatePlans(self.gameState, self.gameState.currentPlayerId)
+        self.children = [DiscreteGameNode(self.gameState.executePlan(plan), plan, self.gameState) for plan in plans]
+        return self.children
+
     def restrictDuration(self, frameCount: int) -> DiscreteGameNode:
         self.gameState = self.parentGameState.executePlan(self.previousPlan, restrictedFrameCount=frameCount)
         return self
 
 class DiscreteGameSearcher:
-    def __init__(self, moveGenerator: DiscretePlanGenerator, gameScorer: DiscreteGameScorer, allottedGenerationTimeSeconds=0.3):
-        self.planGenerator = moveGenerator
-        self.gameScorer = gameScorer
+    def __init__(self, allottedGenerationTimeSeconds=0.3):
         self.allottedGenerationTimeSeconds = allottedGenerationTimeSeconds
 
     def getBestOwnPlan(self, gameState: DiscreteGameState):
@@ -97,12 +100,8 @@ class DiscreteGameSearcher:
             frameCounts.pop(0)
             gameNode = gameLeaves.pop(0)
 
-            plans = self.planGenerator.generatePlans(gameNode.gameState, gameNode.gameState.currentPlayerId)
-
-            movedGameNodes = np.array([DiscreteGameNode(gameState.executePlan(plan), plan, gameState) for plan in plans], dtype=object)
+            movedGameNodes = np.array(gameNode.developChildren()[:], dtype=object)
             movedFrameCounts = np.array([g.frameCount for g in movedGameNodes])
-
-            gameNode.children = movedGameNodes
 
             reverseSortedMovedFrameCountIndices = np.argsort(movedFrameCounts)[::-1]
 
@@ -111,9 +110,9 @@ class DiscreteGameSearcher:
 
             frameCountIndices = np.searchsorted(frameCounts, movedFrameCounts)
 
-            for planIndex in range(len(plans)):
-                frameCounts.insert(movedFrameCounts[planIndex], frameCountIndices[planIndex])
-                gameLeaves.insert(movedGameNodes[planIndex], movedGameNodes[planIndex])
+            for childIndex in range(len(movedGameNodes)):
+                frameCounts.insert(movedFrameCounts[childIndex], frameCountIndices[childIndex])
+                gameLeaves.insert(movedGameNodes[childIndex], movedGameNodes[childIndex])
 
         smallestFrameCount = frameCounts[0]
 
