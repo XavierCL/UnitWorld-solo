@@ -26,7 +26,9 @@ class DiscreteV1Ai(Artificial):
         plan: List[Move] = self.gameSearcher.getBestOwnPlan(currentGameState)
 
         for move in plan:
-            if move.targetsPosition:
+            if move.singuityIds is None:
+                continue
+            elif move.targetsPosition:
                 self.serverCommander.moveUnitsToPosition(move.singuityIds, move.position)
             else:
                 self.serverCommander.moveUnitsToSpawner(move.singuityIds, move.spawnerId)

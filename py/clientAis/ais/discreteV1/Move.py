@@ -22,3 +22,7 @@ class Move:
             return Move(False, singuityIds, spawner.id, spawner.position)
         else:
             return Move(True, singuityIds, spawner.id, spawner.position)
+
+    @staticmethod
+    def fromNothing():
+        return Move(False, None, None, None)

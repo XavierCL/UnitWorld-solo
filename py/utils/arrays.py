@@ -1,4 +1,4 @@
-from typing import Callable, Iterable, List, TypeVar, Union
+from typing import Callable, Iterable, List, Tuple, TypeVar, Union
 
 import numpy as np
 
@@ -29,9 +29,20 @@ def assign(arr: np.ndarray, indices, values) -> np.ndarray:
     arr[indices] = values
     return arr
 
+def assignInline(arr, indices, values):
+    arr[indices] = values
+    return arr
+
 def first(arr: Iterable[Nested], predicate: Callable[[Nested], bool]) -> Nested:
     for value in arr:
         if predicate(value):
             return value
 
     raise Exception("Could not find first value within array")
+
+def combineMeanStdAndCount(mean1: Nested = 0, std1: Nested = 1, count1: int = 1, mean2: Nested = 0, std2: Nested = 1, count2: int = 1) -> Tuple[Nested, Nested, int]:
+    return (
+        (mean1 * count1 + mean2 * count2) / (count1 + count2),
+        ((count1 - 1) * std1 ** 2 + (count2 - 1) * std2 ** 2) / (count1 + count2 - 1) + (count1 * count2 * (mean1 - mean2) ** 2) / ((count1 + count2) * (count1 + count2 - 1)),
+        count1 + count2
+    )
