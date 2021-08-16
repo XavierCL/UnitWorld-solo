@@ -24,38 +24,39 @@ class DiscretePlayer:
         singuityPositions = [s.position for s in playerSinguities]
         return DiscretePlayer(playerId, len(playerSinguities), np.median(singuityPositions, axis=0), np.linalg.norm(np.std(singuityPositions, axis=0)))
 
-    def executeMove(self, move: DiscreteMove, getLastSpawnerVersion: Callable[[str], DiscreteSpawner], setSpawner: Callable[[str, DiscreteSpawner], Any], frameBeforeMove: int, restrictedDuration: int = None) -> Tuple[int, DiscretePlayer]:
+    def executeMove(self, move: DiscreteMove, getLastSpawnerVersion: Callable[[str], DiscreteSpawner], setSpawner: Callable[[str, DiscreteSpawner], Any], frameBeforeMove: int, restrictedDuration: Optional[int] = None) -> Tuple[int, DiscretePlayer]:
         targetPosition = move.position if move.position is not None else getLastSpawnerVersion(move.spawnerId).position
         movementDuration = PhysicsEstimator.estimateMovementDuration(self.singuitiesMeanPosition, targetPosition)
 
         def getLastingMoveDuration(moveDuration: int) -> int:
-            if move.minimumMoveTime is not None and move.minimumMoveTime > moveDuration:
-                return move.minimumMoveTime
+            minimumBoundDuration = moveDuration if move.minimumMoveTime is None else max(moveDuration, move.minimumMoveTime)
+            maximumBoundDuration = minimumBoundDuration if restrictedDuration is None else min(minimumBoundDuration, restrictedDuration)
+            return maximumBoundDuration
 
-            return moveDuration
-
-        if movementDuration > restrictedDuration:
-            return restrictedDuration, DiscretePlayer(self.id, self.singuityCount, self.singuitiesMeanPosition + (targetPosition - self.singuitiesMeanPosition) * (restrictedDuration / movementDuration), self.singuitiesStd)
+        lastingMovementDuration = getLastingMoveDuration(movementDuration)
+        if lastingMovementDuration < movementDuration:
+            return lastingMovementDuration, DiscretePlayer(self.id, self.singuityCount, self.singuitiesMeanPosition + (targetPosition - self.singuitiesMeanPosition) * (lastingMovementDuration / movementDuration), self.singuitiesStd)
 
         if move.spawnerId is None:
-            return getLastingMoveDuration(movementDuration), DiscretePlayer(self.id, self.singuityCount, targetPosition, self.singuitiesStd)
+            return lastingMovementDuration, DiscretePlayer(self.id, self.singuityCount, targetPosition, self.singuitiesStd)
         else:
             spawner = getLastSpawnerVersion(move.spawnerId)
 
             if spawner.isClaimed() and spawner.isAllegedToPlayer(move.playerId):
-                return getLastingMoveDuration(movementDuration), DiscretePlayer(self.id, self.singuityCount, targetPosition, self.singuitiesStd)
+                return lastingMovementDuration, DiscretePlayer(self.id, self.singuityCount, targetPosition, self.singuitiesStd)
 
             else:
                 durationToDeath = PhysicsEstimator.estimateSpawnerToZeroHealthDuration(self.singuityCount, spawner.getHealthPoints())
 
-                if movementDuration + durationToDeath > restrictedDuration:
-                    setSpawner(spawner.id, spawner.attackedFor(self.singuityCount, restrictedDuration - movementDuration))
-                    return restrictedDuration, DiscretePlayer(self.id, self.singuityCount, spawner.position, self.singuitiesStd)
+                lastingKillDuration = getLastingMoveDuration(movementDuration + durationToDeath)
+                if lastingKillDuration < movementDuration + durationToDeath:
+                    setSpawner(spawner.id, spawner.attackedFor(self.singuityCount, lastingKillDuration - movementDuration))
+                    return lastingKillDuration, DiscretePlayer(self.id, self.singuityCount, spawner.position, self.singuitiesStd)
 
-                setSpawner(spawner.id, spawner.tryClaimedBy(self.id, self.singuityCount, frameBeforeMove + movementDuration))
+                setSpawner(spawner.id, spawner.tryClaimedBy(self.id, self.singuityCount, frameBeforeMove + movementDuration + durationToDeath))
 
                 return (
-                    getLastingMoveDuration(movementDuration + durationToDeath),
+                    lastingKillDuration,
                     DiscretePlayer(self.id, max(self.singuityCount - spawner.remainingSinguitiesToCapture(self.id), 0), spawner.position, self.singuitiesStd)
                 )
 
@@ -182,11 +183,11 @@ class DiscreteGameState:
 
         return DiscreteGameState(currentPlayerId, playerDictionary, playerIds, currentPlayerIndex, spawners, spawnersById, gameState.frameCount, gameState)
 
-    def executePlan(self, plan: List[DiscreteMove], restrictedFrameCount: int = None) -> DiscreteGameState:
-        if restrictedFrameCount <= self.frameCount:
+    def executePlan(self, plan: List[DiscreteMove], restrictedFrameCount: Optional[int] = None) -> DiscreteGameState:
+        if restrictedFrameCount is not None and restrictedFrameCount <= self.frameCount:
             return self
 
-        restrictedDuration = restrictedFrameCount - self.frameCount
+        restrictedDuration = None if restrictedFrameCount is None else restrictedFrameCount - self.frameCount
 
         newPlayersById: Dict[str, DiscretePlayer] = {}
         newSpawnersById: Dict[str, DiscreteSpawner] = {}

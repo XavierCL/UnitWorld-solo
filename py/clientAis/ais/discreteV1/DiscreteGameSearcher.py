@@ -89,6 +89,7 @@ class DiscreteGameSearcher:
         self.allottedGenerationTimeSeconds = allottedGenerationTimeSeconds
 
     def getBestOwnPlan(self, gameState: DiscreteGameState):
+        developedGameStates = 0
         rootGameNode = DiscreteGameNode(gameState, None, None)
 
         frameCounts: List[int] = [gameState.frameCount]
@@ -97,11 +98,12 @@ class DiscreteGameSearcher:
         startTime = time.time()
 
         while time.time() - startTime < self.allottedGenerationTimeSeconds:
+            developedGameStates += 1
             frameCounts.pop(0)
             gameNode = gameLeaves.pop(0)
 
             movedGameNodes = np.array(gameNode.developChildren()[:], dtype=object)
-            movedFrameCounts = np.array([g.frameCount for g in movedGameNodes])
+            movedFrameCounts = np.array([childNode.gameState.frameCount for childNode in movedGameNodes])
 
             reverseSortedMovedFrameCountIndices = np.argsort(movedFrameCounts)[::-1]
 
@@ -111,12 +113,14 @@ class DiscreteGameSearcher:
             frameCountIndices = np.searchsorted(frameCounts, movedFrameCounts)
 
             for childIndex in range(len(movedGameNodes)):
-                frameCounts.insert(movedFrameCounts[childIndex], frameCountIndices[childIndex])
-                gameLeaves.insert(movedGameNodes[childIndex], movedGameNodes[childIndex])
+                frameCounts.insert(frameCountIndices[childIndex], movedFrameCounts[childIndex])
+                gameLeaves.insert(frameCountIndices[childIndex], movedGameNodes[childIndex])
 
         smallestFrameCount = frameCounts[0]
 
         for gameLeaf in gameLeaves:
             gameLeaf.restrictDuration(smallestFrameCount)
 
-        return rootGameNode.getBestPlan()
+        print(f"Developed game nodes: {developedGameStates}")
+
+        return [rootGameNode.gameState.discreteMoveToMove(discreteMove) for discreteMove in rootGameNode.getBestPlan()]

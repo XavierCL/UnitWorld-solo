@@ -63,7 +63,9 @@ def clientConnectorCallBack(communicationHandler: CommunicationHandler):
         while not communicationHandler.closed:
             timeBeforeFrame = time.time()
 
-            if gameManager.gameState is not None and gameManager.gameState.frameCount > lastAiGameStateVersion:
+            hasNewFrame = gameManager.gameState is not None and gameManager.gameState.frameCount > lastAiGameStateVersion
+
+            if hasNewFrame:
                 lastAiGameStateVersion = gameManager.gameState.frameCount
                 artificial.frame(gameManager.gameState, gameManager.currentPlayerId)
 
@@ -71,6 +73,9 @@ def clientConnectorCallBack(communicationHandler: CommunicationHandler):
 
             frameTimeInSecond = timeAfterFrame - timeBeforeFrame
 
+            if not hasNewFrame:
+                print(f"No new frame. Sleeping {SECOND_BETWEEN_AI_FRAME:.3f}s.")
+                time.sleep(SECOND_BETWEEN_AI_FRAME)
             if frameTimeInSecond < SECOND_BETWEEN_AI_FRAME:
                 print(f"Frame {0 if gameManager.gameState is None else gameManager.gameState.frameCount} took {frameTimeInSecond:.3f}s. Sleeping {SECOND_BETWEEN_AI_FRAME - frameTimeInSecond:.3f}s.")
                 time.sleep(SECOND_BETWEEN_AI_FRAME - frameTimeInSecond)
