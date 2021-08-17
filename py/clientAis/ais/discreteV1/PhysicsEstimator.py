@@ -19,6 +19,10 @@ class PhysicsEstimator:
     @staticmethod
     def estimateSpawnerToZeroHealthDuration(singuityCount: int, spawnerHealthPoints: float, spawnerCount: int = 0) -> int:
         if spawnerCount == 0:
+
+            if singuityCount == 0:
+                return Spawner.MAX_HEALTH_POINTS**2 / PhysicsEstimator.SINGUITY_ATTACK_PER_FRAME
+
             return spawnerHealthPoints / (singuityCount * PhysicsEstimator.SINGUITY_ATTACK_PER_FRAME)
 
         c = -spawnerHealthPoints / PhysicsEstimator.SINGUITY_ATTACK_PER_FRAME

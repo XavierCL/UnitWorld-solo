@@ -71,12 +71,12 @@ class DiscretePlayer:
     def appendNewSpawned(self, spawner, anteMoveFrameCount: int, postMoveFrameCount: int) -> DiscretePlayer:
         matureSpawnerDuration = min(postMoveFrameCount - anteMoveFrameCount, postMoveFrameCount - spawner.lastFrameClaimed + Spawner.GESTATION_FRAME_LAG)
         durationToTarget = PhysicsEstimator.estimateMovementDuration(spawner.position, self.singuitiesMeanPosition)
-        atTargetCount = max((matureSpawnerDuration - durationToTarget) * PhysicsEstimator.SPAWNER_SPAWN_PER_FRAME, 0)
+        atTargetCount = round(max((matureSpawnerDuration - durationToTarget) * PhysicsEstimator.SPAWNER_SPAWN_PER_FRAME, 0))
         distanceFromSpawnerToMeanPosition = np.linalg.norm(self.singuitiesMeanPosition - spawner.position)
         maxDistanceFromTime = matureSpawnerDuration * Singuity.MAXIMUM_UNITS_PER_FRAME
         furthestSinguityRatio = 1 if distanceFromSpawnerToMeanPosition <= maxDistanceFromTime else maxDistanceFromTime / distanceFromSpawnerToMeanPosition
         unitPositionInLine = (spawner.position + (self.singuitiesMeanPosition - spawner.position) * furthestSinguityRatio / 2)
-        unitCountInLine = PhysicsEstimator.distanceToSpawningSinguities(distanceFromSpawnerToMeanPosition * furthestSinguityRatio)
+        unitCountInLine = round(PhysicsEstimator.distanceToSpawningSinguities(distanceFromSpawnerToMeanPosition * furthestSinguityRatio))
         singuitiesInLineStd = distanceFromSpawnerToMeanPosition * furthestSinguityRatio / 4
 
         newSinguitiesMean, newSinguitiesStd, newSinguitiesCount = arrays.combineMeanStdAndCount(

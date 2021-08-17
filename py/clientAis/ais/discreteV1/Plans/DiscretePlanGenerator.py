@@ -6,7 +6,7 @@ from clientAis.ais.discreteV1.PhysicsEstimator import PhysicsEstimator
 from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
 
 class DiscretePlanGenerator:
-    MINIMUM_MOVEMENT_DURATION = 60
+    MINIMUM_MOVEMENT_DURATION = 150
 
     @staticmethod
     def generatePlans(gameState: DiscreteGameState, playerId: str) -> List[List[DiscreteMove]]:

@@ -41,8 +41,15 @@ def first(arr: Iterable[Nested], predicate: Callable[[Nested], bool]) -> Nested:
     raise Exception("Could not find first value within array")
 
 def combineMeanStdAndCount(mean1: Nested = 0, std1: Nested = 1, count1: int = 1, mean2: Nested = 0, std2: Nested = 1, count2: int = 1) -> Tuple[Nested, Nested, int]:
+    if count1 < 1 and count2 < 1:
+        return (mean1 + mean2) / 2, 0, 0
+    elif count1 < 1:
+        return mean2, std2, count2
+    elif count2 < 1:
+        return mean1, std2, count1
+
     return (
         (mean1 * count1 + mean2 * count2) / (count1 + count2),
-        ((count1 - 1) * std1 ** 2 + (count2 - 1) * std2 ** 2) / (count1 + count2 - 1) + (count1 * count2 * (mean1 - mean2) ** 2) / ((count1 + count2) * (count1 + count2 - 1)),
+        np.sqrt(((count1 - 1) * std1 ** 2 + (count2 - 1) * std2 ** 2) / (count1 + count2 - 1) + (count1 * count2 * (mean1 - mean2) ** 2) / ((count1 + count2) * (count1 + count2 - 1))),
         count1 + count2
     )
