@@ -23,13 +23,16 @@ class ServerReceiver:
         self.loopThread.join()
 
     def loopReceive(self):
-        while not self.communicationHandler.closed:
-            communication = self.communicationHandler.receive()
-            communications = self.messageSerializer.deserialize(communication)
+        try:
+            while not self.communicationHandler.closed:
+                communication = self.communicationHandler.receive()
+                communications = self.messageSerializer.deserialize(communication)
 
-            for communication in communications:
-                if communication["timestamp"] > self.lastReceivedTimestamp:
-                    self.lastReceivedTimestamp = communication["timestamp"]
-                    gameStateMessage = GameStateMessage(communication["data"])
-                    self.gameManager.setCurrentPlayerId(gameStateMessage.currentPlayer)
-                    self.gameManager.setNextCompleteGameState(gameStateMessage.gameState)
+                for communication in communications:
+                    if communication["timestamp"] > self.lastReceivedTimestamp:
+                        self.lastReceivedTimestamp = communication["timestamp"]
+                        gameStateMessage = GameStateMessage(communication["data"])
+                        self.gameManager.setCurrentPlayerId(gameStateMessage.currentPlayer)
+                        self.gameManager.setNextCompleteGameState(gameStateMessage.gameState)
+        except ConnectionResetError:
+            print("Connection closed by peer")

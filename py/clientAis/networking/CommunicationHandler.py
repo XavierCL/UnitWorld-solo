@@ -16,7 +16,6 @@ class CommunicationHandler:
             return self.sock.send(communication.encode("ascii"))
         except:
             self.closed = True
-            raise
 
     def receive(self) -> str:
         if self.closed:

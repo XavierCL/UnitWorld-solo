@@ -45,6 +45,14 @@ class DiscretePlayer:
             if spawner.isClaimed() and spawner.isAllegedToPlayer(move.playerId):
                 return lastingMovementDuration, DiscretePlayer(self.id, self.singuityCount, targetPosition, self.singuitiesStd)
 
+            elif spawner.isAllegedToPlayer(move.playerId):
+                setSpawner(spawner.id, spawner.tryClaimedBy(self.id, self.singuityCount, frameBeforeMove + movementDuration))
+
+                return (
+                    lastingMovementDuration,
+                    DiscretePlayer(self.id, max(self.singuityCount - spawner.remainingSinguitiesToCapture(self.id), 0), spawner.position, self.singuitiesStd)
+                )
+
             else:
                 durationToDeath = PhysicsEstimator.estimateSpawnerToZeroHealthDuration(self.singuityCount, spawner.getHealthPoints())
 
@@ -64,10 +72,12 @@ class DiscretePlayer:
         matureSpawnerDuration = min(postMoveFrameCount - anteMoveFrameCount, postMoveFrameCount - spawner.lastFrameClaimed + Spawner.GESTATION_FRAME_LAG)
         durationToTarget = PhysicsEstimator.estimateMovementDuration(spawner.position, self.singuitiesMeanPosition)
         atTargetCount = max((matureSpawnerDuration - durationToTarget) * PhysicsEstimator.SPAWNER_SPAWN_PER_FRAME, 0)
-        furthestSinguityRatio = min(matureSpawnerDuration * Singuity.MAXIMUM_UNITS_PER_FRAME / np.linalg.norm(self.singuitiesMeanPosition - spawner.position), 1)
+        distanceFromSpawnerToMeanPosition = np.linalg.norm(self.singuitiesMeanPosition - spawner.position)
+        maxDistanceFromTime = matureSpawnerDuration * Singuity.MAXIMUM_UNITS_PER_FRAME
+        furthestSinguityRatio = 1 if distanceFromSpawnerToMeanPosition <= maxDistanceFromTime else maxDistanceFromTime / distanceFromSpawnerToMeanPosition
         unitPositionInLine = (spawner.position + (self.singuitiesMeanPosition - spawner.position) * furthestSinguityRatio / 2)
-        unitCountInLine = PhysicsEstimator.distanceToSpawningSinguities(np.linalg.norm(self.singuitiesMeanPosition - spawner.position) * furthestSinguityRatio)
-        singuitiesInLineStd = np.linalg.norm(self.singuitiesMeanPosition - spawner.position) * furthestSinguityRatio / 4
+        unitCountInLine = PhysicsEstimator.distanceToSpawningSinguities(distanceFromSpawnerToMeanPosition * furthestSinguityRatio)
+        singuitiesInLineStd = distanceFromSpawnerToMeanPosition * furthestSinguityRatio / 4
 
         newSinguitiesMean, newSinguitiesStd, newSinguitiesCount = arrays.combineMeanStdAndCount(
             self.singuitiesMeanPosition, np.ones(1), atTargetCount, unitPositionInLine, singuitiesInLineStd, unitCountInLine
@@ -207,8 +217,13 @@ class DiscreteGameState:
         moveDuration = 0
 
         for move in plan:
-            oldPlayer = getLastPlayerVersion(move.playerId)
-            moveDuration, newPlayersById[move.playerId] = oldPlayer.executeMove(move, getLastSpawnerVersion, lambda sid, s: arrays.assignInline(newSpawnersById, sid, s), self.frameCount, restrictedDuration=restrictedDuration)
+            moveDuration, newPlayersById[move.playerId] = getLastPlayerVersion(move.playerId).executeMove(
+                move,
+                getLastSpawnerVersion,
+                lambda sid, s: arrays.assignInline(newSpawnersById, sid, s),
+                self.frameCount,
+                restrictedDuration=restrictedDuration
+            )
 
         # Assign new spawned singuities
         for spawner in self.spawners:
