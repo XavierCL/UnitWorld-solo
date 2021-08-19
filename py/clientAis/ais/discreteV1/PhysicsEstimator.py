@@ -13,8 +13,11 @@ class PhysicsEstimator:
         return distance * PhysicsEstimator.SPAWNER_SPAWN_PER_FRAME / Singuity.MAXIMUM_UNITS_PER_FRAME
 
     @staticmethod
-    def estimateMovementDuration(singuitiesPosition, targetPosition) -> int:
-        return np.linalg.norm(targetPosition - singuitiesPosition) / Singuity.MAXIMUM_UNITS_PER_FRAME
+    def estimateMovementDuration(singuitiesPosition, targetPosition, clusterStd=None) -> int:
+        if clusterStd is None:
+            return np.linalg.norm(targetPosition - singuitiesPosition) / Singuity.MAXIMUM_UNITS_PER_FRAME
+
+        return (np.linalg.norm(targetPosition - singuitiesPosition) + clusterStd) / Singuity.MAXIMUM_UNITS_PER_FRAME
 
     @staticmethod
     def estimateSpawnerToZeroHealthDuration(singuityCount: int, spawnerHealthPoints: float, spawnerCount: int = 0) -> int:

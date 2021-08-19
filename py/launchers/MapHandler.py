@@ -75,6 +75,9 @@ class MapHandler:
             arrays.assign(np.zeros((discreteMapSize, discreteMapSize), dtype=bool).reshape(-1), homeSquareIndex, True).reshape(discreteMapSize, -1)
         )
 
+        # Removing neutral spawner from home location
+        symmetricSpawnerConfig[homeSpawnerConfig] = False
+
         # Generating final spawner array
         viewPointInGameUnit = mapSizeInGameUnits - mapBordersInGameUnit
         gamePositionOffset = (mapSizeInGameUnits - viewPointInGameUnit * (discreteMapSize - 1) / discreteMapSize) / 2

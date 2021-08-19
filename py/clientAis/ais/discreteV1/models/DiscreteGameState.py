@@ -26,7 +26,7 @@ class DiscretePlayer:
 
     def executeMove(self, move: DiscreteMove, getLastSpawnerVersion: Callable[[str], DiscreteSpawner], setSpawner: Callable[[str, DiscreteSpawner], Any], frameBeforeMove: int, restrictedDuration: Optional[int] = None) -> Tuple[int, DiscretePlayer]:
         targetPosition = move.position if move.position is not None else getLastSpawnerVersion(move.spawnerId).position
-        movementDuration = PhysicsEstimator.estimateMovementDuration(self.singuitiesMeanPosition, targetPosition)
+        movementDuration = PhysicsEstimator.estimateMovementDuration(self.singuitiesMeanPosition, targetPosition, clusterStd=self.singuitiesStd)
 
         def getLastingMoveDuration(moveDuration: int) -> int:
             minimumBoundDuration = moveDuration if move.minimumMoveTime is None else max(moveDuration, move.minimumMoveTime)
@@ -155,8 +155,6 @@ class DiscreteGameState:
         self,
         currentPlayerId: str,
         playerDictionary: Dict[str, DiscretePlayer],
-        playerIds: List[str],
-        currentPlayerIndex: int,
         spawners: List[DiscreteSpawner],
         spawnersById: Dict[str, DiscreteSpawner],
         frameCount: int,
@@ -164,8 +162,6 @@ class DiscreteGameState:
     ):
         self.currentPlayerId = currentPlayerId
         self.playerDictionary = playerDictionary
-        self.playerIds = playerIds
-        self.currentPlayerIndex = currentPlayerIndex
         self.spawners = spawners
         self.spawnersById = spawnersById
         self.frameCount = frameCount
@@ -176,14 +172,18 @@ class DiscreteGameState:
 
     @staticmethod
     def fromGameState(gameState: GameState, currentPlayerId: str) -> DiscreteGameState:
-        playerCount = len(gameState.players)
         playerDictionary: Dict[str, DiscretePlayer] = {}
-        playerIds: List[str] = [None for _ in range(playerCount)]
+        playerIds: List[str] = []
         currentPlayerIndex = None
 
         for playerIndex, player in enumerate(gameState.players):
-            playerDictionary[player.id] = DiscretePlayer.fromGameState(gameState, player.id)
-            playerIds[playerIndex] = player.id
+            discretePlayer = DiscretePlayer.fromGameState(gameState, player.id)
+
+            if discretePlayer.singuityCount == 0 and len([s for s in gameState.spawners if s.allegence is not None and s.allegence.isClaimed and s.allegence.playerId == player.id]) == 0:
+                continue
+
+            playerDictionary[player.id] = discretePlayer
+            playerIds.append(player.id)
 
             if player.id == currentPlayerId:
                 currentPlayerIndex = playerIndex
@@ -191,7 +191,7 @@ class DiscreteGameState:
         spawners = [DiscreteSpawner.fromSpawner(s) for s in gameState.spawners]
         spawnersById: Dict[str, DiscreteSpawner] = {s.id: s for s in spawners}
 
-        return DiscreteGameState(currentPlayerId, playerDictionary, playerIds, currentPlayerIndex, spawners, spawnersById, gameState.frameCount, gameState)
+        return DiscreteGameState(currentPlayerId, playerDictionary, spawners, spawnersById, gameState.frameCount, gameState)
 
     def executePlan(self, plan: List[DiscreteMove], restrictedFrameCount: Optional[int] = None) -> DiscreteGameState:
         if restrictedFrameCount is not None and restrictedFrameCount <= self.frameCount:
@@ -234,9 +234,7 @@ class DiscreteGameState:
 
         return DiscreteGameState(
             self.currentPlayerId,
-            {playerId: getLastPlayerVersion(playerId) for playerId in self.playerIds},
-            self.playerIds,
-            self.currentPlayerIndex,
+            {playerId: getLastPlayerVersion(playerId) for playerId in self.playerDictionary.keys()},
             [getLastSpawnerVersion(spawner.id) for spawner in self.spawners],
             {spawner.id: getLastSpawnerVersion(spawner.id) for spawner in self.spawners},
             self.frameCount + moveDuration,
