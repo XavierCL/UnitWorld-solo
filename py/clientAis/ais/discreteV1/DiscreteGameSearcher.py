@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import random
 import time
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 import numpy as np
 
@@ -93,8 +93,8 @@ class DiscreteGameNode:
         return bestScore.prependPath(bestIndex)
 
     def developChildren(self) -> List[DiscreteGameNode]:
-        plans = DiscretePlanGenerator.generatePlans(self.gameState, self.gameState.currentPlayerId)
-        self.children = [DiscreteGameNode(self.gameState.executePlan(plan), plan, self.gameState, self.depth + 1) for plan in plans]
+        nextSteps = DiscretePlanGenerator.executeStep(self.gameState, self.gameState.currentPlayerId)
+        self.children = [DiscreteGameNode(nextGameState, nextMove, self.gameState, self.depth + 1) for nextMove, nextGameState in nextSteps]
         return self.children
 
     def restrictDuration(self, frameCount: int) -> DiscreteGameNode:
@@ -142,7 +142,7 @@ class DiscreteGameSearcher:
         smallestFrameCount = min(frameCounts[0:1] + [g.gameState.frameCount for g in orphanGameLeaves])
 
         for gameLeaf in gameLeaves + orphanGameLeaves:
-            gameLeaf.restrictDuration(smallestFrameCount)
+            gameLeaf.restrictDuration(smallestFrameCount + 0.001)
 
         print(f"Developed game nodes: {developedGameStates}")
 

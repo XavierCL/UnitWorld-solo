@@ -3,69 +3,68 @@ from typing import List, Tuple
 import numpy as np
 
 from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
-from clientAis.ais.discreteV1.PhysicsEstimator import PhysicsEstimator
 from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
 
 class DiscretePlanGenerator:
     MINIMUM_MOVEMENT_DURATION = 150
-    ALLOWED_NEUTRAL_CAPTURE_MOVES = None
-    ALLOWED_ENEMY_SPAWNER_MOVES = None
-    ALLOWED_OWN_SPAWNER_MOVES = None
+    ALLOWED_NEUTRAL_CLAIM_MOVES = 2
+    ALLOWED_ENEMY_CLAIM_MOVES = 2
+    ALLOWED_OWN_SPAWNER_MOVES = 1
 
     @staticmethod
-    def generatePlans(gameState: DiscreteGameState, playerId: str) -> List[List[DiscreteMove]]:
-        generatedMoves, shortestAllowedNeutralMovementDuration = DiscretePlanGenerator.generateNeutralSpawnerMoves(gameState, playerId)
-        moves = generatedMoves
+    def executeStep(gameState: DiscreteGameState, playerId: str) -> List[Tuple[List[DiscreteMove], DiscreteGameState]]:
+        neutralClaimingMoves = DiscretePlanGenerator.generateNeutralSpawnerMoves(gameState, playerId)
+        neutralClaimingGameStates = [gameState.executePlan([move]) for move in neutralClaimingMoves]
+        neutralClaimingGameStateFrameCounts = [g.frameCount for g in neutralClaimingGameStates]
+        neutralClaimingGameStateFrameCountSortedIndices = np.argsort(neutralClaimingGameStateFrameCounts, kind="stable")
+        neutralClaimingNextSteps: List[Tuple[DiscreteMove, DiscreteGameState]] = list(zip(
+            np.array(neutralClaimingMoves, dtype=object)[neutralClaimingGameStateFrameCountSortedIndices][:DiscretePlanGenerator.ALLOWED_NEUTRAL_CLAIM_MOVES],
+            np.array(neutralClaimingGameStates, dtype=object)[neutralClaimingGameStateFrameCountSortedIndices][:DiscretePlanGenerator.ALLOWED_NEUTRAL_CLAIM_MOVES]
+        ))
 
-        generatedMoves, shortestAllowedEnemyMovementDuration = DiscretePlanGenerator.generateEnemySpawnerMoves(gameState, playerId)
-        moves.extend(generatedMoves)
+        enemyClaimingMoves = DiscretePlanGenerator.generateEnemySpawnerMoves(gameState, playerId)
+        enemyClaimingGameStates = [gameState.executePlan([move]) for move in enemyClaimingMoves]
+        enemyClaimingGameStateFrameCounts = [g.frameCount for g in enemyClaimingGameStates]
+        enemyClaimingGameStateFrameCountSortedIndices = np.argsort(enemyClaimingGameStateFrameCounts, kind="stable")
+        enemyClaimingNextSteps: List[Tuple[DiscreteMove, DiscreteGameState]] = list(zip(
+            np.array(enemyClaimingMoves, dtype=object)[enemyClaimingGameStateFrameCountSortedIndices][:DiscretePlanGenerator.ALLOWED_ENEMY_CLAIM_MOVES],
+            np.array(enemyClaimingGameStates, dtype=object)[enemyClaimingGameStateFrameCountSortedIndices][:DiscretePlanGenerator.ALLOWED_ENEMY_CLAIM_MOVES]
+        ))
 
-        shortestAllowedMovementDuration = min(shortestAllowedNeutralMovementDuration, shortestAllowedEnemyMovementDuration)
+        shortestFrameCounts = [step[1].frameCount for step in neutralClaimingNextSteps[:1] + enemyClaimingNextSteps[:1]]
 
-        moves.extend(DiscretePlanGenerator.generateOwnSpawnerMoves(gameState, playerId, shortestAllowedMovementDuration))
-        moves.extend(DiscretePlanGenerator.generateClusterMoves(gameState, playerId, shortestAllowedMovementDuration))
+        shortestAllowedMoveOnlyDuration = DiscretePlanGenerator.MINIMUM_MOVEMENT_DURATION if len(shortestFrameCounts) == 0 else max(DiscretePlanGenerator.MINIMUM_MOVEMENT_DURATION, min(np.array(shortestFrameCounts) - gameState.frameCount))
 
-        return [[move] for move in moves]
+        nextSteps = neutralClaimingNextSteps + enemyClaimingNextSteps
+
+        nextSteps.extend([(move, gameState.executePlan([move])) for move in DiscretePlanGenerator.generateOwnSpawnerMoves(gameState, playerId, shortestAllowedMoveOnlyDuration)])
+        nextSteps.extend([(move, gameState.executePlan([move])) for move in DiscretePlanGenerator.generateClusterMoves(gameState, playerId, shortestAllowedMoveOnlyDuration)])
+
+        return [([move], gameState) for move, gameState in nextSteps]
 
     @staticmethod
-    def generateNeutralSpawnerMoves(gameState: DiscreteGameState, playerId: str) -> Tuple[List[DiscreteMove], int]:
-        shortestAllowedMovementDuration = float('inf')
+    def generateNeutralSpawnerMoves(gameState: DiscreteGameState, playerId: str) -> List[DiscreteMove]:
         moves = []
-        movementDurations = []
         for spawner in [spawner for spawner in gameState.spawners if not spawner.isClaimed()]:
             moves.append(DiscreteMove.fromSpawner(playerId, spawner.id))
-            movementDuration = PhysicsEstimator.estimateMovementDuration(gameState.playerDictionary[playerId].singuitiesMeanPosition, spawner.position, clusterStd=gameState.playerDictionary[playerId].singuitiesStd)
-            movementDurations.append(movementDuration)
-            shortestAllowedMovementDuration = min(shortestAllowedMovementDuration, max(movementDuration, DiscretePlanGenerator.MINIMUM_MOVEMENT_DURATION))
 
-        sortedMoveIndices = np.argsort(movementDurations, kind="stable")
-        return np.array(moves, dtype=object)[sortedMoveIndices][:DiscretePlanGenerator.ALLOWED_NEUTRAL_CAPTURE_MOVES].tolist(), shortestAllowedMovementDuration
+        return moves
 
     @staticmethod
-    def generateEnemySpawnerMoves(gameState: DiscreteGameState, playerId: str) -> Tuple[List[DiscreteMove], int]:
-        shortestAllowedMovementDuration = float('inf')
+    def generateEnemySpawnerMoves(gameState: DiscreteGameState, playerId: str) -> List[DiscreteMove]:
         moves = []
-        movementDurations = []
         for spawner in [spawner for spawner in gameState.spawners if spawner.isClaimed() and not spawner.isAllegedToPlayer(playerId)]:
             moves.append(DiscreteMove.fromSpawner(playerId, spawner.id))
-            movementDuration = PhysicsEstimator.estimateMovementDuration(gameState.playerDictionary[playerId].singuitiesMeanPosition, spawner.position, clusterStd=gameState.playerDictionary[playerId].singuitiesStd)
-            movementDurations.append(movementDuration)
-            shortestAllowedMovementDuration = min(shortestAllowedMovementDuration, max(movementDuration, DiscretePlanGenerator.MINIMUM_MOVEMENT_DURATION))
 
-        sortedMoveIndices = np.argsort(movementDurations, kind="stable")
-        return np.array(moves, dtype=object)[sortedMoveIndices][:DiscretePlanGenerator.ALLOWED_ENEMY_SPAWNER_MOVES].tolist(), shortestAllowedMovementDuration
+        return moves
 
     @staticmethod
     def generateOwnSpawnerMoves(gameState: DiscreteGameState, playerId: str, shortestAllowedMovementDuration: int) -> List[DiscreteMove]:
         moves = []
-        movementDurations = []
         for spawner in [spawner for spawner in gameState.spawners if spawner.isClaimed() and spawner.isAllegedToPlayer(playerId)]:
-            movementDuration = PhysicsEstimator.estimateMovementDuration(gameState.playerDictionary[playerId].singuitiesMeanPosition, spawner.position, clusterStd=gameState.playerDictionary[playerId].singuitiesStd)
             moves.append(DiscreteMove.fromSpawner(playerId, spawner.id, timeSpentAtSpawner=shortestAllowedMovementDuration))
-            movementDurations.append(movementDuration)
 
-        sortedMoveIndices = np.argsort(movementDurations, kind="stable")
-        return np.array(moves, dtype=object)[sortedMoveIndices][:DiscretePlanGenerator.ALLOWED_OWN_SPAWNER_MOVES].tolist()
+        return moves
 
     @staticmethod
     def generateClusterMoves(gameState: DiscreteGameState, playerId: str, shortestAllowedMovementDuration: int) -> List[DiscreteMove]:

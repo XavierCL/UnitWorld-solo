@@ -1,30 +1,40 @@
-import math
-
 import numpy as np
 
 from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
-from clientAis.games.GameState import Spawner
+from clientAis.ais.discreteV1.PhysicsEstimator import PhysicsEstimator
+from utils import arrays
 
 class DiscreteGameScorer:
+    LONG_TERM_ESTIMATION_DURATION = 1e6
 
     # Returns -1 when all is lost for the current player
     @staticmethod
     def score(gameState: DiscreteGameState, playerId: str) -> float:
-        return DiscreteGameScorer.ownSpawnerRatio(gameState, playerId)
+        playerIds = list(gameState.playerDictionary.keys())
+        playerIndex = arrays.firstIndex(playerIds, playerId)
+
+        if playerIndex == -1:
+            return -1
+
+        longTermSinguityCount = [DiscreteGameScorer.getLongTermSinguityCount(gameState, p) for p in playerIds]
+        currentPlayerSinguityCount = longTermSinguityCount[playerIndex]
+        maxEnemySinguityCount = max(longTermSinguityCount[:playerIndex] + longTermSinguityCount[playerIndex + 1:])
+
+        if currentPlayerSinguityCount == 0:
+            return -1
+        elif maxEnemySinguityCount == -1:
+            return 1
+        else:
+            return (currentPlayerSinguityCount - maxEnemySinguityCount) / (currentPlayerSinguityCount + maxEnemySinguityCount + 1)
 
     @staticmethod
-    def ownSpawnerRatio(gameState: DiscreteGameState, playerId: str) -> float:
-        ownPlayer = gameState.playerDictionary[playerId]
+    def getLongTermSinguityCount(gameState: DiscreteGameState, playerId: str) -> float:
         ownSpawners = [s for s in gameState.spawners if s.isClaimed() and s.isAllegedToPlayer(playerId)]
-        baseScoreOverSpawnerCount = len(ownSpawners)
+        if len(ownSpawners) == 0:
+            return 0
 
-        ownAllegedSpawners = [s for s in gameState.spawners if s.isAllegedToPlayer(playerId)]
+        totalGestationFrames = np.sum([s.frameCountBeforeGestationIsDone(gameState.frameCount) for s in ownSpawners])
 
-        ownSpawnerHealths = np.array([s.getHealthPoints() for s in ownAllegedSpawners])
-        ownSpawnerHealthsOverThird = ownSpawnerHealths / (Spawner.MAX_HEALTH_POINTS * 6)
-        ownSpawnerGestationRatioOverThird = (Spawner.GESTATION_FRAME_LAG - np.array([s.frameCountBeforeGestationIsDone(gameState.frameCount) for s in ownAllegedSpawners])) / (Spawner.GESTATION_FRAME_LAG * 6)
-        singuityStrength = 1 / (ownPlayer.singuityCount / (1 + ownPlayer.singuitiesStd) + 1)
-        biasedOwnSpawnerHealths = (ownSpawnerHealthsOverThird + ownSpawnerGestationRatioOverThird) ** 2
-        ownSpawnerHealthOver1 = np.sum(biasedOwnSpawnerHealths) / len(gameState.spawners) + singuityStrength * (0.5 - math.sqrt(2/6))
-
-        return 2 * (baseScoreOverSpawnerCount + ownSpawnerHealthOver1) / len(gameState.spawners) - 1
+        return gameState.playerDictionary[playerId].singuityCount\
+            + len(ownSpawners) * DiscreteGameScorer.LONG_TERM_ESTIMATION_DURATION * PhysicsEstimator.SPAWNER_SPAWN_PER_FRAME\
+            - totalGestationFrames * PhysicsEstimator.SPAWNER_SPAWN_PER_FRAME

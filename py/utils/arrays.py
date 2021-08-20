@@ -1,4 +1,4 @@
-from typing import Callable, Iterable, List, Tuple, TypeVar, Union
+from typing import Any, Callable, Iterable, List, Optional, Tuple, TypeVar, Union
 
 import numpy as np
 
@@ -53,3 +53,15 @@ def combineMeanStdAndCount(mean1: Nested = 0, std1: Nested = 1, count1: int = 1,
         np.sqrt(((count1 - 1) * std1 ** 2 + (count2 - 1) * std2 ** 2) / (count1 + count2 - 1) + (count1 * count2 * (mean1 - mean2) ** 2) / ((count1 + count2) * (count1 + count2 - 1))),
         count1 + count2
     )
+
+def sort(arr: List[Nested], key: Optional[Callable[[Nested], Any]] = None) -> List[Nested]:
+    copy = arr[:]
+    copy.sort(key)
+    return copy
+
+def firstIndex(arr: Iterable[Nested], value: Nested) -> int:
+    for index, current in enumerate(arr):
+        if current == value:
+            return index
+
+    return -1
