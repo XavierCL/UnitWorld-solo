@@ -1,8 +1,9 @@
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 
 from clientAis.games.GameState import Singuity, Spawner
+from utils import arrays
 
 class PhysicsEstimator:
     SINGUITY_ATTACK_PER_FRAME = Singuity.ATTACK_STRENGTH / Singuity.ATTACK_FRAME_LAG
@@ -10,14 +11,14 @@ class PhysicsEstimator:
 
     @staticmethod
     def distanceToSpawningSinguities(distance: float) -> int:
-        return distance * PhysicsEstimator.SPAWNER_SPAWN_PER_FRAME / Singuity.MAXIMUM_UNITS_PER_FRAME
+        return distance * PhysicsEstimator.SPAWNER_SPAWN_PER_FRAME / Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME
 
     @staticmethod
     def estimateMovementDuration(singuitiesPosition, targetPosition, clusterStd=None) -> int:
         if clusterStd is None:
-            return np.linalg.norm(targetPosition - singuitiesPosition) / Singuity.MAXIMUM_UNITS_PER_FRAME
+            return np.linalg.norm(targetPosition - singuitiesPosition) / Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME
 
-        return (np.linalg.norm(targetPosition - singuitiesPosition) + clusterStd) / Singuity.MAXIMUM_UNITS_PER_FRAME
+        return (np.linalg.norm(targetPosition - singuitiesPosition) + clusterStd) / Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME
 
     @staticmethod
     def estimateSpawnerToZeroHealthDuration(singuityCount: int, spawnerHealthPoints: float, spawnerCount: int = 0) -> int:
@@ -87,3 +88,30 @@ class PhysicsEstimator:
         if returnNewSinguityCount:
             return singuityCount + remainingDuration * PhysicsEstimator.SPAWNER_SPAWN_PER_FRAME, frameCount + remainingDuration
         return frameCount + remainingDuration
+
+    @staticmethod
+    def distance(position1: np.ndarray, position2: np.ndarray) -> float:
+        return np.linalg.norm(position1 - position2)
+
+    @staticmethod
+    def areSinguitiesColliding(position1: np.ndarray, position2: np.ndarray):
+        return np.linalg.norm(position1 - position2) <= 2 * Singuity.ATTACK_RANGE
+
+    @staticmethod
+    def getClusterForce(singuityCount: int, clusterStd: float, averageHealth: float) -> float:
+        return singuityCount * averageHealth / clusterStd
+
+    # Takes in a list of (singuityCount, clusterStd, singuityAverageHealth) and returns a list of singuity count
+    @staticmethod
+    def estimateVoidFight(clusters: List[Tuple[int, float, float]]) -> List[int]:
+        clusterForces = [PhysicsEstimator.getClusterForce(*cluster) for cluster in clusters]
+        maximalForceClusterIndex = np.argmax(clusterForces)
+        averageAdversaryForce = (np.sum(clusterForces) - clusterForces[maximalForceClusterIndex]) / (len(clusters) - 1)
+        maximalRemainingForce = maximalForceClusterIndex - maximalForceClusterIndex/min(Singuity.MAX_HEALTH_POINT / Singuity.ATTACK_STRENGTH, maximalForceClusterIndex / averageAdversaryForce)**2
+        return arrays.assign(np.zeros(len(clusters)), maximalForceClusterIndex, maximalRemainingForce * clusters[maximalForceClusterIndex][1] / clusters[maximalForceClusterIndex][2])
+
+    # Takes in clusters as a list of (singuityCount, clusterStd, singuityAverageHealth) and returns a tuple of (spawnerRemainingHealth, interactionDuration, [singuityCount])
+    @staticmethod
+    def estimateFightOverSpawner(allegedPlayerId: Optional[str], spawnerRemainingHealth: float, restrictedDuration, clusters: List[Tuple[int, float, float]]) -> Tuple[float, int, List[int]]:
+        todo
+

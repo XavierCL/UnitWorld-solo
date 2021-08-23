@@ -35,7 +35,8 @@ class Singuity:
     MAX_HEALTH_POINT = 20
     ATTACK_STRENGTH = 5
     ATTACK_FRAME_LAG = 10
-    MAXIMUM_UNITS_PER_FRAME = 4
+    MAXIMUM_SPEED_UNITS_PER_FRAME = 4
+    ATTACK_RANGE = 18
 
     def __init__(self, data: dict):
         self.id: str = data["i"]

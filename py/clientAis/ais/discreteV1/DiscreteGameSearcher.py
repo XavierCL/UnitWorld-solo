@@ -9,7 +9,7 @@ import numpy as np
 from clientAis.ais.discreteV1.DiscreteGameScorer import DiscreteGameScorer
 from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
 from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
-from clientAis.ais.discreteV1.Plans.DiscretePlanGenerator import DiscretePlanGenerator
+from clientAis.ais.discreteV1.Plans.DiscreteMoveGenerator import DiscreteMoveGenerator
 
 class StateScore:
     def __init__(self, score: float, frameAchieved: int, occurrences: int, path: List[int]):
@@ -45,7 +45,7 @@ class StateScore:
 class DiscreteGameNode:
     INTEGRAL_DISCOUNT_RATIO = 0.5
 
-    def __init__(self, gameState: DiscreteGameState, previousPlan: Optional[List[DiscreteMove]], parentGameState: Optional[DiscreteGameState], depth: int = 0):
+    def __init__(self, gameState: DiscreteGameState, previousPlan: Optional[DiscreteMove], parentGameState: Optional[DiscreteGameState], depth: int = 0):
         self.gameState = gameState
         self.previousPlan = previousPlan
         self.parentGameState = parentGameState
@@ -73,10 +73,12 @@ class DiscreteGameNode:
                 bestIndex = index + 1
 
         bestScore = bestScore.prependPath(bestIndex)
-        return random.choice(bestPlans)
+        return [random.choice(bestPlans)]
 
     def getBestScore(self, playerId: str, rootFrameCount: int, parentScore: float, integralDiscount: float = 0) -> StateScore:
         currentNodeScore = DiscreteGameScorer.score(self.gameState, playerId)
+
+        # Add average siblings also, so that a plan with more good scores performs better. Removes the need for the "occurrence" variable.
         integralDiscount = integralDiscount + parentScore * (self.gameState.frameCount - self.parentGameState.frameCount)
 
         if len(self.children) == 0:
@@ -93,12 +95,12 @@ class DiscreteGameNode:
         return bestScore.prependPath(bestIndex)
 
     def developChildren(self) -> List[DiscreteGameNode]:
-        nextSteps = DiscretePlanGenerator.executeStep(self.gameState, self.gameState.currentPlayerId)
+        nextSteps = DiscreteMoveGenerator.executeStep(self.gameState, self.gameState.currentPlayerId)
         self.children = [DiscreteGameNode(nextGameState, nextMove, self.gameState, self.depth + 1) for nextMove, nextGameState in nextSteps]
         return self.children
 
     def restrictDuration(self, frameCount: int) -> DiscreteGameNode:
-        self.gameState = self.parentGameState.executePlan(self.previousPlan, restrictedFrameCount=frameCount)
+        self.gameState = self.parentGameState.executeMove(self.previousPlan, restrictedFrameCount=frameCount)
         return self
 
 class DiscreteGameSearcher:
