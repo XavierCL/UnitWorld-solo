@@ -12,7 +12,7 @@ class DiscreteV1Ai(Artificial):
         super().__init__(serverCommander)
 
         self.currentPlayerId: str = None
-        self.gameSearcher = DiscreteGameSearcher(allottedGenerationTimeSeconds=0.3)
+        self.gameSearcher = DiscreteGameSearcher(allottedGenerationTimeSeconds=0.4)
 
     def frame(self, gameState: GameState, currentPlayerId: str):
         self.currentPlayerId = currentPlayerId

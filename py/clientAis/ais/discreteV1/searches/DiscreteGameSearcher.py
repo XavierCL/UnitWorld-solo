@@ -52,7 +52,7 @@ class DiscreteGameNode:
         self.children: List[DiscreteGameNode] = []
         self.depth = depth
 
-    def getBestPlan(self) -> List[DiscreteMove]:
+    def getBestPlan(self) -> DiscreteMove:
         if len(self.children) == 0:
             return DiscreteMove.fromNothing()
 
@@ -73,7 +73,7 @@ class DiscreteGameNode:
                 bestIndex = index + 1
 
         bestScore = bestScore.prependPath(bestIndex)
-        return [random.choice(bestPlans)]
+        return random.choice(bestPlans)
 
     def getBestScore(self, playerId: str, rootFrameCount: int, parentScore: float, integralDiscount: float = 0) -> StateScore:
         currentNodeScore = DiscreteGameScorer.score(self.gameState, playerId)
@@ -148,4 +148,4 @@ class DiscreteGameSearcher:
 
         print(f"Developed game nodes: {developedGameStates}")
 
-        return [rootGameNode.gameState.discreteMoveToMove(discreteMove) for discreteMove in rootGameNode.getBestPlan()]
+        return rootGameNode.gameState.discreteMoveToMove(rootGameNode.getBestPlan())

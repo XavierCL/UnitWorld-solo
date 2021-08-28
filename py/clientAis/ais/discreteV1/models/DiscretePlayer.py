@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from typing import List, Optional, Tuple
+
 import numpy as np
+from sklearn.cluster import DBSCAN
 
 from clientAis.ais.discreteV1.physics.PhysicsEstimator import PhysicsEstimator
 from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
@@ -8,35 +11,55 @@ from clientAis.games.GameState import GameState, Singuity, Spawner
 from utils import arrays
 
 class DiscretePlayer:
-    def __init__(self, id: str, singuityCount: int, singuitiesMeanPosition: np.ndarray, singuitiesStd: float, singuitiesAverageHealth: float):
-        if singuitiesStd < 2 and singuityCount > 0:
-            temp1 = 0
-
+    def __init__(self, id: str, singuityCount: int, singuitiesMeanPosition: np.ndarray, singuitiesStd: float, singuitiesAverageHealth: float, inCluster: Optional[List[str]] = None):
         self.id = id
         self.singuityCount = singuityCount
         self.singuitiesMeanPosition = singuitiesMeanPosition
         self.singuitiesStd = singuitiesStd
         self.singuitiesAverageHealth = singuitiesAverageHealth
+        self.inCluster = inCluster
 
     @staticmethod
     def fromGameState(gameState: GameState, playerId: str) -> DiscretePlayer:
         playerSinguities = [s for s in gameState.singuities if s.playerId == playerId]
 
         if len(playerSinguities) == 0:
-            return DiscretePlayer(playerId, 0, np.zeros(2), 1, 0)
+            return DiscretePlayer(playerId, 0, np.zeros(2), 1, 0, [])
 
         singuityPositions = [s.position for s in playerSinguities]
-        singuityStd, singuityCenter = arrays.mad(singuityPositions, axis=0, returnMedian=True)
-        singuityAverageHealth = np.mean([s.healthPoints for s in playerSinguities]).item()
-        return DiscretePlayer(playerId, len(playerSinguities), singuityCenter, np.linalg.norm(singuityStd), singuityAverageHealth)
 
-    def executeMovement(self, move: DiscreteMove, targetPosition: np.ndarray, restrictedDuration: int = None):
+        singuityClusterIds = DBSCAN(eps=100, min_samples=25).fit_predict(singuityPositions)
+        singuityClusters: List[List[Singuity]] = [[] for _ in range(np.max(singuityClusterIds) + 1)]
+
+        for index, singuity in [(index, singuity) for index, singuity in enumerate(playerSinguities) if singuityClusterIds[index] != -1]:
+            singuityClusters[singuityClusterIds[index]].append(singuity)
+
+        def getClusterForce(singuities: List[Singuity]) -> float:
+            clusterStd = arrays.mad([s.position for s in singuities], axis=0)
+            averageHealth = np.mean([s.healthPoints for s in singuities]).item()
+            return PhysicsEstimator.getClusterForce(len(singuities), np.linalg.norm(clusterStd), averageHealth)
+
+        clusterForces = [getClusterForce(cluster) for cluster in singuityClusters]
+
+        if len(clusterForces) == 0:
+            singuityStd, singuityCenter = arrays.mad(singuityPositions, axis=0, returnMedian=True)
+            singuityAverageHealth = np.mean([s.healthPoints for s in playerSinguities]).item()
+            return DiscretePlayer(playerId, len(playerSinguities), singuityCenter, np.linalg.norm(singuityStd), singuityAverageHealth, [s.id for s in playerSinguities])
+
+        else:
+            keptCluster = singuityClusters[np.argmax(clusterForces)]
+
+            singuityStd, singuityCenter = arrays.mad([s.position for s in keptCluster], axis=0, returnMedian=True)
+            singuityAverageHealth = np.mean([s.healthPoints for s in keptCluster]).item()
+            return DiscretePlayer(playerId, len(keptCluster), singuityCenter, np.linalg.norm(singuityStd), singuityAverageHealth, [s.id for s in keptCluster])
+
+    def executeMovement(self, move: DiscreteMove, targetPosition: np.ndarray, restrictedDuration: int = None, acceptableSinguityCount: int = None):
         def getLastingMoveDuration(moveDuration: int) -> int:
             minimumBoundDuration = moveDuration if move.minimumMoveTime is None else max(moveDuration, move.minimumMoveTime)
             maximumBoundDuration = minimumBoundDuration if restrictedDuration is None else min(minimumBoundDuration, restrictedDuration)
             return maximumBoundDuration
 
-        originalMovementDuration = PhysicsEstimator.estimateMovementDuration(self.singuitiesMeanPosition, targetPosition, clusterStd=self.singuitiesStd)
+        originalMovementDuration = PhysicsEstimator.estimateMovementDuration(self.singuitiesMeanPosition, targetPosition, clusterStd=self.singuitiesStd, acceptableSinguityCount=None if acceptableSinguityCount is None else (self.singuityCount, acceptableSinguityCount))
         constrainedMovementDuration = getLastingMoveDuration(originalMovementDuration)
 
         if constrainedMovementDuration == 0:
@@ -77,7 +100,7 @@ class DiscretePlayer:
         unitCountInLine = round(PhysicsEstimator.distanceToSpawningSinguities(distanceFromSpawnerToMeanPosition * furthestSinguityRatio))
         singuitiesInLineStd = distanceFromSpawnerToMeanPosition * furthestSinguityRatio / 4
 
-        if PhysicsEstimator.distance(spawnerPosition, self.singuitiesMeanPosition) > self.singuitiesStd * 2:
+        if PhysicsEstimator.distance(spawnerPosition, self.singuitiesMeanPosition) <= self.singuitiesStd * 2:
             newSinguitiesMean, newSinguitiesStd, newSinguitiesCount = arrays.combineMeanStdAndCount(
                 self.singuitiesMeanPosition, np.sqrt(atTargetCount), atTargetCount, unitPositionInLine, singuitiesInLineStd, unitCountInLine
             )

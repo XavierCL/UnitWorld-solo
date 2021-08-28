@@ -90,7 +90,8 @@ class DiscreteGameState:
                         )
 
         # Get time until cluster arrives
-        movementDuration, movedPlayer = getLastPlayerVersion(move.playerId).executeMovement(move, move.position if move.spawnerId is None else getLastSpawnerVersion(move.spawnerId).position, restrictedDuration)
+        targetSpawner = None if move.spawnerId is None else getLastSpawnerVersion(move.spawnerId)
+        movementDuration, movedPlayer = getLastPlayerVersion(move.playerId).executeMovement(move, move.position if targetSpawner is None else targetSpawner.position, restrictedDuration, acceptableSinguityCount=None if targetSpawner is None or targetSpawner.isAllegedToPlayer(move.playerId) else targetSpawner.remainingSinguitiesToCapture(move.playerId))
 
         # Process interactions until player arrives
         updatedSpawners, updatedPlayers, interactionDuration = self.executeInteractions(self.spawners, [p for p in self.playerDictionary.values() if p.id != move.playerId], movementDuration)
@@ -111,7 +112,7 @@ class DiscreteGameState:
         updateSpawnersAndPlayers(updatedSpawners, updatedPlayers)
 
         # Capture spawner if neutral after interaction
-        if move.spawnerId is not None:
+        if targetSpawner is not None and (not targetSpawner.isClaimed() or targetSpawner.isAllegedToPlayer(move.playerId)):
             updatedSpawner, updatedPlayer = self.tryCaptureNeutralOrOwnAllegedSpawner(getLastSpawnerVersion(move.spawnerId), getLastPlayerVersion(move.playerId), self.frameCount + movementDuration + interactionDuration)
             updateSpawnersAndPlayers([updatedSpawner], [updatedPlayer])
 
@@ -202,6 +203,8 @@ class DiscreteGameState:
                 [(cluster.id, cluster.singuityCount, cluster.singuitiesStd, cluster.singuitiesAverageHealth) for cluster in spawnerInteractionSubjects[interactingSpawnerId]]
             )
             updateSpawnersAndPlayers(interactingSpawnerId, spawnerHealthPoints, spawnerInteractionSubjects[interactingSpawnerId], remainingCounts)
+            del spawnerInteractionSubjects[interactingSpawnerId]
+
         # No interaction duration restriction
         elif restrictDurationToPlayer is not None and restrictedDuration is None:
             return [], [], 0
@@ -237,14 +240,20 @@ class DiscreteGameState:
 
         return newSpawner, newPlayer
 
-    def discreteMoveToMove(self, discreteMove: DiscreteMove) -> Move:
-        singuityIds = [s.id for s in self.rootGameState.singuities if s.playerId == discreteMove.playerId]
+    def discreteMoveToMove(self, discreteMove: DiscreteMove) -> List[Move]:
+        discretePlayer = self.playerDictionary[discreteMove.playerId]
+        singuityIds = np.array([s.id for s in self.rootGameState.singuities if s.playerId == discreteMove.playerId])
+        outOfCluster = singuityIds[~np.isin(singuityIds, discretePlayer.inCluster)]
+
+        moves = []
+
+        if len(outOfCluster) > 0:
+            moves.append(Move.fromPosition(list(outOfCluster), discretePlayer.singuitiesMeanPosition))
 
         if discreteMove.spawnerId is not None:
-            return Move.fromSpawner(singuityIds, arrays.first(self.rootGameState.spawners, lambda s: s.id == discreteMove.spawnerId), discreteMove.playerId)
+            moves.append(Move.fromSpawner(discretePlayer.inCluster, arrays.first(self.rootGameState.spawners, lambda s: s.id == discreteMove.spawnerId), discreteMove.playerId))
 
         elif discreteMove.position is not None:
-            return Move.fromPosition(singuityIds, discreteMove.position)
+            moves.append(Move.fromPosition(discretePlayer.inCluster, discreteMove.position))
 
-        else:
-            return Move.fromNothing()
+        return moves

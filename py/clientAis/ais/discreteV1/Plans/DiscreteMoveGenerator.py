@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 
@@ -8,68 +8,38 @@ from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
 class DiscreteMoveGenerator:
     MINIMUM_MOVEMENT_DURATION = 150
     ALLOWED_NEUTRAL_CLAIM_MOVES = 1
-    ALLOWED_ENEMY_CLAIM_MOVES = 3
+    ALLOWED_ENEMY_CLAIM_MOVES = 2
     ALLOWED_OWN_SPAWNER_MOVES = 1
 
     @staticmethod
     def executeStep(gameState: DiscreteGameState, playerId: str) -> List[Tuple[DiscreteMove, DiscreteGameState]]:
-        player = gameState.playerDictionary[playerId]
+        neutralClaimingNextSteps = DiscreteMoveGenerator.getQuickestFirstNSteps(gameState, DiscreteMoveGenerator.generateNeutralSpawnerMoves(gameState, playerId), DiscreteMoveGenerator.ALLOWED_NEUTRAL_CLAIM_MOVES)
+        enemyClaimingNextSteps = DiscreteMoveGenerator.getQuickestFirstNSteps(gameState, DiscreteMoveGenerator.generateEnemySpawnerMoves(gameState, playerId), DiscreteMoveGenerator.ALLOWED_ENEMY_CLAIM_MOVES)
 
-        if player.singuityCount >= 100 and player.singuitiesStd ** 2 / 16 < player.singuityCount:
+        shortestFrameCounts = [step[1].frameCount for step in neutralClaimingNextSteps[:1] + enemyClaimingNextSteps[:1]]
 
-            neutralClaimingMoves = DiscreteMoveGenerator.generateNeutralSpawnerMoves(gameState, playerId)
-            neutralClaimingGameStates = [gameState.executeMove(move) for move in neutralClaimingMoves]
-            neutralClaimingGameStateFrameCounts = [g.frameCount for g in neutralClaimingGameStates]
-            neutralClaimingGameStateFrameCountSortedIndices = np.argsort(neutralClaimingGameStateFrameCounts, kind="stable")
-            neutralClaimingNextSteps: List[Tuple[DiscreteMove, DiscreteGameState]] = list(
-                zip(
-                    np.array(neutralClaimingMoves, dtype=object)[neutralClaimingGameStateFrameCountSortedIndices][:DiscreteMoveGenerator.ALLOWED_NEUTRAL_CLAIM_MOVES],
-                    np.array(neutralClaimingGameStates, dtype=object)[neutralClaimingGameStateFrameCountSortedIndices][:DiscreteMoveGenerator.ALLOWED_NEUTRAL_CLAIM_MOVES]
-                )
+        shortestAllowedMoveOnlyDuration = DiscreteMoveGenerator.MINIMUM_MOVEMENT_DURATION if len(shortestFrameCounts) == 0 else max(
+            DiscreteMoveGenerator.MINIMUM_MOVEMENT_DURATION, min(np.array(shortestFrameCounts) - gameState.frameCount)
+        )
+
+        nextSteps = neutralClaimingNextSteps + enemyClaimingNextSteps
+
+        nextSteps.extend(DiscreteMoveGenerator.getQuickestFirstNSteps(gameState, DiscreteMoveGenerator.generateOwnSpawnerMoves(gameState, playerId, shortestAllowedMoveOnlyDuration), DiscreteMoveGenerator.ALLOWED_OWN_SPAWNER_MOVES))
+        nextSteps.extend([(move, gameState.executeMove(move)) for move in DiscreteMoveGenerator.generateClusterMoves(gameState, playerId, shortestAllowedMoveOnlyDuration)])
+
+        return nextSteps
+
+    @staticmethod
+    def getQuickestFirstNSteps(originalGameState: DiscreteGameState, moves: List[DiscreteMove], limit: Optional[int] = None) -> List[Tuple[DiscreteMove, DiscreteGameState]]:
+        gameStates = [originalGameState.executeMove(move) for move in moves]
+        frameCounts = [g.frameCount for g in gameStates]
+        frameCountSortedIndices = np.argsort(frameCounts, kind="stable")
+        return list(
+            zip(
+                np.array(moves, dtype=object)[frameCountSortedIndices][:limit],
+                np.array(gameStates, dtype=object)[frameCountSortedIndices][:limit]
             )
-
-            enemyClaimingMoves = DiscreteMoveGenerator.generateEnemySpawnerMoves(gameState, playerId)
-            enemyClaimingGameStates = [gameState.executeMove(move) for move in enemyClaimingMoves]
-            enemyClaimingGameStateFrameCounts = [g.frameCount for g in enemyClaimingGameStates]
-            enemyClaimingGameStateFrameCountSortedIndices = np.argsort(enemyClaimingGameStateFrameCounts, kind="stable")
-            enemyClaimingNextSteps: List[Tuple[DiscreteMove, DiscreteGameState]] = list(
-                zip(
-                    np.array(enemyClaimingMoves, dtype=object)[enemyClaimingGameStateFrameCountSortedIndices][:DiscreteMoveGenerator.ALLOWED_ENEMY_CLAIM_MOVES],
-                    np.array(enemyClaimingGameStates, dtype=object)[enemyClaimingGameStateFrameCountSortedIndices][:DiscreteMoveGenerator.ALLOWED_ENEMY_CLAIM_MOVES]
-                )
-            )
-
-            shortestFrameCounts = [step[1].frameCount for step in neutralClaimingNextSteps[:1] + enemyClaimingNextSteps[:1]]
-
-            shortestAllowedMoveOnlyDuration = DiscreteMoveGenerator.MINIMUM_MOVEMENT_DURATION if len(shortestFrameCounts) == 0 else max(
-                DiscreteMoveGenerator.MINIMUM_MOVEMENT_DURATION, min(np.array(shortestFrameCounts) - gameState.frameCount)
-                )
-
-            nextSteps = neutralClaimingNextSteps + enemyClaimingNextSteps
-
-            nextSteps.extend([(move, gameState.executeMove(move)) for move in DiscreteMoveGenerator.generateOwnSpawnerMoves(gameState, playerId, shortestAllowedMoveOnlyDuration)])
-            nextSteps.extend([(move, gameState.executeMove(move)) for move in DiscreteMoveGenerator.generateClusterMoves(gameState, playerId, shortestAllowedMoveOnlyDuration)])
-
-            return nextSteps
-        else:
-            neutralClaimingMoves = DiscreteMoveGenerator.generateNeutralSpawnerMoves(gameState, playerId)
-            neutralClaimingGameStates = [gameState.executeMove(move) for move in neutralClaimingMoves]
-            neutralClaimingGameStateFrameCounts = [g.frameCount for g in neutralClaimingGameStates]
-            neutralClaimingGameStateFrameCountSortedIndices = np.argsort(neutralClaimingGameStateFrameCounts, kind="stable")
-            neutralClaimingNextSteps: List[Tuple[DiscreteMove, DiscreteGameState]] = list(
-                zip(
-                    np.array(neutralClaimingMoves, dtype=object)[neutralClaimingGameStateFrameCountSortedIndices][:DiscreteMoveGenerator.ALLOWED_NEUTRAL_CLAIM_MOVES],
-                    np.array(neutralClaimingGameStates, dtype=object)[neutralClaimingGameStateFrameCountSortedIndices][:DiscreteMoveGenerator.ALLOWED_NEUTRAL_CLAIM_MOVES]
-                )
-            )
-
-            shortestAllowedMoveOnlyDuration = DiscreteMoveGenerator.MINIMUM_MOVEMENT_DURATION if len(neutralClaimingNextSteps) == 0 else max(
-                DiscreteMoveGenerator.MINIMUM_MOVEMENT_DURATION, neutralClaimingNextSteps[0][1].frameCount - gameState.frameCount
-                )
-
-            return neutralClaimingNextSteps\
-                   + [(move, gameState.executeMove(move)) for move in DiscreteMoveGenerator.generateClusterMoves(gameState, playerId, shortestAllowedMoveOnlyDuration, ownOnly=True)]\
-                   + [(move, gameState.executeMove(move)) for move in DiscreteMoveGenerator.generateOwnSpawnerMoves(gameState, playerId, shortestAllowedMoveOnlyDuration)]
+        )
 
     @staticmethod
     def generateNeutralSpawnerMoves(gameState: DiscreteGameState, playerId: str) -> List[DiscreteMove]:
