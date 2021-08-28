@@ -70,10 +70,11 @@ def firstIndex(arr: Iterable[Nested], value: Nested) -> int:
 
     return -1
 
-def mad(arr: Iterable, median: Optional[float] = None, axis: Optional[int] = None, returnMedian=False) -> Union[float, Tuple[float, float]]:
+def mad(arr: Iterable, median: Optional[float] = None, axis: Optional[int] = None, returnMedian=False, minMad: Optional = None) -> Union[float, Tuple[float, float]]:
     if median is None:
         median = np.median(arr, axis)
     ad = np.median(np.abs(arr - median), axis)
+    ad = ad if minMad is None else np.max([np.ones_like(ad) * minMad, ad], axis=0)
 
     if returnMedian:
         return ad, median

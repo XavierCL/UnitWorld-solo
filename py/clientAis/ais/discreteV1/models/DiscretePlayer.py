@@ -35,21 +35,21 @@ class DiscretePlayer:
             singuityClusters[singuityClusterIds[index]].append(singuity)
 
         def getClusterForce(singuities: List[Singuity]) -> float:
-            clusterStd = arrays.mad([s.position for s in singuities], axis=0)
+            clusterStd = arrays.mad([s.position for s in singuities], axis=0, minMad=PhysicsEstimator.getMinimumStd(len(singuities)))
             averageHealth = np.mean([s.healthPoints for s in singuities]).item()
             return PhysicsEstimator.getClusterForce(len(singuities), np.linalg.norm(clusterStd), averageHealth)
 
         clusterForces = [getClusterForce(cluster) for cluster in singuityClusters]
 
         if len(clusterForces) == 0:
-            singuityStd, singuityCenter = arrays.mad(singuityPositions, axis=0, returnMedian=True)
+            singuityStd, singuityCenter = arrays.mad(singuityPositions, axis=0, returnMedian=True, minMad=PhysicsEstimator.getMinimumStd(len(singuityPositions)))
             singuityAverageHealth = np.mean([s.healthPoints for s in playerSinguities]).item()
             return DiscretePlayer(playerId, len(playerSinguities), singuityCenter, np.linalg.norm(singuityStd), singuityAverageHealth, [s.id for s in playerSinguities])
 
         else:
             keptCluster = singuityClusters[np.argmax(clusterForces)]
 
-            singuityStd, singuityCenter = arrays.mad([s.position for s in keptCluster], axis=0, returnMedian=True)
+            singuityStd, singuityCenter = arrays.mad([s.position for s in keptCluster], axis=0, returnMedian=True, minMad=PhysicsEstimator.getMinimumStd(len(keptCluster)))
             singuityAverageHealth = np.mean([s.healthPoints for s in keptCluster]).item()
             return DiscretePlayer(playerId, len(keptCluster), singuityCenter, np.linalg.norm(singuityStd), singuityAverageHealth, [s.id for s in keptCluster])
 
