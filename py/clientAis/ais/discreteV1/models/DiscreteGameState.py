@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import math
 from typing import Dict, List, Optional, Tuple
 
+import numpy as np
 from sklearn.neighbors import KDTree
 
 from clientAis.ais.discreteV1.models.DiscretePlayer import DiscretePlayer
 from clientAis.ais.discreteV1.models.DiscreteSpawner import DiscreteSpawner
-from clientAis.ais.discreteV1.Move import Move
-from clientAis.ais.discreteV1.PhysicsEstimator import PhysicsEstimator
+from clientAis.ais.discreteV1.Plans.Move import Move
+from clientAis.ais.discreteV1.physics.PhysicsEstimator import PhysicsEstimator
 from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
 from clientAis.games.GameState import GameState
 from utils import arrays
@@ -35,7 +37,7 @@ class DiscreteGameState:
     def fromGameState(gameState: GameState, currentPlayerId: str) -> DiscreteGameState:
         playerDictionary: Dict[str, DiscretePlayer] = {}
         playerIds: List[str] = []
-        DiscreteGameState.spawnerCollisionDetector = KDTree([s.position for s in gameState.spawners])
+        DiscreteGameState.spawnerCollisionDetector = KDTree(np.array([s.position for s in gameState.spawners]))
 
         for playerIndex, player in enumerate(gameState.players):
             discretePlayer = DiscretePlayer.fromGameState(gameState, player.id)
@@ -80,11 +82,12 @@ class DiscreteGameState:
                 newPlayersById[updatedPlayer.id] = updatedPlayer
 
         def assignNewSpawnees(frameBefore: int, frameAfter: int):
-            for spawner in self.spawners:
-                if spawner.isClaimed():
-                    newPlayersById[spawner.allegence.playerId] = getLastPlayerVersion(spawner.allegence.playerId).appendNewSpawned(
-                        spawner.position, spawner.lastFrameClaimed, frameBefore, frameAfter
-                    )
+            if frameAfter > frameBefore:
+                for spawner in self.spawners:
+                    if spawner.isClaimed():
+                        newPlayersById[spawner.allegence.playerId] = getLastPlayerVersion(spawner.allegence.playerId).appendNewSpawned(
+                            spawner.position, spawner.lastFrameClaimed, frameBefore, frameAfter
+                        )
 
         # Get time until cluster arrives
         movementDuration, movedPlayer = getLastPlayerVersion(move.playerId).executeMovement(move, move.position if move.spawnerId is None else getLastSpawnerVersion(move.spawnerId).position, restrictedDuration)
@@ -93,7 +96,7 @@ class DiscreteGameState:
         updatedSpawners, updatedPlayers, interactionDuration = self.executeInteractions(self.spawners, [p for p in self.playerDictionary.values() if p.id != move.playerId], movementDuration)
 
         # Update both interactions and moved player
-        updateSpawnersAndPlayers(updatedSpawners, updatedPlayers + movedPlayer)
+        updateSpawnersAndPlayers(updatedSpawners, updatedPlayers + [movedPlayer])
 
         # Spawn singuities before player fights
         assignNewSpawnees(self.frameCount, self.frameCount + movementDuration)
@@ -137,9 +140,9 @@ class DiscreteGameState:
                 spawnerInteractions[spawner.id] = [cluster]
 
         for cluster in clusters:
-            closestSpawner = spawners[DiscreteGameState.spawnerCollisionDetector.query(cluster.singuitiesMeanPosition.reshape(1, 2))[0]]
+            closestSpawner = spawners[DiscreteGameState.spawnerCollisionDetector.query(cluster.singuitiesMeanPosition.reshape(1, 2), return_distance=False)[0].item()]
 
-            if PhysicsEstimator.areSinguitiesColliding(cluster.singuitiesMeanPosition, closestSpawner.position):
+            if PhysicsEstimator.areSinguitiesColliding(cluster.singuitiesMeanPosition, closestSpawner.position, cluster.singuitiesStd):
                 addSpawnerInteraction(closestSpawner, cluster)
 
         return spawnerInteractions, spawnerInteractedClusters
@@ -150,7 +153,7 @@ class DiscreteGameState:
         if len(clusters) <= 1:
             return interactions
 
-        clusterCollisionDetector = KDTree([c.singuitiesMeanPosition for c in clusters])
+        clusterCollisionDetector = KDTree(np.array([c.singuitiesMeanPosition for c in clusters]))
 
         interactingClusters = set()
 
@@ -158,19 +161,19 @@ class DiscreteGameState:
             if cluster in interactingClusters:
                 continue
 
-            [closest, secondClosest] = clusterCollisionDetector.query(cluster.singuitiesMeanPosition.reshape(1, 2), 2)[0]
+            [closest, secondClosest] = clusterCollisionDetector.query(cluster.singuitiesMeanPosition.reshape(1, 2), 2, return_distance=False)[0]
             if clusters[closest].id != cluster.id:
                 closestCluster = clusters[closest]
             else:
                 closestCluster = clusters[secondClosest]
 
-            if PhysicsEstimator.areSinguitiesColliding(clusters[secondClosest].singuitiesMeanPosition, cluster.singuitiesMeanPosition) and closestCluster.id not in interactingClusters:
+            if PhysicsEstimator.areSinguitiesColliding(clusters[secondClosest].singuitiesMeanPosition, cluster.singuitiesMeanPosition, clusters[secondClosest].singuitiesStd + cluster.singuitiesStd) and closestCluster.id not in interactingClusters:
                 interactingClusters.update([cluster.id, closestCluster.id])
                 interactions.append([cluster, closestCluster])
 
         return interactions
 
-    def executeInteractions(self, spawners: List[DiscreteSpawner], players: List[DiscretePlayer], restrictedDuration: int, restrictDurationToPlayer: Optional[str] = None) -> Tuple[List[DiscreteSpawner], List[DiscretePlayer], int]:
+    def executeInteractions(self, spawners: List[DiscreteSpawner], players: List[DiscretePlayer], restrictedDuration: Optional[int], restrictDurationToPlayer: Optional[str] = None) -> Tuple[List[DiscreteSpawner], List[DiscretePlayer], int]:
         updatedSpawners = []
         updatedPlayers = []
 
@@ -196,17 +199,20 @@ class DiscreteGameState:
                 None if spawner.allegence is None else spawner.allegence.playerId,
                 spawner.getHealthPoints(),
                 restrictedDuration,
-                [(cluster.singuityCount, cluster.singuitiesStd, cluster.singuitiesAverageHealth) for cluster in spawnerInteractionSubjects[interactingSpawnerId]]
+                [(cluster.id, cluster.singuityCount, cluster.singuitiesStd, cluster.singuitiesAverageHealth) for cluster in spawnerInteractionSubjects[interactingSpawnerId]]
             )
             updateSpawnersAndPlayers(interactingSpawnerId, spawnerHealthPoints, spawnerInteractionSubjects[interactingSpawnerId], remainingCounts)
+        # No interaction duration restriction
+        elif restrictDurationToPlayer is not None and restrictedDuration is None:
+            return [], [], 0
 
         for spawnerId, interactionSubjects in spawnerInteractionSubjects.items():
             spawner = oldSpawnersById[spawnerId]
-            spawnerHealthPoints, interactionDuration, remainingCounts = PhysicsEstimator.estimateFightOverSpawner(
+            spawnerHealthPoints, _, remainingCounts = PhysicsEstimator.estimateFightOverSpawner(
                 None if spawner.allegence is None else spawner.allegence.playerId,
                 spawner.getHealthPoints(),
-                restrictedDuration,
-                [(cluster.singuityCount, cluster.singuitiesStd, cluster.singuitiesAverageHealth) for cluster in interactionSubjects]
+                interactionDuration,
+                [(cluster.id, cluster.singuityCount, cluster.singuitiesStd, cluster.singuitiesAverageHealth) for cluster in interactionSubjects]
             )
             updateSpawnersAndPlayers(spawnerId, spawnerHealthPoints, interactionSubjects, remainingCounts)
 

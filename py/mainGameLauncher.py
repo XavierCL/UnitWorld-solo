@@ -12,9 +12,7 @@ pythonExecutablePath = "mainClientAi.py"
 javaAiFolder = "../jva/out/production/jva/clientAis/"
 
 mapHandler = MapHandler(lastGamePath, archivedGamesPath)
-mapHandler.archiveLastMap()
-mapHandler.generateRandomMap()
-mapHandler.saveMapToFile()
+# mapHandler.archiveGenerateAndSaveMap()
 
 # Copying game from release
 gameFileNames = ["openal32.dll", "sfml-audio-2.dll", "sfml-graphics-2.dll", "sfml-network-2.dll", "sfml-system-2.dll", "sfml-window-2.dll", "UnitWorld_client_ais.exe",

@@ -46,11 +46,13 @@ def combineMeanStdAndCount(mean1: Nested = 0, std1: Nested = 1, count1: int = 1,
     elif count1 < 1:
         return mean2, std2, count2
     elif count2 < 1:
-        return mean1, std2, count1
+        return mean1, std1, count1
 
     return (
         (mean1 * count1 + mean2 * count2) / (count1 + count2),
-        np.sqrt(((count1 - 1) * std1 ** 2 + (count2 - 1) * std2 ** 2) / (count1 + count2 - 1) + (count1 * count2 * (mean1 - mean2) ** 2) / ((count1 + count2) * (count1 + count2 - 1))),
+        np.sqrt(
+            ((count1 - 1) * std1 ** 2 + (count2 - 1) * std2 ** 2) / (count1 + count2 - 1) + (count1 * count2 * (mean1 - mean2) ** 2) / ((count1 + count2) * (count1 + count2 - 1))
+        ),
         count1 + count2
     )
 
@@ -65,3 +67,13 @@ def firstIndex(arr: Iterable[Nested], value: Nested) -> int:
             return index
 
     return -1
+
+def mad(arr: Iterable, median: Optional[float] = None, axis: Optional[int] = None, returnMedian=False) -> Union[float, Tuple[float, float]]:
+    if median is None:
+        median = np.median(arr, axis)
+    ad = np.median(np.abs(arr - median), axis)
+
+    if returnMedian:
+        return ad, median
+
+    return ad

@@ -6,7 +6,7 @@ from typing import List, Optional
 
 import numpy as np
 
-from clientAis.ais.discreteV1.DiscreteGameScorer import DiscreteGameScorer
+from clientAis.ais.discreteV1.models.DiscreteGameScorer import DiscreteGameScorer
 from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
 from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
 from clientAis.ais.discreteV1.Plans.DiscreteMoveGenerator import DiscreteMoveGenerator
@@ -104,7 +104,7 @@ class DiscreteGameNode:
         return self
 
 class DiscreteGameSearcher:
-    def __init__(self, allottedGenerationTimeSeconds=0.3, maxDepth: int = None):
+    def __init__(self, allottedGenerationTimeSeconds=1000, maxDepth: int = None):
         self.allottedGenerationTimeSeconds = allottedGenerationTimeSeconds
         self.maxDepth = maxDepth
 

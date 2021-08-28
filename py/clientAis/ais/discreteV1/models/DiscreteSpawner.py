@@ -58,7 +58,7 @@ class DiscreteSpawner:
         return max(Spawner.GESTATION_FRAME_LAG - (currentFrame - self.lastFrameClaimed), 0)
 
     def tryClaimedBy(self, playerId, singuityCount, frameCount: int) -> DiscreteSpawner:
-        if self.remainingSinguitiesToCapture(playerId) == 0:
+        if self.remainingSinguitiesToCapture(playerId) == 0 or singuityCount == 0:
             return self
 
         if self.remainingSinguitiesToCapture(playerId) <= singuityCount:
@@ -75,6 +75,6 @@ class DiscreteSpawner:
 
     def loseHealthPointsTo(self, healthPoints: float):
         if self.allegence is None:
-            return
+            return self
 
         return DiscreteSpawner(self.id, self.position, self.allegence.loseHealthPointsTo(healthPoints), self.lastFrameClaimed)

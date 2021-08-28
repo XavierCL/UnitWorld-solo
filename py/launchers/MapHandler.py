@@ -15,6 +15,11 @@ class MapHandler:
 
         self.generatedMap = None
 
+    def archiveGenerateAndSaveMap(self):
+        self.archiveLastMap()
+        self.generateRandomMap()
+        self.saveMapToFile()
+
     def archiveLastMap(self):
         if len([True for file in os.listdir(self.lastGamePath) if file == "config.json"]) == 1:
             archivedGameIds = [
