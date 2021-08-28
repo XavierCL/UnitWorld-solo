@@ -1,11 +1,15 @@
 from typing import List
 
+import numpy as np
+
 from clientAis.ais.Artificial import Artificial
 from clientAis.ais.discreteV1.searches.DiscreteGameSearcher import DiscreteGameSearcher
 from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
 from clientAis.ais.discreteV1.Plans.Move import Move
 from clientAis.games.GameState import GameState
 from clientAis.communications.ServerCommander import ServerCommander
+
+np.seterr(all='raise')
 
 class DiscreteV1Ai(Artificial):
     def __init__(self, serverCommander: ServerCommander):

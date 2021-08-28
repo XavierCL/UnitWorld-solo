@@ -106,7 +106,7 @@ class DiscreteGameState:
         updatedSpawners, updatedPlayers, interactionDuration = self.executeInteractions(
             [getLastSpawnerVersion(spawnerId) for spawnerId in self.spawnersById.keys()],
             [getLastPlayerVersion(playerId) for playerId in self.playerDictionary.keys()],
-            None if restrictedDuration is None else restrictedDuration - movementDuration,
+            PhysicsEstimator.MAXIMUM_INTERACTION_DURATION if restrictedDuration is None else restrictedDuration - movementDuration,
             restrictDurationToPlayer=move.playerId
         )
         updateSpawnersAndPlayers(updatedSpawners, updatedPlayers)
@@ -242,13 +242,16 @@ class DiscreteGameState:
 
     def discreteMoveToMove(self, discreteMove: DiscreteMove) -> List[Move]:
         discretePlayer = self.playerDictionary[discreteMove.playerId]
-        singuityIds = np.array([s.id for s in self.rootGameState.singuities if s.playerId == discreteMove.playerId])
-        outOfCluster = singuityIds[~np.isin(singuityIds, discretePlayer.inCluster)]
+        ownSinguities = np.array([s for s in self.rootGameState.singuities if s.playerId == discreteMove.playerId], dtype=object)
+        singuityIds = np.array([s.id for s in ownSinguities])
+        inClusterMask = np.isin(singuityIds, discretePlayer.inCluster)
+        outOfCluster = singuityIds[~inClusterMask]
+        inClusterSpeed = np.mean([s.speed for s in ownSinguities[inClusterMask]], axis=0)
 
         moves = []
 
         if len(outOfCluster) > 0:
-            moves.append(Move.fromPosition(list(outOfCluster), discretePlayer.singuitiesMeanPosition))
+            moves.append(Move.fromPosition(list(outOfCluster), discretePlayer.singuitiesMeanPosition + inClusterSpeed * PhysicsEstimator.FULL_STOP_DURATION / 2))
 
         if discreteMove.spawnerId is not None:
             moves.append(Move.fromSpawner(discretePlayer.inCluster, arrays.first(self.rootGameState.spawners, lambda s: s.id == discreteMove.spawnerId), discreteMove.playerId))

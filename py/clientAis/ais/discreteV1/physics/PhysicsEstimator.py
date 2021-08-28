@@ -1,3 +1,4 @@
+import math
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
@@ -6,8 +7,15 @@ from clientAis.games.GameState import Singuity, Spawner
 from utils import arrays
 
 class PhysicsEstimator:
+    FULL_STOP_DURATION = Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME / Singuity.MAXIMUM_ACCELERATION_PER_FRAME
     SINGUITY_ATTACK_PER_FRAME = Singuity.ATTACK_STRENGTH / Singuity.ATTACK_FRAME_LAG
     SPAWNER_SPAWN_PER_FRAME = 1 / Spawner.SPAWN_FRAME_LAG
+    MAXIMUM_SINGUITY_DENSITY_PER_AREA = 100 / (math.pi * 18 ** 2)
+    MAXIMUM_INTERACTION_DURATION = 2 * 5000 / Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME
+
+    @staticmethod
+    def getMinimumStd(singuityCount: int) -> float:
+        return max(1., math.sqrt(singuityCount / (math.pi * PhysicsEstimator.MAXIMUM_SINGUITY_DENSITY_PER_AREA)))
 
     @staticmethod
     def distanceToSpawningSinguities(distance: float) -> int:
@@ -105,11 +113,13 @@ class PhysicsEstimator:
 
     @staticmethod
     def getClusterForce(singuityCount: int, clusterStd: float, averageHealth: float) -> float:
-        return ((singuityCount * averageHealth) / clusterStd) ** 2
+        return singuityCount ** 2 * averageHealth / (math.pi * clusterStd ** 2 * PhysicsEstimator.MAXIMUM_SINGUITY_DENSITY_PER_AREA)
 
     @staticmethod
     def clusterForceToCount(clusterForce: float, clusterStd: float, averageHealth: float) -> int:
-        return np.sqrt(clusterForce) * clusterStd / averageHealth
+        if averageHealth == 0:
+            return 0
+        return round(math.sqrt(clusterForce * math.pi * clusterStd ** 2 * PhysicsEstimator.MAXIMUM_SINGUITY_DENSITY_PER_AREA / averageHealth))
 
     # Takes in a list of (singuityCount, clusterStd, singuityAverageHealth) and returns a list of singuity count
     @staticmethod
@@ -118,13 +128,16 @@ class PhysicsEstimator:
         clusterForces = [PhysicsEstimator.getClusterForce(*cluster) for cluster in clusters]
         maximalForceClusterIndex = np.argmax(clusterForces)
         averageAdversaryForce = (np.sum(clusterForces) - clusterForces[maximalForceClusterIndex]) / (len(clusters) - 1)
-        maximalRemainingForce = maximalForceClusterIndex - maximalForceClusterIndex / min(
+
+        maximalRemainingForce = (clusterForces[maximalForceClusterIndex] - clusterForces[maximalForceClusterIndex] / min(
             Singuity.MAX_HEALTH_POINT / Singuity.ATTACK_STRENGTH, clusterForces[maximalForceClusterIndex] / averageAdversaryForce
-        ) ** 2
+        ) ** 2) if averageAdversaryForce > 1 else clusterForces[maximalForceClusterIndex]
+
         return arrays.assign(
-            np.zeros(len(clusters)), maximalForceClusterIndex,
+            np.zeros(len(clusters)),
+            maximalForceClusterIndex,
             PhysicsEstimator.clusterForceToCount(maximalRemainingForce, clusters[maximalForceClusterIndex][1], clusters[maximalForceClusterIndex][2])
-            )
+        )
 
     # Takes in clusters as a list of (singuityCount, clusterStd, singuityAverageHealth) and returns a tuple of (spawnerRemainingHealth, interactionDuration, [singuityCount])
     @staticmethod
@@ -146,9 +159,9 @@ class PhysicsEstimator:
             remainingCounts = np.array([clusters[0][1]])
         else:
             averageAdversaryForce = (np.sum(clusterForces) - clusterForces[maximalForceClusterIndex]) / (len(clusters) - 1)
-            maximalRemainingForce = clusterForces[maximalForceClusterIndex] - clusterForces[maximalForceClusterIndex] / min(
+            maximalRemainingForce = (clusterForces[maximalForceClusterIndex] - clusterForces[maximalForceClusterIndex] / min(
                 Singuity.MAX_HEALTH_POINT / Singuity.ATTACK_STRENGTH, clusterForces[maximalForceClusterIndex] / averageAdversaryForce
-                ) ** 2
+                ) ** 2) if averageAdversaryForce > 1 else clusterForces[maximalForceClusterIndex]
 
             if homeClusterIndex == maximalForceClusterIndex:
                 maximalRemainingForce /= spawnerRemainingHealth / Spawner.MAX_HEALTH_POINTS + 1

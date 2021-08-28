@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 import numpy as np
 from sklearn.cluster import DBSCAN
@@ -24,7 +24,7 @@ class DiscretePlayer:
         playerSinguities = [s for s in gameState.singuities if s.playerId == playerId]
 
         if len(playerSinguities) == 0:
-            return DiscretePlayer(playerId, 0, np.zeros(2), 1, 0, [])
+            return DiscretePlayer(playerId, 0, np.zeros(2), PhysicsEstimator.getMinimumStd(0), 0, [])
 
         singuityPositions = [s.position for s in playerSinguities]
 
@@ -63,13 +63,13 @@ class DiscretePlayer:
         constrainedMovementDuration = getLastingMoveDuration(originalMovementDuration)
 
         if constrainedMovementDuration == 0:
-            return self
+            return 0, self
 
         targetIsWithinStd = PhysicsEstimator.distance(self.singuitiesMeanPosition, targetPosition) <= self.singuitiesStd
 
         if targetIsWithinStd:
             ratioOfTimeSpentInside = min(constrainedMovementDuration * Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME, self.singuitiesStd * 2) / (self.singuitiesStd * 2)
-            newStd = min((np.sqrt(self.singuityCount)) * ratioOfTimeSpentInside + self.singuitiesStd * (1 - ratioOfTimeSpentInside), self.singuitiesStd)
+            newStd = min(PhysicsEstimator.getMinimumStd(self.singuityCount) * ratioOfTimeSpentInside + self.singuitiesStd * (1 - ratioOfTimeSpentInside), self.singuitiesStd)
         else:
             # maximum duration on a 5000 unit map
             newStd = self.singuitiesStd * (1 + constrainedMovementDuration / 1768)
@@ -102,13 +102,13 @@ class DiscretePlayer:
 
         if PhysicsEstimator.distance(spawnerPosition, self.singuitiesMeanPosition) <= self.singuitiesStd * 2:
             newSinguitiesMean, newSinguitiesStd, newSinguitiesCount = arrays.combineMeanStdAndCount(
-                self.singuitiesMeanPosition, np.sqrt(atTargetCount), atTargetCount, unitPositionInLine, singuitiesInLineStd, unitCountInLine
+                self.singuitiesMeanPosition, np.sqrt(atTargetCount), atTargetCount, unitPositionInLine, singuitiesInLineStd, unitCountInLine, PhysicsEstimator.getMinimumStd(atTargetCount + unitCountInLine)
             )
         else:
             newSinguitiesMean, newSinguitiesStd, newSinguitiesCount = self.singuitiesMeanPosition, np.sqrt(atTargetCount), atTargetCount
 
         singuitiesMean, singuitiesStd, singuitiesCount = arrays.combineMeanStdAndCount(
-            self.singuitiesMeanPosition, np.array([self.singuitiesStd]), self.singuityCount, newSinguitiesMean, np.linalg.norm(newSinguitiesStd), newSinguitiesCount
+            self.singuitiesMeanPosition, np.array([self.singuitiesStd]), self.singuityCount, newSinguitiesMean, np.linalg.norm(newSinguitiesStd), newSinguitiesCount, PhysicsEstimator.getMinimumStd(newSinguitiesCount + self.singuityCount)
         )
 
         return DiscretePlayer(self.id, singuitiesCount, singuitiesMean, np.linalg.norm(singuitiesStd), 0 if self.singuityCount + newSinguitiesCount == 0 else (self.singuitiesAverageHealth * self.singuityCount + Singuity.MAX_HEALTH_POINT * newSinguitiesCount) / (self.singuityCount + newSinguitiesCount))

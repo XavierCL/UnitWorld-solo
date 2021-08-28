@@ -5,8 +5,6 @@ from clientAis.ais.discreteV1.physics.PhysicsEstimator import PhysicsEstimator
 from utils import arrays
 
 class DiscreteGameScorer:
-    LONG_TERM_ESTIMATION_DURATION = 1e6
-
     # Returns -1 when all is lost for the current player
     @staticmethod
     def score(gameState: DiscreteGameState, playerId: str) -> float:
