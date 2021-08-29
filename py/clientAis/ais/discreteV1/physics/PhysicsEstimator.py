@@ -109,7 +109,7 @@ class PhysicsEstimator:
 
     @staticmethod
     def areSinguitiesColliding(position1: np.ndarray, position2: np.ndarray, clustersStd: float = 0):
-        return np.linalg.norm(position1 - position2) <= 2 * Singuity.ATTACK_RANGE + 2 * clustersStd
+        return PhysicsEstimator.distance(position1, position2) <= Singuity.ATTACK_RANGE + clustersStd
 
     @staticmethod
     def getClusterForce(singuityCount: int, clusterStd: float, averageHealth: float) -> float:
@@ -149,7 +149,7 @@ class PhysicsEstimator:
         if allegedPlayerId is not None:
             for clusterIndex, (cluster, clusterForce) in enumerate(zip(clusters, clusterForces)):
                 if cluster[0] == allegedPlayerId:
-                    clusterForces[clusterIndex] *= spawnerRemainingHealth / Spawner.MAX_HEALTH_POINTS + 1
+                    clusterForces[clusterIndex] *= 10 * spawnerRemainingHealth / Spawner.MAX_HEALTH_POINTS + 1
                     homeClusterIndex = clusterIndex
                     break
 
@@ -164,7 +164,7 @@ class PhysicsEstimator:
                 ) ** 2) if averageAdversaryForce > 1 else clusterForces[maximalForceClusterIndex]
 
             if homeClusterIndex == maximalForceClusterIndex:
-                maximalRemainingForce /= spawnerRemainingHealth / Spawner.MAX_HEALTH_POINTS + 1
+                maximalRemainingForce /= 10 * spawnerRemainingHealth / Spawner.MAX_HEALTH_POINTS + 1
 
             remainingCounts = arrays.assign(
                 np.zeros(len(clusters)), maximalForceClusterIndex, PhysicsEstimator.clusterForceToCount(
