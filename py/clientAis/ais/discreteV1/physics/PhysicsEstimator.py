@@ -14,8 +14,8 @@ class PhysicsEstimator:
     MAXIMUM_INTERACTION_DURATION = 2 * 5000 / Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME
 
     @staticmethod
-    def getMinimumStd(singuityCount: int) -> float:
-        return max(1., math.sqrt(singuityCount / (math.pi * PhysicsEstimator.MAXIMUM_SINGUITY_DENSITY_PER_AREA)))
+    def getMinimumStd(singuityCount: Union[np.ndarray, int]) -> Union[np.ndarray, float]:
+        return np.max([np.ones_like(singuityCount), np.sqrt(singuityCount / (math.pi * PhysicsEstimator.MAXIMUM_SINGUITY_DENSITY_PER_AREA))], axis=0)
 
     @staticmethod
     def distanceToSpawningSinguities(distance: float) -> int:
@@ -105,7 +105,11 @@ class PhysicsEstimator:
 
     @staticmethod
     def distance(position1: np.ndarray, position2: np.ndarray) -> float:
-        return np.linalg.norm(position1 - position2)
+        return np.linalg.norm(position1 - position2, axis=-1)
+
+    @staticmethod
+    def distance2(position1: np.ndarray, position2: np.ndarray) -> float:
+        return np.sum((position1 - position2) ** 2, axis=-1)
 
     @staticmethod
     def areSinguitiesColliding(position1: np.ndarray, position2: np.ndarray, clustersStd: float = 0):

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import numpy as np
 from sklearn.cluster import DBSCAN
@@ -65,7 +65,7 @@ class DiscretePlayer:
         if constrainedMovementDuration == 0:
             return 0, self
 
-        targetIsWithinStd = PhysicsEstimator.distance(self.singuitiesMeanPosition, targetPosition) <= self.singuitiesStd
+        targetIsWithinStd = PhysicsEstimator.distance2(self.singuitiesMeanPosition, targetPosition) <= self.singuitiesStd ** 2
 
         if targetIsWithinStd:
             ratioOfTimeSpentInside = min(constrainedMovementDuration * Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME, self.singuitiesStd * 2) / (self.singuitiesStd * 2)
@@ -89,26 +89,37 @@ class DiscretePlayer:
     def tryClaimFor(self, remainingSinguitiesToClaim):
         return DiscretePlayer(self.id, max(self.singuityCount - remainingSinguitiesToClaim, 0), self.singuitiesMeanPosition, self.singuitiesStd, self.singuitiesAverageHealth)
 
-    def appendNewSpawned(self, spawnerPosition: np.ndarray, spawnerLastFrameClaimed: int, anteMoveFrameCount: int, postMoveFrameCount: int) -> DiscretePlayer:
-        matureSpawnerDuration = min(postMoveFrameCount - anteMoveFrameCount, postMoveFrameCount - spawnerLastFrameClaimed + Spawner.GESTATION_FRAME_LAG)
-        durationToTarget = PhysicsEstimator.estimateMovementDuration(spawnerPosition, self.singuitiesMeanPosition)
-        atTargetCount = round(max((matureSpawnerDuration - durationToTarget) * PhysicsEstimator.SPAWNER_SPAWN_PER_FRAME, 0))
-        distanceFromSpawnerToMeanPosition = np.linalg.norm(self.singuitiesMeanPosition - spawnerPosition)
-        maxDistanceFromTime = matureSpawnerDuration * Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME
-        furthestSinguityRatio = 1 if distanceFromSpawnerToMeanPosition <= maxDistanceFromTime else maxDistanceFromTime / distanceFromSpawnerToMeanPosition
-        unitPositionInLine = (spawnerPosition + (self.singuitiesMeanPosition - spawnerPosition) * furthestSinguityRatio / 2)
-        unitCountInLine = round(PhysicsEstimator.distanceToSpawningSinguities(distanceFromSpawnerToMeanPosition * furthestSinguityRatio))
-        singuitiesInLineStd = distanceFromSpawnerToMeanPosition * furthestSinguityRatio / 4
+    def appendNewSpawned(self, spawners: List[Tuple[np.ndarray, int]], anteMoveFrameCount: int, postMoveFrameCount: int) -> DiscretePlayer:
+        spawnerLastClaimedFrames = np.array([s[1] for s in spawners])
+        spawnerPositions = np.array([s[0] for s in spawners])
 
-        if PhysicsEstimator.distance(spawnerPosition, self.singuitiesMeanPosition) <= self.singuitiesStd * 2:
-            newSinguitiesMean, newSinguitiesStd, newSinguitiesCount = arrays.combineMeanStdAndCount(
-                self.singuitiesMeanPosition, np.sqrt(atTargetCount), atTargetCount, unitPositionInLine, singuitiesInLineStd, unitCountInLine, PhysicsEstimator.getMinimumStd(atTargetCount + unitCountInLine)
-            )
-        else:
-            newSinguitiesMean, newSinguitiesStd, newSinguitiesCount = self.singuitiesMeanPosition, np.sqrt(atTargetCount), atTargetCount
+        matureSpawnerDurations = np.maximum(0, postMoveFrameCount - np.maximum(anteMoveFrameCount, spawnerLastClaimedFrames + Spawner.GESTATION_FRAME_LAG))
+        newSinguityCounts = np.round(matureSpawnerDurations / Spawner.SPAWN_FRAME_LAG)
 
-        singuitiesMean, singuitiesStd, singuitiesCount = arrays.combineMeanStdAndCount(
-            self.singuitiesMeanPosition, np.array([self.singuitiesStd]), self.singuityCount, newSinguitiesMean, np.linalg.norm(newSinguitiesStd), newSinguitiesCount, PhysicsEstimator.getMinimumStd(newSinguitiesCount + self.singuityCount)
-        )
+        usefulSpawnersMask = newSinguityCounts > 0
+        spawnerPositions = spawnerPositions[usefulSpawnersMask]
+        matureSpawnerDurations = matureSpawnerDurations[usefulSpawnersMask]
+        newSinguityCounts = newSinguityCounts[usefulSpawnersMask]
 
-        return DiscretePlayer(self.id, singuitiesCount, singuitiesMean, np.linalg.norm(singuitiesStd), 0 if self.singuityCount + newSinguitiesCount == 0 else (self.singuitiesAverageHealth * self.singuityCount + Singuity.MAX_HEALTH_POINT * newSinguitiesCount) / (self.singuityCount + newSinguitiesCount))
+        distanceFromSpawnersToMeanPosition = PhysicsEstimator.distance(self.singuitiesMeanPosition, spawnerPositions)
+        durationsToTarget = distanceFromSpawnersToMeanPosition / Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME
+        atTargetCounts = np.round(np.maximum((matureSpawnerDurations - durationsToTarget) * PhysicsEstimator.SPAWNER_SPAWN_PER_FRAME, 0))
+
+        atTargetCount = np.sum(atTargetCounts)
+
+        furthestSinguityRatios = np.ones_like(distanceFromSpawnersToMeanPosition)
+        matureSpawnerDurationIsLowerThanTargetDurationMask = matureSpawnerDurations < atTargetCounts
+        furthestSinguityRatios[matureSpawnerDurationIsLowerThanTargetDurationMask] = matureSpawnerDurations[matureSpawnerDurationIsLowerThanTargetDurationMask] / atTargetCounts[matureSpawnerDurationIsLowerThanTargetDurationMask]
+
+        inLineCounts = newSinguityCounts - atTargetCounts
+        inLineMeanPositions = spawnerPositions + (spawnerPositions - self.singuitiesMeanPosition) * furthestSinguityRatios[:, np.newaxis] / 2
+        inLineStds = distanceFromSpawnersToMeanPosition * furthestSinguityRatios / 4
+        lineUsageMask = PhysicsEstimator.distance2(spawnerPositions, self.singuitiesMeanPosition) <= (self.singuitiesStd * 2)**2
+
+        means = np.concatenate([[self.singuitiesMeanPosition, self.singuitiesMeanPosition], inLineMeanPositions[lineUsageMask]])
+        stds = np.concatenate([[self.singuitiesStd, PhysicsEstimator.getMinimumStd(atTargetCount)], inLineStds[lineUsageMask]])
+        counts = np.concatenate([[self.singuityCount, atTargetCount], inLineCounts[lineUsageMask]])
+
+        mean, std, count = arrays.combineMeanStdAndCount(means, stds, counts, minStd=np.ones(2))
+
+        return DiscretePlayer(self.id, count, mean, np.mean(std), 0 if count == 0 else (self.singuitiesAverageHealth * self.singuityCount + Singuity.MAX_HEALTH_POINT * (count - self.singuityCount)) / count)

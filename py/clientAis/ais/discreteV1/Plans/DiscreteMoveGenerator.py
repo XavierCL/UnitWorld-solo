@@ -31,13 +31,13 @@ class DiscreteMoveGenerator:
 
     @staticmethod
     def getQuickestFirstNSteps(originalGameState: DiscreteGameState, moves: List[DiscreteMove], limit: Optional[int] = None) -> List[Tuple[DiscreteMove, DiscreteGameState]]:
-        gameStates = [originalGameState.executeMove(move) for move in moves]
-        frameCounts = [g.frameCount for g in gameStates]
-        frameCountSortedIndices = np.argsort(frameCounts, kind="stable")
+        durationsAndPartialStates = [originalGameState.preprocessMove(move) for move in moves]
+        durations = [duration for duration, _ in durationsAndPartialStates]
+        durationSortedIndices = np.argsort(durations, kind="stable")
         return list(
             zip(
-                np.array(moves, dtype=object)[frameCountSortedIndices][:limit],
-                np.array(gameStates, dtype=object)[frameCountSortedIndices][:limit]
+                np.array(moves, dtype=object)[durationSortedIndices][:limit],
+                [partialGameState() for _, partialGameState in np.array(durationsAndPartialStates, dtype=object)[durationSortedIndices][:limit]]
             )
         )
 

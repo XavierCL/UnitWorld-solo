@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 from sklearn.neighbors import KDTree
@@ -37,6 +37,7 @@ class DiscreteGameState:
     def fromGameState(gameState: GameState, currentPlayerId: str) -> DiscreteGameState:
         playerDictionary: Dict[str, DiscretePlayer] = {}
         playerIds: List[str] = []
+
         DiscreteGameState.spawnerCollisionDetector = KDTree(np.array([s.position for s in gameState.spawners]))
 
         for playerIndex, player in enumerate(gameState.players):
@@ -54,10 +55,13 @@ class DiscreteGameState:
         return DiscreteGameState(currentPlayerId, playerDictionary, spawners, spawnersById, gameState.frameCount, gameState)
 
     def executeMove(self, move: DiscreteMove, restrictedFrameCount: Optional[int] = None) -> DiscreteGameState:
+        return self.preprocessMove(move, restrictedFrameCount)[1]()
+
+    def preprocessMove(self, move: DiscreteMove, restrictedFrameCount: Optional[int] = None) -> Tuple[int, Callable[[], DiscreteGameState]]:
         restrictedDuration = None if (restrictedFrameCount is None) else (restrictedFrameCount - self.frameCount)
 
         if restrictedFrameCount is not None and restrictedFrameCount <= self.frameCount:
-            return self
+            return 0, lambda: self
 
         newPlayersById: Dict[str, DiscretePlayer] = {}
         newSpawnersById: Dict[str, DiscreteSpawner] = {}
@@ -81,13 +85,16 @@ class DiscreteGameState:
             for updatedPlayer in updatedPlayers:
                 newPlayersById[updatedPlayer.id] = updatedPlayer
 
-        def assignNewSpawnees(frameBefore: int, frameAfter: int):
+        def assignNewSpawnees(spawners: List[DiscreteSpawner], frameBefore: int, frameAfter: int):
             if frameAfter > frameBefore:
-                for spawner in self.spawners:
+                spawnersByPlayer = {playerId: [] for playerId in self.playerDictionary.keys()}
+
+                for spawner in spawners:
                     if spawner.isClaimed():
-                        newPlayersById[spawner.allegence.playerId] = getLastPlayerVersion(spawner.allegence.playerId).appendNewSpawned(
-                            spawner.position, spawner.lastFrameClaimed, frameBefore, frameAfter
-                        )
+                        spawnersByPlayer[spawner.allegence.playerId].append(spawner)
+
+                for playerId, claimedSpawners in spawnersByPlayer.items():
+                    newPlayersById[playerId] = getLastPlayerVersion(playerId).appendNewSpawned([(spawner.position, spawner.lastFrameClaimed) for spawner in claimedSpawners], frameBefore, frameAfter)
 
         # Get time until cluster arrives
         targetSpawner = None if move.spawnerId is None else getLastSpawnerVersion(move.spawnerId)
@@ -99,34 +106,43 @@ class DiscreteGameState:
         # Update both interactions and moved player
         updateSpawnersAndPlayers(updatedSpawners, updatedPlayers + [movedPlayer])
 
+        # Take snapshot of spawners to make them spawn after the interaction
+        spawnersAfterMovement = [getLastSpawnerVersion(spawner.id) for spawner in self.spawners]
+
         # Spawn singuities before player fights
-        assignNewSpawnees(self.frameCount, self.frameCount + movementDuration)
+        assignNewSpawnees(self.spawners, self.frameCount, self.frameCount + movementDuration)
 
         # Process main interactions once player is at destination
         updatedSpawners, updatedPlayers, interactionDuration = self.executeInteractions(
-            [getLastSpawnerVersion(spawnerId) for spawnerId in self.spawnersById.keys()],
+            [getLastSpawnerVersion(spawner.id) for spawner in self.spawners],
             [getLastPlayerVersion(playerId) for playerId in self.playerDictionary.keys()],
             PhysicsEstimator.MAXIMUM_INTERACTION_DURATION if restrictedDuration is None else restrictedDuration - movementDuration,
             restrictDurationToPlayer=move.playerId
         )
-        updateSpawnersAndPlayers(updatedSpawners, updatedPlayers)
 
-        # Capture spawner if neutral after interaction
-        if targetSpawner is not None and (not targetSpawner.isClaimed() or targetSpawner.isAllegedToPlayer(move.playerId)):
-            updatedSpawner, updatedPlayer = self.tryCaptureNeutralOrOwnAllegedSpawner(getLastSpawnerVersion(move.spawnerId), getLastPlayerVersion(move.playerId), self.frameCount + movementDuration + interactionDuration)
-            updateSpawnersAndPlayers([updatedSpawner], [updatedPlayer])
+        def finalizeState():
+            updateSpawnersAndPlayers(updatedSpawners, updatedPlayers)
 
-        # Spawn singuities during interaction
-        assignNewSpawnees(self.frameCount + movementDuration, self.frameCount + movementDuration + interactionDuration)
+            # Capture spawner if neutral after interaction
+            if targetSpawner is not None and (targetSpawner.allegence is None or (not targetSpawner.isClaimed() and targetSpawner.isAllegedToPlayer(move.playerId))):
+                updatedSpawner, updatedPlayer = self.tryCaptureNeutralOrOwnAllegedSpawner(
+                    getLastSpawnerVersion(targetSpawner.id), getLastPlayerVersion(move.playerId), self.frameCount + movementDuration + interactionDuration
+                )
+                updateSpawnersAndPlayers([updatedSpawner], [updatedPlayer])
 
-        return DiscreteGameState(
-            self.currentPlayerId,
-            {playerId: getLastPlayerVersion(playerId) for playerId in self.playerDictionary.keys()},
-            [getLastSpawnerVersion(spawner.id) for spawner in self.spawners],
-            {spawner.id: getLastSpawnerVersion(spawner.id) for spawner in self.spawners},
-            self.frameCount + movementDuration + interactionDuration,
-            None
-        )
+            # Spawn singuities during interaction
+            assignNewSpawnees(spawnersAfterMovement, self.frameCount + movementDuration, self.frameCount + movementDuration + interactionDuration)
+
+            return DiscreteGameState(
+                self.currentPlayerId,
+                {playerId: getLastPlayerVersion(playerId) for playerId in self.playerDictionary.keys()},
+                [getLastSpawnerVersion(spawner.id) for spawner in self.spawners],
+                {spawner.id: getLastSpawnerVersion(spawner.id) for spawner in self.spawners},
+                self.frameCount + movementDuration + interactionDuration,
+                None
+            )
+
+        return movementDuration + interactionDuration, finalizeState
 
     def getSpawnerInteractions(self, spawners: List[DiscreteSpawner], clusters: List[DiscretePlayer]) -> Tuple[Dict[str, List[DiscretePlayer]], Dict[str, str]]:
         spawnerInteractions: Dict[str, List[DiscretePlayer]] = {}
@@ -140,11 +156,16 @@ class DiscreteGameState:
             else:
                 spawnerInteractions[spawner.id] = [cluster]
 
-        for cluster in clusters:
-            closestSpawner = spawners[DiscreteGameState.spawnerCollisionDetector.query(cluster.singuitiesMeanPosition.reshape(1, 2), return_distance=False)[0].item()]
+        clusterPositions = np.array([cluster.singuitiesMeanPosition for cluster in clusters])
+        closestSpawnerIndices = DiscreteGameState.spawnerCollisionDetector.query(clusterPositions, return_distance=False).reshape(-1)
 
-            if PhysicsEstimator.areSinguitiesColliding(cluster.singuitiesMeanPosition, closestSpawner.position, cluster.singuitiesStd):
-                addSpawnerInteraction(closestSpawner, cluster)
+        for closestSpawnerIndex in closestSpawnerIndices:
+            closestSpawner = spawners[closestSpawnerIndex]
+
+            for cluster in clusters:
+
+                if PhysicsEstimator.areSinguitiesColliding(cluster.singuitiesMeanPosition, closestSpawner.position, cluster.singuitiesStd):
+                    addSpawnerInteraction(closestSpawner, cluster)
 
         return spawnerInteractions, spawnerInteractedClusters
 
@@ -251,7 +272,7 @@ class DiscreteGameState:
         moves = []
 
         if len(outOfCluster) > 0:
-            moves.append(Move.fromPosition(list(outOfCluster), discretePlayer.singuitiesMeanPosition + inClusterSpeed * PhysicsEstimator.FULL_STOP_DURATION / 2))
+            moves.append(Move.fromPosition(list(outOfCluster), discretePlayer.singuitiesMeanPosition + inClusterSpeed * PhysicsEstimator.FULL_STOP_DURATION))
 
         if discreteMove.spawnerId is not None:
             moves.append(Move.fromSpawner(discretePlayer.inCluster, arrays.first(self.rootGameState.spawners, lambda s: s.id == discreteMove.spawnerId), discreteMove.playerId))

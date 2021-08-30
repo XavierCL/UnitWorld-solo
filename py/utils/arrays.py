@@ -29,6 +29,11 @@ def assign(arr: np.ndarray, indices, values) -> np.ndarray:
     arr[indices] = values
     return arr
 
+def assignShape(shape: Tuple, indices, values) -> Tuple:
+    arr = np.array(shape, dtype=object)
+    arr[indices] = values
+    return tuple(arr)
+
 def assignInline(arr, indices, values):
     arr[indices] = values
     return arr
@@ -40,22 +45,22 @@ def first(arr: Iterable[Nested], predicate: Callable[[Nested], bool]) -> Nested:
 
     raise Exception("Could not find first value within array")
 
-def combineMeanStdAndCount(mean1: Nested = 0, std1: Nested = 1, count1: int = 1, mean2: Nested = 0, std2: Nested = 1, count2: int = 1, minStd: Optional = None) -> Tuple[Nested, Nested, int]:
-    if count1 < 1 and count2 < 1:
-        return (mean1 + mean2) / 2, 1 if minStd is None else minStd, 0
-    elif count1 < 1:
-        return mean2, std2, count2
-    elif count2 < 1:
-        return mean1, std1, count1
+def combineMeanStdAndCount(means: np.ndarray, stds: np.ndarray, counts: np.ndarray, minStd: Optional[float] = None) -> Tuple[float, float, int]:
+    count = np.sum(counts, axis=0)
+    minStd = 1 if minStd is None else minStd
+    meanConversionShape = assignShape(assignShape(means.shape, None, np.newaxis), 0, slice(None))
+    if count < 1:
+        return np.mean(means, axis=0), minStd, 0
 
-    intermediateStd = np.sqrt(
-        ((count1 - 1) * std1 ** 2 + (count2 - 1) * std2 ** 2) / (count1 + count2 - 1) + (count1 * count2 * (mean1 - mean2) ** 2) / ((count1 + count2) * (count1 + count2 - 1))
-    )
+    mean = np.sum((counts[meanConversionShape] * means), axis=0) / count
+    variances = stds**2
+    means2 = means**2
+    std = np.sqrt(np.sum(counts[meanConversionShape] * (means2 + variances[meanConversionShape]), axis=0) / count - mean ** 2)
 
     return (
-        (mean1 * count1 + mean2 * count2) / (count1 + count2),
-        np.max([intermediateStd, np.zeros_like(intermediateStd) if minStd is None else np.ones_like(intermediateStd) * minStd], axis=0),
-        count1 + count2
+        mean,
+        np.maximum(std, minStd),
+        count
     )
 
 def sort(arr: List[Nested], key: Optional[Callable[[Nested], Any]] = None) -> List[Nested]:
