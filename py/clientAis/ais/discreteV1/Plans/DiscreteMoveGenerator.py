@@ -45,7 +45,7 @@ class DiscreteMoveGenerator:
     def generateNeutralSpawnerMoves(gameState: DiscreteGameState, playerId: str) -> List[DiscreteMove]:
         moves = []
         for spawner in [spawner for spawner in gameState.spawners if not spawner.isClaimed()]:
-            moves.append(DiscreteMove.fromSpawner(playerId, spawner.id))
+            moves.append(DiscreteMove.fromSpawner("neutral", playerId, spawner.id))
 
         return moves
 
@@ -53,7 +53,7 @@ class DiscreteMoveGenerator:
     def generateEnemySpawnerMoves(gameState: DiscreteGameState, playerId: str) -> List[DiscreteMove]:
         moves = []
         for spawner in [spawner for spawner in gameState.spawners if spawner.isClaimed() and not spawner.isAllegedToPlayer(playerId)]:
-            moves.append(DiscreteMove.fromSpawner(playerId, spawner.id))
+            moves.append(DiscreteMove.fromSpawner("enemy", playerId, spawner.id))
 
         return moves
 
@@ -61,7 +61,7 @@ class DiscreteMoveGenerator:
     def generateOwnSpawnerMoves(gameState: DiscreteGameState, playerId: str, shortestAllowedMovementDuration: int) -> List[DiscreteMove]:
         moves = []
         for spawner in [spawner for spawner in gameState.spawners if spawner.isClaimed() and spawner.isAllegedToPlayer(playerId)]:
-            moves.append(DiscreteMove.fromSpawner(playerId, spawner.id, timeSpentAtSpawner=shortestAllowedMovementDuration))
+            moves.append(DiscreteMove.fromSpawner("own", playerId, spawner.id, timeSpentAtSpawner=shortestAllowedMovementDuration))
 
         return moves
 
@@ -69,6 +69,6 @@ class DiscreteMoveGenerator:
     def generateClusterMoves(gameState: DiscreteGameState, playerId: str, shortestAllowedMovementDuration: int, ownOnly=False) -> List[DiscreteMove]:
         moves = []
         for discretePlayer in [p for p in gameState.playerDictionary.values() if p.id == playerId or not ownOnly]:
-            moves.append(DiscreteMove.fromPosition(playerId, discretePlayer.singuitiesMeanPosition, timeSpentAtPosition=shortestAllowedMovementDuration))
+            moves.append(DiscreteMove.fromPosition(gameState.currentPlayerId == discretePlayer.id, playerId, discretePlayer.singuitiesMeanPosition, timeSpentAtPosition=shortestAllowedMovementDuration))
 
         return moves

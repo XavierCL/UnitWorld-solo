@@ -159,13 +159,11 @@ class DiscreteGameState:
         clusterPositions = np.array([cluster.singuitiesMeanPosition for cluster in clusters])
         closestSpawnerIndices = DiscreteGameState.spawnerCollisionDetector.query(clusterPositions, return_distance=False).reshape(-1)
 
-        for closestSpawnerIndex in closestSpawnerIndices:
+        for cluster, closestSpawnerIndex in zip(clusters, closestSpawnerIndices):
             closestSpawner = spawners[closestSpawnerIndex]
 
-            for cluster in clusters:
-
-                if PhysicsEstimator.areSinguitiesColliding(cluster.singuitiesMeanPosition, closestSpawner.position, cluster.singuitiesStd):
-                    addSpawnerInteraction(closestSpawner, cluster)
+            if PhysicsEstimator.areSinguitiesColliding(cluster.singuitiesMeanPosition, closestSpawner.position, cluster.singuitiesStd):
+                addSpawnerInteraction(closestSpawner, cluster)
 
         return spawnerInteractions, spawnerInteractedClusters
 

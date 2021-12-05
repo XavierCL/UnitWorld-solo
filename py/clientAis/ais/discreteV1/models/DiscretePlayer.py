@@ -97,6 +97,9 @@ class DiscretePlayer:
         newSinguityCounts = np.round(matureSpawnerDurations / Spawner.SPAWN_FRAME_LAG)
 
         usefulSpawnersMask = newSinguityCounts > 0
+        if np.count_nonzero(usefulSpawnersMask) <= 0:
+            return self
+
         spawnerPositions = spawnerPositions[usefulSpawnersMask]
         matureSpawnerDurations = matureSpawnerDurations[usefulSpawnersMask]
         newSinguityCounts = newSinguityCounts[usefulSpawnersMask]

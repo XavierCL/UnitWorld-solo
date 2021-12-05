@@ -12,15 +12,23 @@ from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
 from clientAis.ais.discreteV1.Plans.DiscreteMoveGenerator import DiscreteMoveGenerator
 
 class StateScore:
-    def __init__(self, score: float, frameAchieved: int, occurrences: int, path: List[int]):
+    def __init__(self, score: float, frameAchieved: int, occurrences: int, movePath: List[DiscreteMove], path: List[int]):
         self.score = score
         self.frameAchieved = frameAchieved
         self.occurrences = occurrences
+        self.movePath = movePath
         self.path = path
+
+    @staticmethod
+    def fromLeaf(score: float, frameAchieved: int):
+        return StateScore(score, frameAchieved, 1, [], [])
+
+    def mergeWith(self, otherScore: StateScore):
+        return StateScore(self.score, self.frameAchieved, self.occurrences + otherScore.occurrences, self.movePath, self.path)
 
     def getBestScore(self, otherScore: StateScore) -> StateScore:
         if self.isSameAs(otherScore):
-            return StateScore(self.score, self.frameAchieved, self.occurrences + otherScore.occurrences, self.path)
+            return self.mergeWith(otherScore)
 
         elif self.isBetterThan(otherScore):
             return self
@@ -39,8 +47,8 @@ class StateScore:
     def isPlanBetterThan(self, otherScore: StateScore) -> bool:
         return self.isBetterThan(otherScore) or self.isSameAs(otherScore) and self.occurrences > otherScore.occurrences
 
-    def prependPath(self, index: int) -> StateScore:
-        return StateScore(self.score, self.frameAchieved, self.occurrences, [index] + self.path)
+    def prependPath(self, move: DiscreteMove, index: int) -> StateScore:
+        return StateScore(self.score, self.frameAchieved, self.occurrences, [move] + self.movePath, [index] + self.path)
 
 class DiscreteGameNode:
     INTEGRAL_DISCOUNT_RATIO = 0.5
@@ -58,22 +66,26 @@ class DiscreteGameNode:
 
         currentNodeScore = DiscreteGameScorer.score(self.gameState, self.gameState.currentPlayerId)
         bestScore = self.children[0].getBestScore(self.gameState.currentPlayerId, self.gameState.frameCount, currentNodeScore)
-        bestPlans = [self.children[0].previousPlan]
-        bestIndex = 0
+        bestIndices = [0]
 
         for index, child in enumerate(self.children[1:]):
             currentScore = child.getBestScore(self.gameState.currentPlayerId, self.gameState.frameCount, currentNodeScore)
 
             if bestScore.isSamePlanAs(currentScore):
-                bestPlans.append(child.previousPlan)
+                bestIndices.append(index + 1)
 
             elif currentScore.isPlanBetterThan(bestScore):
                 bestScore = currentScore
-                bestPlans = [child.previousPlan]
-                bestIndex = index + 1
+                bestIndices = [index + 1]
 
-        bestScore = bestScore.prependPath(bestIndex)
-        return random.choice(bestPlans)
+        chosenIndex = random.choice(bestIndices)
+        bestScore = bestScore.prependPath(self.children[chosenIndex].previousPlan, chosenIndex)
+        print([move.debugName for move in bestScore.movePath])
+
+        if bestScore.movePath[0].debugName == "to enemy cluster":
+            temp1 = 0
+
+        return self.children[chosenIndex].previousPlan
 
     def getBestScore(self, playerId: str, rootFrameCount: int, parentScore: float, integralDiscount: float = 0) -> StateScore:
         currentNodeScore = DiscreteGameScorer.score(self.gameState, playerId)
@@ -82,7 +94,10 @@ class DiscreteGameNode:
         integralDiscount = integralDiscount + parentScore * (self.gameState.frameCount - self.parentGameState.frameCount)
 
         if len(self.children) == 0:
-            return StateScore((1 - DiscreteGameNode.INTEGRAL_DISCOUNT_RATIO) * currentNodeScore + integralDiscount * DiscreteGameNode.INTEGRAL_DISCOUNT_RATIO / (self.gameState.frameCount - rootFrameCount), self.gameState.frameCount, 1, [])
+            return StateScore.fromLeaf(
+                (1 - DiscreteGameNode.INTEGRAL_DISCOUNT_RATIO) * currentNodeScore + integralDiscount * DiscreteGameNode.INTEGRAL_DISCOUNT_RATIO / (
+                            self.gameState.frameCount - rootFrameCount), self.gameState.frameCount
+                )
 
         bestScore = self.children[0].getBestScore(playerId, rootFrameCount, currentNodeScore, integralDiscount)
         bestIndex = 0
@@ -92,7 +107,7 @@ class DiscreteGameNode:
             bestScore = bestScore.getBestScore(currentScore)
             bestIndex = index + 1 if bestScore is currentScore else bestIndex
 
-        return bestScore.prependPath(bestIndex)
+        return bestScore.prependPath(self.children[bestIndex].previousPlan, bestIndex)
 
     def developChildren(self) -> List[DiscreteGameNode]:
         nextSteps = DiscreteMoveGenerator.executeStep(self.gameState, self.gameState.currentPlayerId)
