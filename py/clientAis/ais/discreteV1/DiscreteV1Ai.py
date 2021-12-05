@@ -16,7 +16,7 @@ class DiscreteV1Ai(Artificial):
         super().__init__(serverCommander)
 
         self.currentPlayerId: str = None
-        self.gameSearcher = DiscreteGameSearcher(allottedGenerationTimeSeconds=0.4)
+        self.gameSearcher = DiscreteGameSearcher(maxDepth=1)
 
     def frame(self, gameState: GameState, currentPlayerId: str):
         self.currentPlayerId = currentPlayerId
@@ -36,6 +36,10 @@ class DiscreteV1Ai(Artificial):
                 self.serverCommander.moveUnitsToSpawner(move.singuityIds, move.spawnerId)
 
     def frameIsIgnored(self, gameState: GameState) -> bool:
+        if len(gameState.players) <= 1:
+            # Waiting for other players
+            return True
+
         notOwnSpawners = [s for s in gameState.spawners if s.allegence is None or not s.allegence.isClaimed or (s.allegence.isClaimed and s.allegence.playerId != self.currentPlayerId)]
 
         if len(notOwnSpawners) == 0:

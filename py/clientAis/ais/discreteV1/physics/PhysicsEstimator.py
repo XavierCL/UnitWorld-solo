@@ -12,6 +12,8 @@ class PhysicsEstimator:
     SPAWNER_SPAWN_PER_FRAME = 1 / Spawner.SPAWN_FRAME_LAG
     MAXIMUM_SINGUITY_DENSITY_PER_AREA = 100 / (math.pi * 18 ** 2)
     MAXIMUM_INTERACTION_DURATION = 2 * 5000 / Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME
+    ATTACKS_NEEDED_TO_KILL_ONE_SINGUITY = Singuity.MAX_HEALTH_POINT / Singuity.ATTACK_STRENGTH
+    FRAMES_NEEDED_TO_KILL_ONE_SINGUITY = Singuity.ATTACK_FRAME_LAG * ATTACKS_NEEDED_TO_KILL_ONE_SINGUITY
 
     @staticmethod
     def getMinimumStd(singuityCount: Union[np.ndarray, int]) -> Union[np.ndarray, float]:
@@ -124,6 +126,86 @@ class PhysicsEstimator:
         if averageHealth == 0:
             return 0
         return round(math.sqrt(clusterForce * math.pi * clusterStd ** 2 * PhysicsEstimator.MAXIMUM_SINGUITY_DENSITY_PER_AREA / averageHealth))
+
+    # Asymptotically correct estimation of a fight between two enemy clusters where they have the same std
+    # Parameter is 2 * (number of units, average unit health), output is (fight duration, cluster1 remaining units, cluster2 remaining units)
+    # Never will the two clusters be returned with remaining units.
+    # However both clusters can be returned with 0 units if they have the same fighting force
+    @staticmethod
+    def estimateVoid1on1FightWithSameStd(cluster1: Tuple[int, float], cluster2: Tuple[int, float]) -> Tuple[int, int, int]:
+        (cluster1Units, cluster1Healths), (cluster2Units, cluster2Healths) = cluster1, cluster2
+        (cluster1Units, cluster2Units) = (math.ceil(cluster1Units), math.ceil(cluster2Units))
+
+        if cluster1Units <= 0 or cluster1Healths <= 0:
+            return 0, 0, cluster2Units
+        elif cluster2Units <= 0 or cluster2Healths <= 0:
+            return 0, cluster1Units, 0
+
+        cluster1HealthRoundFactor, cluster2HealthRoundFactor = PhysicsEstimator.ATTACKS_NEEDED_TO_KILL_ONE_SINGUITY * cluster1Units, PhysicsEstimator.ATTACKS_NEEDED_TO_KILL_ONE_SINGUITY * cluster2Units
+        (cluster1Healths, cluster2Healths) = (math.ceil(cluster1Healths * cluster1HealthRoundFactor) / cluster1HealthRoundFactor, math.ceil(cluster2Healths * cluster2HealthRoundFactor) / cluster2HealthRoundFactor)
+
+        if cluster1Healths <= 0:
+            return 0, 0, cluster2Units
+        elif cluster2Healths <= 0:
+            return 0, cluster1Units, 0
+
+        healthsSqrt = math.sqrt(cluster1Healths * cluster2Healths)
+        discreteCheck = cluster2Units * healthsSqrt - cluster1Healths * cluster1Units
+
+        if discreteCheck == 0:
+            # Tie, solve for unit count == 1
+            # One attempt at https://www.desmos.com/calculator/pl2aczcp4m
+            # Alternate solution, solve for cluster1 + 1
+            approximateSolution = PhysicsEstimator.estimateVoid1on1FightWithSameStd((cluster1Units + 1, cluster1Healths), cluster2)
+            return approximateSolution[0], 0, 0
+
+        cluster1Wins = discreteCheck <= 0
+
+        def getFightDuration(winnerUnits, winnerHealths, loserUnits):
+            return PhysicsEstimator.FRAMES_NEEDED_TO_KILL_ONE_SINGUITY * healthsSqrt * math.log((loserUnits * healthsSqrt + winnerHealths * winnerUnits)/(loserUnits * healthsSqrt - winnerHealths * winnerUnits)) / 2
+
+        fightDuration = getFightDuration(cluster1Units, cluster1Healths, cluster2Units) if cluster1Wins else getFightDuration(cluster2Units, cluster2Healths, cluster1Units)
+
+        def getRemainingUnits(winnerUnits, winnerHealths, loserUnits, atFrame):
+            return math.ceil(((winnerHealths * winnerUnits - loserUnits * healthsSqrt)*math.e**(atFrame/(PhysicsEstimator.FRAMES_NEEDED_TO_KILL_ONE_SINGUITY * healthsSqrt)) + (winnerHealths * winnerUnits + loserUnits * healthsSqrt)*math.e**(-atFrame/(PhysicsEstimator.FRAMES_NEEDED_TO_KILL_ONE_SINGUITY * healthsSqrt))) / (2 * winnerHealths))
+
+        return (math.ceil(fightDuration), getRemainingUnits(cluster1Units, cluster1Healths, cluster2Units, fightDuration), 0)\
+            if cluster1Wins\
+            else (math.ceil(fightDuration), 0, getRemainingUnits(cluster2Units, cluster2Healths, cluster1Units, fightDuration))
+
+    # Tales in 2*[unit count, std, average health]
+    # Returns the frame duration, unit count for cluster 1 and unit count for cluster 2.
+    # Average health is assumed not to have changed.
+    @staticmethod
+    def estimateVoid1on1Fight(cluster1: Tuple[int, float, float], cluster2: Tuple[int, float, float]) -> Tuple[int, int, int]:
+        (cluster1Units, cluster1Health, cluster1Std), (cluster2Units, cluster2Health, cluster2Std) = cluster1, cluster2
+
+        def estimateVoid1on1FightFromStd(smallestCluster: Tuple[int, float, float], largestCluster: Tuple[int, float, float]) -> Tuple[int, int, int]:
+            (smallestClusterUnits, smallestClusterHealth, smallestClusterStd), (largestClusterUnits, largestClusterHealth, largestClusterStd) = smallestCluster, largestCluster
+
+            equivalentLargestClusterUnits = round(largestClusterUnits * smallestClusterStd / largestClusterStd)
+            equivalentFightResult = PhysicsEstimator.estimateVoid1on1FightWithSameStd(
+                (smallestClusterUnits, smallestClusterHealth), (equivalentLargestClusterUnits, largestClusterHealth)
+            )
+
+            if equivalentFightResult[2] > 0:
+                return equivalentFightResult[0], 0, largestClusterUnits - equivalentLargestClusterUnits + equivalentFightResult[2]
+
+            smallestLostRatio = equivalentFightResult[1] / smallestClusterUnits
+            largestLostRatio = (largestClusterUnits - equivalentLargestClusterUnits + equivalentFightResult[2]) / largestClusterUnits
+
+            if smallestLostRatio < largestLostRatio:
+                fightDuration = math.ceil(equivalentFightResult[0] / (1 - smallestLostRatio))
+                return fightDuration, 0, math.ceil(largestClusterUnits - (equivalentLargestClusterUnits - equivalentFightResult[2]) / (1 - smallestLostRatio))
+            else:
+                fightDuration = math.ceil(equivalentFightResult[0] / (1 - largestLostRatio))
+                return fightDuration, math.ceil(smallestClusterUnits - (smallestClusterUnits - equivalentFightResult[1]) / (1 - largestLostRatio)), 0
+
+        if cluster1Std <= cluster2Std:
+            return estimateVoid1on1FightFromStd(cluster1, cluster2)
+        else:
+            duration, cluster2Remaining, cluster1Remaining = estimateVoid1on1FightFromStd(cluster2, cluster1)
+            return duration, cluster1Remaining, cluster2Remaining
 
     # Takes in a list of (singuityCount, clusterStd, singuityAverageHealth) and returns a list of singuity count
     @staticmethod
