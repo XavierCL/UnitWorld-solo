@@ -22,6 +22,6 @@ for gameFileName in gameFileNames:
 
 gameLauncher = GameLauncher(lastGamePath, pythonExecutablePath, javaAiFolder)
 gameLauncher.runServerBackground()
-# gameLauncher.runPythonAiBackground(aiName="discreteV1")
 gameLauncher.runCppAiBackground()
+gameLauncher.runPythonAiBackground("discreteV1")
 gameLauncher.runCppClientGuiBlocking(mode="observer")

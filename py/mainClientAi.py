@@ -24,7 +24,6 @@ commandLineOptions = {key: value for key, value in zip(arrays.soft_accessor(sys.
 DEFAULT_SERVER_IP = "127.0.0.1"
 DEFAULT_SERVER_PORT = 52124
 DEFAULT_AI_NAME = "discreteV1"
-SECOND_BETWEEN_AI_FRAME = 0.5
 
 serverIp = commandLineOptions.get("serverIp") or DEFAULT_SERVER_IP
 serverPort = int(commandLineOptions.get("serverPort") or DEFAULT_SERVER_PORT)
@@ -73,14 +72,17 @@ def clientConnectorCallBack(communicationHandler: CommunicationHandler):
 
             frameTimeInSecond = timeAfterFrame - timeBeforeFrame
 
+            allottedFrameTime = artificial.frameTimeSecond()
+
             if not hasNewFrame:
-                print(f"No new frame. Sleeping {SECOND_BETWEEN_AI_FRAME:.3f}s.")
-                time.sleep(SECOND_BETWEEN_AI_FRAME)
-            if frameTimeInSecond < SECOND_BETWEEN_AI_FRAME:
-                print(f"Frame {0 if gameManager.gameState is None else gameManager.gameState.frameCount} took {frameTimeInSecond:.3f}s. Sleeping {SECOND_BETWEEN_AI_FRAME - frameTimeInSecond:.3f}s.")
-                time.sleep(SECOND_BETWEEN_AI_FRAME - frameTimeInSecond)
+                print(f"No new frame. Sleeping {allottedFrameTime:.3f}s.")
+                time.sleep(allottedFrameTime)
+            elif frameTimeInSecond < allottedFrameTime:
+                print(f"Frame {0 if gameManager.gameState is None else gameManager.gameState.frameCount} took {frameTimeInSecond:.3f}s. Sleeping {allottedFrameTime - frameTimeInSecond:.3f}s.")
+                time.sleep(allottedFrameTime - frameTimeInSecond)
             else:
                 print(f"Frame {0 if gameManager.gameState is None else gameManager.gameState.frameCount} took {frameTimeInSecond:.3f}s. Not sleeping")
+                time.sleep(0.001)
     except:
         raise
     finally:

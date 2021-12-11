@@ -7,9 +7,9 @@ from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
 
 class DiscreteMoveGenerator:
     MINIMUM_MOVEMENT_DURATION = 150
-    ALLOWED_NEUTRAL_CLAIM_MOVES = None
-    ALLOWED_ENEMY_CLAIM_MOVES = None
-    ALLOWED_OWN_SPAWNER_MOVES = None
+    ALLOWED_NEUTRAL_CLAIM_MOVES = 2
+    ALLOWED_ENEMY_CLAIM_MOVES = 2
+    ALLOWED_OWN_SPAWNER_MOVES = 4
 
     @staticmethod
     def executeStep(gameState: DiscreteGameState, playerId: str) -> List[Tuple[DiscreteMove, DiscreteGameState]]:

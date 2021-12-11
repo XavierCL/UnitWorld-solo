@@ -35,6 +35,12 @@ class DiscreteV1Ai(Artificial):
             else:
                 self.serverCommander.moveUnitsToSpawner(move.singuityIds, move.spawnerId)
 
+    def frameTimeSecond(self) -> float:
+        if self.gameSearcher.allottedGenerationTimeSeconds is None:
+            return super().frameTimeSecond()
+
+        return self.gameSearcher.allottedGenerationTimeSeconds
+
     def frameIsIgnored(self, gameState: GameState) -> bool:
         if len(gameState.players) <= 1:
             # Waiting for other players

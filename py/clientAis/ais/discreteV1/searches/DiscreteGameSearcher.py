@@ -96,8 +96,8 @@ class DiscreteGameNode:
         if len(self.children) == 0:
             return StateScore.fromLeaf(
                 (1 - DiscreteGameNode.INTEGRAL_DISCOUNT_RATIO) * currentNodeScore + integralDiscount * DiscreteGameNode.INTEGRAL_DISCOUNT_RATIO / (
-                            self.gameState.frameCount - rootFrameCount), self.gameState.frameCount
-                )
+                        self.gameState.frameCount - rootFrameCount), self.gameState.frameCount
+            )
 
         bestScore = self.children[0].getBestScore(playerId, rootFrameCount, currentNodeScore, integralDiscount)
         bestIndex = 0
@@ -119,12 +119,13 @@ class DiscreteGameNode:
         return self
 
 class DiscreteGameSearcher:
-    def __init__(self, allottedGenerationTimeSeconds=1000, maxDepth: int = None):
+    def __init__(self, allottedGenerationTimeSeconds: Optional[float] = None, maxDepth: Optional[int] = None):
         self.allottedGenerationTimeSeconds = allottedGenerationTimeSeconds
         self.maxDepth = maxDepth
 
     def getBestOwnPlan(self, gameState: DiscreteGameState):
         developedGameStates = 0
+        reachedGameStates = 1
         rootGameNode = DiscreteGameNode(gameState, None, None)
 
         frameCounts: List[int] = [gameState.frameCount]
@@ -133,16 +134,32 @@ class DiscreteGameSearcher:
 
         startTime = time.time()
 
-        while time.time() - startTime < self.allottedGenerationTimeSeconds and len(frameCounts) > 0:
-            developedGameStates += 1
+        def shouldContinueExploration() -> bool:
+            if len(frameCounts) <= 0:
+                return False
+
+            if self.allottedGenerationTimeSeconds is None:
+                return True
+
+            currentDuration = time.time() - startTime
+
+            estimatedPostExplorationDuration = (len(gameLeaves) + len(orphanGameLeaves)) * (time.time() - startTime) / (reachedGameStates + 1)
+
+            return currentDuration + estimatedPostExplorationDuration < self.allottedGenerationTimeSeconds
+
+        while shouldContinueExploration():
             frameCounts.pop(0)
             gameNode = gameLeaves.pop(0)
 
+            developedChildren = gameNode.developChildren()
+            reachedGameStates += len(developedChildren)
+            developedGameStates += 1
+
             if self.maxDepth is not None and gameNode.depth == self.maxDepth - 1:
-                orphanGameLeaves.extend(gameNode.developChildren())
+                orphanGameLeaves.extend(developedChildren)
                 continue
 
-            movedGameNodes = np.array(gameNode.developChildren()[:], dtype=object)
+            movedGameNodes = np.array(developedChildren[:], dtype=object)
             movedFrameCounts = np.array([childNode.gameState.frameCount for childNode in movedGameNodes])
 
             reverseSortedMovedFrameCountIndices = np.argsort(movedFrameCounts)[::-1]
@@ -158,9 +175,13 @@ class DiscreteGameSearcher:
 
         smallestFrameCount = min(frameCounts[0:1] + [g.gameState.frameCount for g in orphanGameLeaves])
 
-        for gameLeaf in gameLeaves + orphanGameLeaves:
+        allLeaves = gameLeaves + orphanGameLeaves
+
+        for gameLeaf in allLeaves:
+            # Must restrict to more than smallest frame count in case the smallest developed move if the same as the smallest undeveloped move,
+            # in which case the smallest undeveloped must reach the same result at least
             gameLeaf.restrictDuration(smallestFrameCount + 0.001)
 
-        print(f"Developed game nodes: {developedGameStates}")
+        print(f"Developed: {developedGameStates}, Reached: {reachedGameStates}, Leaves: {len(allLeaves)}")
 
         return rootGameNode.gameState.discreteMoveToMove(rootGameNode.getBestPlan())

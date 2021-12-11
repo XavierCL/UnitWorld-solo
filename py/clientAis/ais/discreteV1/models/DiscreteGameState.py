@@ -265,17 +265,16 @@ class DiscreteGameState:
         singuityIds = np.array([s.id for s in ownSinguities])
         inClusterMask = np.isin(singuityIds, discretePlayer.inCluster)
         outOfCluster = singuityIds[~inClusterMask]
-        inClusterSpeed = np.mean([s.speed for s in ownSinguities[inClusterMask]], axis=0)
 
         moves = []
-
-        if len(outOfCluster) > 0:
-            moves.append(Move.fromPosition(list(outOfCluster), discretePlayer.singuitiesMeanPosition + inClusterSpeed * PhysicsEstimator.FULL_STOP_DURATION))
 
         if discreteMove.spawnerId is not None:
             moves.append(Move.fromSpawner(discretePlayer.inCluster, arrays.first(self.rootGameState.spawners, lambda s: s.id == discreteMove.spawnerId), discreteMove.playerId))
 
         elif discreteMove.position is not None:
             moves.append(Move.fromPosition(discretePlayer.inCluster, discreteMove.position))
+
+        if len(outOfCluster) > 0 and len(moves) > 0:
+            moves.append(Move.fromPosition(list(outOfCluster), moves[-1].position))
 
         return moves
