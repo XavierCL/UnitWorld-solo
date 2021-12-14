@@ -51,7 +51,7 @@ class StateScore:
         return StateScore(self.score, self.frameAchieved, self.occurrences, [move] + self.movePath, [index] + self.path)
 
 class DiscreteGameNode:
-    INTEGRAL_DISCOUNT_RATIO = 0.5
+    INTEGRAL_DISCOUNT_RATIO = 0.1
 
     def __init__(self, gameState: DiscreteGameState, previousPlan: Optional[DiscreteMove], parentGameState: Optional[DiscreteGameState], depth: int = 0):
         self.gameState = gameState
@@ -81,9 +81,6 @@ class DiscreteGameNode:
         chosenIndex = random.choice(bestIndices)
         bestScore = bestScore.prependPath(self.children[chosenIndex].previousPlan, chosenIndex)
         print([move.debugName for move in bestScore.movePath])
-
-        if bestScore.movePath[0].debugName == "to enemy cluster":
-            temp1 = 0
 
         return self.children[chosenIndex].previousPlan
 

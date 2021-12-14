@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from typing import Callable, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -123,12 +122,15 @@ class DiscreteGameState:
         def finalizeState():
             updateSpawnersAndPlayers(updatedSpawners, updatedPlayers)
 
-            # Capture spawner if neutral after interaction
-            if targetSpawner is not None and (targetSpawner.allegence is None or (not targetSpawner.isClaimed() and targetSpawner.isAllegedToPlayer(move.playerId))):
-                updatedSpawner, updatedPlayer = self.tryCaptureNeutralOrOwnAllegedSpawner(
-                    getLastSpawnerVersion(targetSpawner.id), getLastPlayerVersion(move.playerId), self.frameCount + movementDuration + interactionDuration
-                )
-                updateSpawnersAndPlayers([updatedSpawner], [updatedPlayer])
+            if targetSpawner is not None:
+                updatedTargetSpawner = getLastSpawnerVersion(targetSpawner.id)
+
+                # Capture spawner if neutral after interaction
+                if not targetSpawner.isClaimed() and (updatedTargetSpawner.allegence is None or (not updatedTargetSpawner.isClaimed() and updatedTargetSpawner.isAllegedToPlayer(move.playerId))):
+                    updatedSpawner, updatedPlayer = self.tryCaptureNeutralOrOwnAllegedSpawner(
+                        getLastSpawnerVersion(targetSpawner.id), getLastPlayerVersion(move.playerId), self.frameCount + movementDuration + interactionDuration
+                    )
+                    updateSpawnersAndPlayers([updatedSpawner], [updatedPlayer])
 
             # Spawn singuities during interaction
             assignNewSpawnees(spawnersAfterMovement, self.frameCount + movementDuration, self.frameCount + movementDuration + interactionDuration)
@@ -144,7 +146,7 @@ class DiscreteGameState:
 
         return movementDuration + interactionDuration, finalizeState
 
-    def getSpawnerInteractions(self, spawners: List[DiscreteSpawner], clusters: List[DiscretePlayer]) -> Tuple[Dict[str, List[DiscretePlayer]], Dict[str, str]]:
+    def getSpawnerInteractions(self, spawners: List[DiscreteSpawner], clusters: List[DiscretePlayer]) -> Tuple[Dict[str, List[DiscretePlayer]], Dict[str, Tuple[str, float]]]:
         spawnerInteractions: Dict[str, List[DiscretePlayer]] = {}
         spawnerInteractedClusters: Dict[str, str] = {}
 
