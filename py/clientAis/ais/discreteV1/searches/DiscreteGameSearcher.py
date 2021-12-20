@@ -170,14 +170,16 @@ class DiscreteGameSearcher:
                 frameCounts.insert(frameCountIndices[childIndex], movedFrameCounts[childIndex])
                 gameLeaves.insert(frameCountIndices[childIndex], movedGameNodes[childIndex])
 
-        smallestFrameCount = min(frameCounts[0:1] + [g.gameState.frameCount for g in orphanGameLeaves])
+        # smallestFrameCount = min(frameCounts[0:1] + [g.gameState.frameCount for g in orphanGameLeaves])
 
         allLeaves = gameLeaves + orphanGameLeaves
 
         for gameLeaf in allLeaves:
             # Must restrict to more than smallest frame count in case the smallest developed move if the same as the smallest undeveloped move,
             # in which case the smallest undeveloped must reach the same result at least
-            gameLeaf.restrictDuration(smallestFrameCount + 0.001)
+            # Sometimes this metric does not make sense, as with max depth = 1, where only the smallest frame move will be fully computed.
+            # gameLeaf.restrictDuration(smallestFrameCount + 0.001)
+            pass
 
         print(f"Developed: {developedGameStates}, Reached: {reachedGameStates}, Leaves: {len(allLeaves)}")
 

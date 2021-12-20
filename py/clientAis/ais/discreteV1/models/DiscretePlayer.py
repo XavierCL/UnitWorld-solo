@@ -37,7 +37,7 @@ class DiscretePlayer:
         def getClusterForce(singuities: List[Singuity]) -> float:
             clusterStd = arrays.mad([s.position for s in singuities], axis=0, minMad=PhysicsEstimator.getMinimumStd(len(singuities)))
             averageHealth = np.mean([s.healthPoints for s in singuities]).item()
-            return PhysicsEstimator.getClusterForce(len(singuities), np.linalg.norm(clusterStd), averageHealth)
+            return PhysicsEstimator.getClusterForce(len(singuities), np.linalg.norm(clusterStd), averageHealth, 0)
 
         clusterForces = [getClusterForce(cluster) for cluster in singuityClusters]
 

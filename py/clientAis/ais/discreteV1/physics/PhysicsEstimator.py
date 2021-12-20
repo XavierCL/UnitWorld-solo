@@ -4,7 +4,6 @@ from typing import List, Optional, Tuple, Union
 import numpy as np
 
 from clientAis.games.GameState import Singuity, Spawner
-from utils import arrays
 
 class PhysicsEstimator:
     FULL_STOP_DURATION = Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME / Singuity.MAXIMUM_ACCELERATION_PER_FRAME
@@ -34,7 +33,7 @@ class PhysicsEstimator:
         distanceToClusterCenter = PhysicsEstimator.distance(targetPosition, singuitiesPosition)
         clusterRearRatio = acceptableSinguityCount[1] / acceptableSinguityCount[0]
         return ((1 - clusterRearRatio) * max(distanceToClusterCenter - clusterStd * 2, 0) + clusterRearRatio * (
-                    distanceToClusterCenter + clusterStd * 2)) / Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME
+                distanceToClusterCenter + clusterStd * 2)) / Singuity.MAXIMUM_SPEED_UNITS_PER_FRAME
 
     @staticmethod
     def estimateSpawnerToZeroHealthDuration(singuityCount: int, spawnerHealthPoints: float, spawnerCount: int = 0) -> int:
@@ -125,14 +124,33 @@ class PhysicsEstimator:
         return isColliding
 
     @staticmethod
-    def getClusterForce(singuityCount: int, clusterStd: float, averageHealth: float) -> float:
-        return singuityCount ** 2 * averageHealth / (math.pi * clusterStd ** 2 * PhysicsEstimator.MAXIMUM_SINGUITY_DENSITY_PER_AREA)
+    def getClusterForce(singuityCount: int, clusterStd: float, averageHealth: float, distanceToTarget2: float) -> float:
+        clusterStd2 = clusterStd ** 2
+
+        if distanceToTarget2 >= clusterStd2:
+            return 0
+
+        if distanceToTarget2 == 0:
+            pass
+        elif clusterStd == 0:
+            return 0
+        else:
+            singuityCount = singuityCount * clusterStd2 / (clusterStd2 + distanceToTarget2)
+
+        return singuityCount ** 2 * averageHealth / (math.pi * clusterStd2 * PhysicsEstimator.MAXIMUM_SINGUITY_DENSITY_PER_AREA)
 
     @staticmethod
-    def clusterForceToCount(clusterForce: float, clusterStd: float, averageHealth: float) -> int:
+    def clusterForceToCount(clusterForce: float, previousCount: int, clusterStd: float, averageHealth: float, distanceToTarget2) -> int:
+        clusterStd2 = clusterStd ** 2
         if averageHealth == 0:
             return 0
-        return round(math.sqrt(clusterForce * math.pi * clusterStd ** 2 * PhysicsEstimator.MAXIMUM_SINGUITY_DENSITY_PER_AREA / averageHealth))
+        elif distanceToTarget2 >= clusterStd2:
+            return previousCount
+        elif clusterStd == 0:
+            return previousCount
+        else:
+            uninjuredSinguities = previousCount - previousCount * clusterStd2 / (clusterStd2 + distanceToTarget2)
+            return math.sqrt(clusterForce * math.pi * clusterStd2 * PhysicsEstimator.MAXIMUM_SINGUITY_DENSITY_PER_AREA / averageHealth) + uninjuredSinguities
 
     # Asymptotically correct estimation of a fight between two enemy clusters where they have the same std
     # Parameter is 2 * (number of units, average unit health), output is (fight duration, cluster1 remaining units, cluster2 remaining units)
@@ -150,7 +168,7 @@ class PhysicsEstimator:
 
         cluster1HealthRoundFactor, cluster2HealthRoundFactor = PhysicsEstimator.ATTACKS_NEEDED_TO_KILL_ONE_SINGUITY * cluster1Units, PhysicsEstimator.ATTACKS_NEEDED_TO_KILL_ONE_SINGUITY * cluster2Units
         (cluster1Healths, cluster2Healths) = (
-        math.ceil(cluster1Healths * cluster1HealthRoundFactor) / cluster1HealthRoundFactor, math.ceil(cluster2Healths * cluster2HealthRoundFactor) / cluster2HealthRoundFactor)
+            math.ceil(cluster1Healths * cluster1HealthRoundFactor) / cluster1HealthRoundFactor, math.ceil(cluster2Healths * cluster2HealthRoundFactor) / cluster2HealthRoundFactor)
 
         if cluster1Healths <= 0:
             return 0, 0, cluster2Units
@@ -172,16 +190,16 @@ class PhysicsEstimator:
         def getFightDuration(winnerUnits, winnerHealths, loserUnits):
             return PhysicsEstimator.FRAMES_NEEDED_TO_KILL_ONE_SINGUITY * healthsSqrt * math.log(
                 (loserUnits * healthsSqrt + winnerHealths * winnerUnits) / (loserUnits * healthsSqrt - winnerHealths * winnerUnits)
-                ) / 2
+            ) / 2
 
         fightDuration = getFightDuration(cluster1Units, cluster1Healths, cluster2Units) if cluster1Wins else getFightDuration(cluster2Units, cluster2Healths, cluster1Units)
 
         def getRemainingUnits(winnerUnits, winnerHealths, loserUnits, atFrame):
             return math.ceil(
                 ((winnerHealths * winnerUnits - loserUnits * healthsSqrt) * math.e ** (atFrame / (PhysicsEstimator.FRAMES_NEEDED_TO_KILL_ONE_SINGUITY * healthsSqrt)) + (
-                            winnerHealths * winnerUnits + loserUnits * healthsSqrt) * math.e ** (
-                             -atFrame / (PhysicsEstimator.FRAMES_NEEDED_TO_KILL_ONE_SINGUITY * healthsSqrt))) / (2 * winnerHealths)
-                )
+                        winnerHealths * winnerUnits + loserUnits * healthsSqrt) * math.e ** (
+                         -atFrame / (PhysicsEstimator.FRAMES_NEEDED_TO_KILL_ONE_SINGUITY * healthsSqrt))) / (2 * winnerHealths)
+            )
 
         return (math.ceil(fightDuration), getRemainingUnits(cluster1Units, cluster1Healths, cluster2Units, fightDuration), 0)\
             if cluster1Wins\
@@ -223,7 +241,7 @@ class PhysicsEstimator:
 
     # Takes in a list of (singuityCount, clusterStd, singuityAverageHealth) and returns a list of singuity count
     @staticmethod
-    def estimateVoidFight(clusters: List[Tuple[int, float, float]]) -> List[int]:
+    def estimateVoidFight(clusters: List[Tuple[int, float, float, float]]) -> List[int]:
         # Todo void fights also take a minimum amount of time.
         clusterForces = [PhysicsEstimator.getClusterForce(*cluster) for cluster in clusters]
         maximalForceClusterIndex = np.argmax(clusterForces)
@@ -233,17 +251,17 @@ class PhysicsEstimator:
             Singuity.MAX_HEALTH_POINT / Singuity.ATTACK_STRENGTH, clusterForces[maximalForceClusterIndex] / averageAdversaryForce
         ) ** 2) if averageAdversaryForce > 1 else clusterForces[maximalForceClusterIndex]
 
-        return arrays.assign(
-            np.zeros(len(clusters)),
-            maximalForceClusterIndex,
-            PhysicsEstimator.clusterForceToCount(maximalRemainingForce, clusters[maximalForceClusterIndex][1], clusters[maximalForceClusterIndex][2])
-        )
+        return [PhysicsEstimator.clusterForceToCount(maximalRemainingForce if index == maximalForceClusterIndex else 0, cluster[0], cluster[1], cluster[2], cluster[3]) for index, cluster in
+                enumerate(clusters)]
 
     # Takes in clusters as a list of (singuityCount, clusterStd, singuityAverageHealth) and returns a tuple of (spawnerRemainingHealth, interactionDuration, [singuityCount])
     @staticmethod
-    def estimateFightOverSpawner(allegedPlayerId: Optional[str], spawnerRemainingHealth: float, restrictedDuration: Optional[int], clusters: List[Tuple[str, int, float, float]]) ->\
+    def estimateFightOverSpawner(
+        allegedPlayerId: Optional[str], spawnerRemainingHealth: float, restrictedDuration: Optional[int], clusters: List[Tuple[str, int, float, float, float]]
+    ) ->\
             Tuple[float, int, List[int]]:
-        clusterForces = [PhysicsEstimator.getClusterForce(singuityCount, averageHealth, clusterStd) for _, singuityCount, averageHealth, clusterStd in clusters]
+        clusterForces = [PhysicsEstimator.getClusterForce(singuityCount, averageHealth, clusterStd, distance2) for _, singuityCount, averageHealth, clusterStd, distance2 in
+                         clusters]
         homeClusterIndex = None
 
         if allegedPlayerId is not None:
@@ -266,11 +284,8 @@ class PhysicsEstimator:
             if homeClusterIndex == maximalForceClusterIndex:
                 maximalRemainingForce /= 10 * spawnerRemainingHealth / Spawner.MAX_HEALTH_POINTS + 1
 
-            remainingCounts = arrays.assign(
-                np.zeros(len(clusters)), maximalForceClusterIndex, PhysicsEstimator.clusterForceToCount(
-                    maximalRemainingForce, clusters[maximalForceClusterIndex][2], clusters[maximalForceClusterIndex][3]
-                )
-            )
+            remainingCounts = [PhysicsEstimator.clusterForceToCount(
+                    maximalRemainingForce if maximalForceClusterIndex == index else 0, cluster[1], cluster[2], cluster[3], cluster[4]) for index, cluster in enumerate(clusters)]
 
         if maximalForceClusterIndex != homeClusterIndex:
             interactionMaxDuration = PhysicsEstimator.estimateSpawnerToZeroHealthDuration(remainingCounts[maximalForceClusterIndex], spawnerRemainingHealth)

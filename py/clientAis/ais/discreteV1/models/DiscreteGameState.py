@@ -44,7 +44,7 @@ class DiscreteGameState:
 
             if discretePlayer.singuityCount == 0 and len(
                     [s for s in gameState.spawners if s.allegence is not None and s.allegence.isClaimed and s.allegence.playerId == player.id]
-                    ) == 0:
+            ) == 0:
                 continue
 
             playerDictionary[player.id] = discretePlayer
@@ -97,7 +97,7 @@ class DiscreteGameState:
                 for playerId, claimedSpawners in spawnersByPlayer.items():
                     newPlayersById[playerId] = getLastPlayerVersion(playerId).appendNewSpawned(
                         [(spawner.position, spawner.lastFrameClaimed) for spawner in claimedSpawners], frameBefore, frameAfter
-                        )
+                    )
 
         # Get time until cluster arrives
         targetSpawner = None if move.spawnerId is None else getLastSpawnerVersion(move.spawnerId)
@@ -105,13 +105,13 @@ class DiscreteGameState:
             move, move.position if targetSpawner is None else targetSpawner.position, restrictedDuration,
             acceptableSinguityCount=None if targetSpawner is None or targetSpawner.isAllegedToPlayer(
                 move.playerId
-                ) else targetSpawner.remainingSinguitiesToCapture(move.playerId)
-            )
+            ) else targetSpawner.remainingSinguitiesToCapture(move.playerId)
+        )
 
         # Process interactions until player arrives
         updatedSpawners, updatedPlayers, interactionDuration = self.executeInteractions(
             self.spawners, [p for p in self.playerDictionary.values() if p.id != move.playerId], movementDuration
-            )
+        )
 
         # Update both interactions and moved player
         updateSpawnersAndPlayers(updatedSpawners, updatedPlayers + [movedPlayer])
@@ -183,8 +183,8 @@ class DiscreteGameState:
 
         return spawnerInteractions, spawnerInteractedClusters
 
-    def getClusterInteractions(self, clusters: List[DiscretePlayer]) -> List[List[DiscretePlayer]]:
-        interactions: List[List[DiscretePlayer]] = []
+    def getClusterInteractions(self, clusters: List[DiscretePlayer]) -> List[List[Tuple[DiscretePlayer, float]]]:
+        interactions: List[List[Tuple[DiscretePlayer, float]]] = []
 
         if len(clusters) <= 1:
             return interactions
@@ -203,17 +203,19 @@ class DiscreteGameState:
             else:
                 closestCluster = clusters[secondClosest]
 
-            if PhysicsEstimator.areSinguitiesColliding(
-                    clusters[secondClosest].singuitiesMeanPosition, cluster.singuitiesMeanPosition, clusters[secondClosest].singuitiesStd + cluster.singuitiesStd
-                    ) and closestCluster.id not in interactingClusters:
+            isColliding, distance2 = PhysicsEstimator.areSinguitiesColliding(
+                clusters[secondClosest].singuitiesMeanPosition, cluster.singuitiesMeanPosition, clusters[secondClosest].singuitiesStd + cluster.singuitiesStd, returnDistance=True
+            )
+
+            if isColliding and closestCluster.id not in interactingClusters:
                 interactingClusters.update([cluster.id, closestCluster.id])
-                interactions.append([cluster, closestCluster])
+                interactions.append([(cluster, distance2), (closestCluster, distance2)])
 
         return interactions
 
     def executeInteractions(
         self, spawners: List[DiscreteSpawner], players: List[DiscretePlayer], restrictedDuration: Optional[int], restrictDurationToPlayer: Optional[str] = None
-        ) -> Tuple[List[DiscreteSpawner], List[DiscretePlayer], int]:
+    ) -> Tuple[List[DiscreteSpawner], List[DiscretePlayer], int]:
         updatedSpawners = []
         updatedPlayers = []
 
@@ -239,8 +241,8 @@ class DiscreteGameState:
                 None if spawner.allegence is None else spawner.allegence.playerId,
                 spawner.getHealthPoints(),
                 restrictedDuration,
-                todo use distance in fight estimation
-                [(cluster.id, cluster.singuityCount, cluster.singuitiesStd, cluster.singuitiesAverageHealth) for (cluster, distance2) in spawnerInteractionSubjects[interactingSpawnerId]]
+                [(cluster.id, cluster.singuityCount, cluster.singuitiesStd, cluster.singuitiesAverageHealth, distance2) for (cluster, distance2) in
+                 spawnerInteractionSubjects[interactingSpawnerId]]
             )
             updateSpawnersAndPlayers(interactingSpawnerId, spawnerHealthPoints, list(list(zip(*spawnerInteractionSubjects[interactingSpawnerId]))[0]), remainingCounts)
             del spawnerInteractionSubjects[interactingSpawnerId]
@@ -255,8 +257,7 @@ class DiscreteGameState:
                 None if spawner.allegence is None else spawner.allegence.playerId,
                 spawner.getHealthPoints(),
                 interactionDuration,
-                todo use distance in fight estimation
-                [(cluster.id, cluster.singuityCount, cluster.singuitiesStd, cluster.singuitiesAverageHealth) for (cluster, distance2) in interactionSubjects]
+                [(cluster.id, cluster.singuityCount, cluster.singuitiesStd, cluster.singuitiesAverageHealth, distance2) for (cluster, distance2) in interactionSubjects]
             )
             updateSpawnersAndPlayers(spawnerId, spawnerHealthPoints, list(list(zip(*interactionSubjects))[0]), remainingCounts)
 
@@ -264,9 +265,9 @@ class DiscreteGameState:
 
         for interactingClusters in clusterInteractions:
             remainingCounts = PhysicsEstimator.estimateVoidFight(
-                [(cluster.singuityCount, cluster.singuitiesStd, cluster.singuitiesAverageHealth) for cluster in interactingClusters]
+                [(cluster.singuityCount, cluster.singuitiesStd, cluster.singuitiesAverageHealth, distance2) for (cluster, distance2) in interactingClusters]
             )
-            updatePlayers(interactingClusters, remainingCounts)
+            updatePlayers(list(list(zip(*interactingClusters))[0]), remainingCounts)
 
         return updatedSpawners, updatedPlayers, interactionDuration
 
