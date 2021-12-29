@@ -14,7 +14,7 @@ class DiscreteMove:
 
     @staticmethod
     def fromSpawner(debugSpawnerType: str, playerId: str, spawnerId: str, timeSpentAtSpawner: Optional[int] = None) -> DiscreteMove:
-        return DiscreteMove(f"to {debugSpawnerType} spawner", playerId, spawnerId, None, timeSpentAtSpawner)
+        return DiscreteMove(f"to {debugSpawnerType} spawner {spawnerId}", playerId, spawnerId, None, timeSpentAtSpawner)
 
     @staticmethod
     def fromPosition(debugIsCurrentCluster: bool, playerId: str, position: np.ndarray, timeSpentAtPosition: Optional[int] = None) -> DiscreteMove:

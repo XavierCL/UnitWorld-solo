@@ -8,6 +8,7 @@ from clientAis.ais.packing.PackingAi import PackingAi
 from clientAis.ais.packingAhead.PackingAheadAi import PackingAheadAi
 from clientAis.ais.packingBehind.PackingBehindAi import PackingBehindAi
 from clientAis.ais.quickAttack.QuickAttackAi import QuickAttackAi
+from clientAis.ais.shortMachine.ShortMachineAi import ShortMachineAi
 from clientAis.ais.singleMindClosest.SingleMindClosestAi import SingleMindClosestAi
 from clientAis.ais.Voider.VoiderAi import VoiderAi
 from clientAis.ais.propagatingVision.PropagatingVisionAi import PropagatingVisionAi
@@ -23,7 +24,7 @@ commandLineOptions = {key: value for key, value in zip(arrays.soft_accessor(sys.
 
 DEFAULT_SERVER_IP = "127.0.0.1"
 DEFAULT_SERVER_PORT = 52124
-DEFAULT_AI_NAME = "discreteV1"
+DEFAULT_AI_NAME = "shortMachine"
 
 serverIp = commandLineOptions.get("serverIp") or DEFAULT_SERVER_IP
 serverPort = int(commandLineOptions.get("serverPort") or DEFAULT_SERVER_PORT)
@@ -37,7 +38,8 @@ ais: Dict[str, Callable[[ServerCommander], Artificial]] = {
     "quickAttack": lambda serverCommander: QuickAttackAi(serverCommander),
     "packingAhead": lambda serverCommander: PackingAheadAi(serverCommander),
     "packingBehind": lambda serverCommander: PackingBehindAi(serverCommander),
-    "discreteV1": lambda serverCommander: DiscreteV1Ai(serverCommander)
+    "discreteV1": lambda serverCommander: DiscreteV1Ai(serverCommander),
+    "shortMachine": lambda serverCommander: ShortMachineAi(serverCommander)
 }
 
 def clientConnectorCallBack(communicationHandler: CommunicationHandler):
@@ -66,7 +68,9 @@ def clientConnectorCallBack(communicationHandler: CommunicationHandler):
 
             if hasNewFrame:
                 lastAiGameStateVersion = gameManager.gameState.frameCount
-                artificial.frame(gameManager.gameState, gameManager.currentPlayerId)
+
+                if not artificial.frameIsIgnored(gameManager.gameState, gameManager.currentPlayerId):
+                    artificial.frame(gameManager.gameState, gameManager.currentPlayerId)
 
             timeAfterFrame = time.time()
 

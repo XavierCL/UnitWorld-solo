@@ -45,6 +45,13 @@ def first(arr: Iterable[Nested], predicate: Callable[[Nested], bool]) -> Nested:
 
     raise Exception("Could not find first value within array")
 
+def firstOrNone(arr: Iterable[Nested], predicate: Callable[[Nested], bool]) -> Union[Nested, None]:
+    for value in arr:
+        if predicate(value):
+            return value
+
+    return None
+
 def combineMeanStdAndCount(means: np.ndarray, stds: np.ndarray, counts: np.ndarray, minStd: Optional[float] = None) -> Tuple[float, float, int]:
     count = np.sum(counts, axis=0)
     minStd = 1 if minStd is None else minStd
@@ -53,8 +60,8 @@ def combineMeanStdAndCount(means: np.ndarray, stds: np.ndarray, counts: np.ndarr
         return np.mean(means, axis=0), minStd, 0
 
     mean = np.sum((counts[meanConversionShape] * means), axis=0) / count
-    variances = stds**2
-    means2 = means**2
+    variances = stds ** 2
+    means2 = means ** 2
     std = np.sqrt(np.sum(counts[meanConversionShape] * (means2 + variances[meanConversionShape]), axis=0) / count - mean ** 2)
 
     return (
@@ -85,3 +92,17 @@ def mad(arr: Iterable, median: Optional[float] = None, axis: Optional[int] = Non
         return ad, median
 
     return ad
+
+# O(max(arr) + shape(arr))
+def toNaturals(arr: np.ndarray, returnMapping=False) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
+    uniques = np.unique(arr)
+    reverseUniques = assign(np.empty(np.max(uniques) + 1, dtype=arr.dtype), uniques, np.arange(len(uniques)))
+
+    if returnMapping:
+        return reverseUniques[arr], reverseUniques
+
+    return reverseUniques[arr]
+
+def reciprocal(arr: np.ndarray, defaultValue=-1) -> np.ndarray:
+    mask = arr != defaultValue
+    return assign(np.ones(0 if len(arr) == 0 else np.max(arr) + 1, arr.dtype) * -1, arr[mask], np.arange(len(arr))[mask])

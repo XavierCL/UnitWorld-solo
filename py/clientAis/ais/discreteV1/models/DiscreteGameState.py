@@ -22,6 +22,7 @@ class DiscreteGameState:
         playerDictionary: Dict[str, DiscretePlayer],
         spawners: List[DiscreteSpawner],
         spawnersById: Dict[str, DiscreteSpawner],
+        playerSpawners: Dict[str, List[DiscreteSpawner]],
         frameCount: int,
         gameState: Optional[GameState]
     ):
@@ -29,6 +30,7 @@ class DiscreteGameState:
         self.playerDictionary = playerDictionary
         self.spawners = spawners
         self.spawnersById = spawnersById
+        self.playerSpawners = playerSpawners
         self.frameCount = frameCount
         self.rootGameState = gameState
 
@@ -40,7 +42,7 @@ class DiscreteGameState:
         DiscreteGameState.spawnerCollisionDetector = KDTree(np.array([s.position for s in gameState.spawners]))
 
         for playerIndex, player in enumerate(gameState.players):
-            discretePlayer = DiscretePlayer.fromGameState(gameState, player.id)
+            discretePlayer = DiscretePlayer.fromGameState(gameState, player.id, currentPlayerId)
 
             if discretePlayer.singuityCount == 0 and len(
                     [s for s in gameState.spawners if s.allegence is not None and s.allegence.isClaimed and s.allegence.playerId == player.id]
@@ -52,8 +54,9 @@ class DiscreteGameState:
 
         spawners = [DiscreteSpawner.fromSpawner(s) for s in gameState.spawners]
         spawnersById: Dict[str, DiscreteSpawner] = {s.id: s for s in spawners}
+        spawnersByPlayer: Dict[str, List[DiscreteSpawner]] = {p: [s for s in spawners if s.isAllegedToPlayer(p)] for p in playerIds}
 
-        return DiscreteGameState(currentPlayerId, playerDictionary, spawners, spawnersById, gameState.frameCount, gameState)
+        return DiscreteGameState(currentPlayerId, playerDictionary, spawners, spawnersById, spawnersByPlayer, gameState.frameCount, gameState)
 
     def executeMove(self, move: DiscreteMove, restrictedFrameCount: Optional[int] = None) -> DiscreteGameState:
         return self.preprocessMove(move, restrictedFrameCount)[1]()
@@ -147,11 +150,14 @@ class DiscreteGameState:
             # Spawn singuities during interaction
             assignNewSpawnees(spawnersAfterMovement, self.frameCount + movementDuration, self.frameCount + movementDuration + interactionDuration)
 
+            spawners =[getLastSpawnerVersion(spawner.id) for spawner in self.spawners]
+
             return DiscreteGameState(
                 self.currentPlayerId,
                 {playerId: getLastPlayerVersion(playerId) for playerId in self.playerDictionary.keys()},
-                [getLastSpawnerVersion(spawner.id) for spawner in self.spawners],
-                {spawner.id: getLastSpawnerVersion(spawner.id) for spawner in self.spawners},
+                spawners,
+                {spawner.id: spawner for spawner in spawners},
+                {p: [s for s in spawners if s.isAllegedToPlayer(p)] for p in self.playerDictionary.keys()},
                 self.frameCount + movementDuration + interactionDuration,
                 None
             )
@@ -216,6 +222,9 @@ class DiscreteGameState:
     def executeInteractions(
         self, spawners: List[DiscreteSpawner], players: List[DiscretePlayer], restrictedDuration: Optional[int], restrictDurationToPlayer: Optional[str] = None
     ) -> Tuple[List[DiscreteSpawner], List[DiscretePlayer], int]:
+        if len(players) == 0:
+            return [], [], 0
+
         updatedSpawners = []
         updatedPlayers = []
 

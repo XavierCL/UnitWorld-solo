@@ -11,7 +11,8 @@ from clientAis.games.GameState import GameState, Singuity, Spawner
 from utils import arrays
 
 class DiscretePlayer:
-    def __init__(self, id: str, singuityCount: int, singuitiesMeanPosition: np.ndarray, singuitiesStd: float, singuitiesAverageHealth: float, inCluster: Optional[List[str]] = None):
+    def __init__(self, isCurrentPlayer: bool, id: str, singuityCount: int, singuitiesMeanPosition: np.ndarray, singuitiesStd: float, singuitiesAverageHealth: float, inCluster: Optional[List[str]] = None):
+        self.isCurrentPlayer = isCurrentPlayer
         self.id = id
         self.singuityCount = singuityCount
         self.singuitiesMeanPosition = singuitiesMeanPosition
@@ -20,11 +21,11 @@ class DiscretePlayer:
         self.inCluster = inCluster
 
     @staticmethod
-    def fromGameState(gameState: GameState, playerId: str) -> DiscretePlayer:
+    def fromGameState(gameState: GameState, playerId: str, currentPlayerId: str) -> DiscretePlayer:
         playerSinguities = [s for s in gameState.singuities if s.playerId == playerId]
 
         if len(playerSinguities) == 0:
-            return DiscretePlayer(playerId, 0, np.zeros(2), PhysicsEstimator.getMinimumStd(0), 0, [])
+            return DiscretePlayer(currentPlayerId == playerId, playerId, 0, np.zeros(2), PhysicsEstimator.getMinimumStd(0), 0, [])
 
         singuityPositions = [s.position for s in playerSinguities]
 
@@ -44,14 +45,14 @@ class DiscretePlayer:
         if len(clusterForces) == 0:
             singuityStd, singuityCenter = arrays.mad(singuityPositions, axis=0, returnMedian=True, minMad=PhysicsEstimator.getMinimumStd(len(singuityPositions)))
             singuityAverageHealth = np.mean([s.healthPoints for s in playerSinguities]).item()
-            return DiscretePlayer(playerId, len(playerSinguities), singuityCenter, np.linalg.norm(singuityStd), singuityAverageHealth, [s.id for s in playerSinguities])
+            return DiscretePlayer(currentPlayerId == playerId, playerId, len(playerSinguities), singuityCenter, np.linalg.norm(singuityStd), singuityAverageHealth, [s.id for s in playerSinguities])
 
         else:
             keptCluster = singuityClusters[np.argmax(clusterForces)]
 
             singuityStd, singuityCenter = arrays.mad([s.position for s in keptCluster], axis=0, returnMedian=True, minMad=PhysicsEstimator.getMinimumStd(len(keptCluster)))
             singuityAverageHealth = np.mean([s.healthPoints for s in keptCluster]).item()
-            return DiscretePlayer(playerId, len(keptCluster), singuityCenter, np.linalg.norm(singuityStd), singuityAverageHealth, [s.id for s in keptCluster])
+            return DiscretePlayer(currentPlayerId == playerId, playerId, len(keptCluster), singuityCenter, np.linalg.norm(singuityStd), singuityAverageHealth, [s.id for s in keptCluster])
 
     def executeMovement(self, move: DiscreteMove, targetPosition: np.ndarray, restrictedDuration: int = None, acceptableSinguityCount: int = None):
         def getLastingMoveDuration(moveDuration: int) -> int:
@@ -76,6 +77,7 @@ class DiscretePlayer:
 
         return constrainedMovementDuration,\
             DiscretePlayer(
+                self.isCurrentPlayer,
                 self.id,
                 self.singuityCount,
                 self.singuitiesMeanPosition + (targetPosition - self.singuitiesMeanPosition) * (constrainedMovementDuration / constrainedMovementDuration),
@@ -84,10 +86,10 @@ class DiscretePlayer:
             )
 
     def fought(self, remainingSinguityCount):
-        return DiscretePlayer(self.id, remainingSinguityCount, self.singuitiesMeanPosition, self.singuitiesStd, self.singuitiesAverageHealth)
+        return DiscretePlayer(self.isCurrentPlayer, self.id, remainingSinguityCount, self.singuitiesMeanPosition, self.singuitiesStd, self.singuitiesAverageHealth)
 
     def tryClaimFor(self, remainingSinguitiesToClaim):
-        return DiscretePlayer(self.id, max(self.singuityCount - remainingSinguitiesToClaim, 0), self.singuitiesMeanPosition, self.singuitiesStd, self.singuitiesAverageHealth)
+        return DiscretePlayer(self.isCurrentPlayer, self.id, max(self.singuityCount - remainingSinguitiesToClaim, 0), self.singuitiesMeanPosition, self.singuitiesStd, self.singuitiesAverageHealth)
 
     def appendNewSpawned(self, spawners: List[Tuple[np.ndarray, int]], anteMoveFrameCount: int, postMoveFrameCount: int) -> DiscretePlayer:
         spawnerLastClaimedFrames = np.array([s[1] for s in spawners])
@@ -125,4 +127,4 @@ class DiscretePlayer:
 
         mean, std, count = arrays.combineMeanStdAndCount(means, stds, counts, minStd=np.ones(2))
 
-        return DiscretePlayer(self.id, count, mean, np.mean(std), 0 if count == 0 else (self.singuitiesAverageHealth * self.singuityCount + Singuity.MAX_HEALTH_POINT * (count - self.singuityCount)) / count)
+        return DiscretePlayer(self.isCurrentPlayer, self.id, count, mean, np.mean(std), 0 if count == 0 else (self.singuitiesAverageHealth * self.singuityCount + Singuity.MAX_HEALTH_POINT * (count - self.singuityCount)) / count)
