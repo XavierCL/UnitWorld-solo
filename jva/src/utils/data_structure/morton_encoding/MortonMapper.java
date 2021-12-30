@@ -1,6 +1,5 @@
 package utils.data_structure.morton_encoding;
 
-import clientAis.communications.game_data.Singuity;
 import utils.math.vector.Vector2;
 import utils.math.vector.Vector2Int;
 
