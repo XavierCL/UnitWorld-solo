@@ -1,5 +1,3 @@
-import math
-
 import numpy as np
 
 from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
@@ -60,5 +58,5 @@ class DiscreteGameScorer:
             ownForceStd = ownPlayer.singuitiesStd
 
         return PhysicsEstimator.estimateSpawnerToZeroHealthDurationIntegral(virtualSinguityCount, totalEnemySpawnerHealthPoints, [], False, 1.0) * 5\
-            + np.sum([PhysicsEstimator.estimateMovementDuration(ownForceMeanPosition, s.position, ownForceStd) for s in claimedEnemySpawners]) * 5\
-            + gameState.frameCount
+               + np.sum([PhysicsEstimator.estimateMovementDuration(ownForceMeanPosition, s.position, ownForceStd) for s in claimedEnemySpawners]) * 5\
+               + gameState.frameCount

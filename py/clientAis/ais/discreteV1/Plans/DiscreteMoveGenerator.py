@@ -13,8 +13,12 @@ class DiscreteMoveGenerator:
 
     @staticmethod
     def executeStep(gameState: DiscreteGameState, playerId: str) -> List[Tuple[DiscreteMove, DiscreteGameState]]:
-        neutralClaimingNextSteps = DiscreteMoveGenerator.getQuickestFirstNSteps(gameState, DiscreteMoveGenerator.generateNeutralSpawnerMoves(gameState, playerId), DiscreteMoveGenerator.ALLOWED_NEUTRAL_CLAIM_MOVES)
-        enemyClaimingNextSteps = DiscreteMoveGenerator.getQuickestFirstNSteps(gameState, DiscreteMoveGenerator.generateEnemySpawnerMoves(gameState, playerId), DiscreteMoveGenerator.ALLOWED_ENEMY_CLAIM_MOVES)
+        neutralClaimingNextSteps = DiscreteMoveGenerator.getQuickestFirstNSteps(
+            gameState, DiscreteMoveGenerator.generateNeutralSpawnerMoves(gameState, playerId), DiscreteMoveGenerator.ALLOWED_NEUTRAL_CLAIM_MOVES
+            )
+        enemyClaimingNextSteps = DiscreteMoveGenerator.getQuickestFirstNSteps(
+            gameState, DiscreteMoveGenerator.generateEnemySpawnerMoves(gameState, playerId), DiscreteMoveGenerator.ALLOWED_ENEMY_CLAIM_MOVES
+            )
 
         shortestFrameCounts = [step[1].frameCount for step in neutralClaimingNextSteps[:1] + enemyClaimingNextSteps[:1]]
 
@@ -24,7 +28,11 @@ class DiscreteMoveGenerator:
 
         nextSteps = neutralClaimingNextSteps + enemyClaimingNextSteps
 
-        nextSteps.extend(DiscreteMoveGenerator.getQuickestFirstNSteps(gameState, DiscreteMoveGenerator.generateOwnSpawnerMoves(gameState, playerId, shortestAllowedMoveOnlyDuration), DiscreteMoveGenerator.ALLOWED_OWN_SPAWNER_MOVES))
+        nextSteps.extend(
+            DiscreteMoveGenerator.getQuickestFirstNSteps(
+                gameState, DiscreteMoveGenerator.generateOwnSpawnerMoves(gameState, playerId, shortestAllowedMoveOnlyDuration), DiscreteMoveGenerator.ALLOWED_OWN_SPAWNER_MOVES
+                )
+            )
         nextSteps.extend([(move, gameState.executeMove(move)) for move in DiscreteMoveGenerator.generateClusterMoves(gameState, playerId, shortestAllowedMoveOnlyDuration)])
 
         return nextSteps
@@ -69,6 +77,10 @@ class DiscreteMoveGenerator:
     def generateClusterMoves(gameState: DiscreteGameState, playerId: str, shortestAllowedMovementDuration: int, ownOnly=False) -> List[DiscreteMove]:
         moves = []
         for discretePlayer in [p for p in gameState.playerDictionary.values() if p.id == playerId or not ownOnly]:
-            moves.append(DiscreteMove.fromPosition(gameState.currentPlayerId == discretePlayer.id, playerId, discretePlayer.singuitiesMeanPosition, timeSpentAtPosition=shortestAllowedMovementDuration))
+            moves.append(
+                DiscreteMove.fromPosition(
+                    gameState.currentPlayerId == discretePlayer.id, playerId, discretePlayer.singuitiesMeanPosition, timeSpentAtPosition=shortestAllowedMovementDuration
+                    )
+                )
 
         return moves

@@ -3,11 +3,11 @@ from typing import List
 import numpy as np
 
 from clientAis.ais.Artificial import Artificial
-from clientAis.ais.discreteV1.searches.DiscreteGameSearcher import DiscreteGameSearcher
 from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
 from clientAis.ais.discreteV1.Plans.Move import Move
-from clientAis.games.GameState import GameState
+from clientAis.ais.discreteV1.searches.DiscreteGameSearcher import DiscreteGameSearcher
 from clientAis.communications.ServerCommander import ServerCommander
+from clientAis.games.GameState import GameState
 
 np.seterr(all='raise')
 
@@ -46,7 +46,8 @@ class DiscreteV1Ai(Artificial):
             # Waiting for other players
             return True
 
-        notOwnSpawners = [s for s in gameState.spawners if s.allegence is None or not s.allegence.isClaimed or (s.allegence.isClaimed and s.allegence.playerId != self.currentPlayerId)]
+        notOwnSpawners = [s for s in gameState.spawners if
+                          s.allegence is None or not s.allegence.isClaimed or (s.allegence.isClaimed and s.allegence.playerId != self.currentPlayerId)]
 
         if len(notOwnSpawners) == 0:
             # Game is won

@@ -18,5 +18,3 @@ class ShortMachineAi(Artificial):
                 self.serverCommander.moveUnitsToPosition(move.singuityIds, move.position)
             else:
                 self.serverCommander.moveUnitsToSpawner(move.singuityIds, move.spawnerId)
-
-

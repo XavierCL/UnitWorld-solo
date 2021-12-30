@@ -4,8 +4,8 @@ import numpy as np
 from sklearn.neighbors import KDTree
 
 from clientAis.ais.Artificial import Artificial
-from clientAis.games.GameState import GameState, Singuity, Spawner, SpawnerAllegence
 from clientAis.communications.ServerCommander import ServerCommander
+from clientAis.games.GameState import GameState, Singuity, Spawner, SpawnerAllegence
 from utils import arrays
 
 class PropagatingVisionAi(Artificial):
@@ -24,7 +24,7 @@ class PropagatingVisionAi(Artificial):
         spawnerSinguitiesChanged, spawnersClosestSinguityIndices = self.optimizeSpawnerSinguities(gameState, currentPlayerId, propagatedPresence, spawnersClosestSinguityIndices)
 
         i = 0
-        while spawnerSinguitiesChanged and i < len(self.spawners)**2:
+        while spawnerSinguitiesChanged and i < len(self.spawners) ** 2:
             propagatedPresence = self.getPropagatedPresencePerSpawner(gameState, currentPlayerId, spawnersClosestSinguityIndices)
             spawnerSinguitiesChanged, spawnersClosestSinguityIndices = self.optimizeSpawnerSinguities(
                 gameState, currentPlayerId, propagatedPresence, spawnersClosestSinguityIndices
@@ -68,7 +68,8 @@ class PropagatingVisionAi(Artificial):
         propagatedPresence = np.zeros(len(self.spawners))
 
         spawnerPositions = np.array([s.position for s in self.spawners])
-        singuitiesPosition = [np.mean([s.position for s in singuitiesArray[singuityIndices]], axis=0) if len(singuityIndices) > 0 else spawnerPositions[spawnerIndex] for spawnerIndex, singuityIndices in enumerate(spawnersClosestSinguityIndices)]
+        singuitiesPosition = [np.mean([s.position for s in singuitiesArray[singuityIndices]], axis=0) if len(singuityIndices) > 0 else spawnerPositions[spawnerIndex] for
+                              spawnerIndex, singuityIndices in enumerate(spawnersClosestSinguityIndices)]
 
         for spawnerIndex in range(len(self.spawners)):
             distances = np.linalg.norm(spawnerPositions - singuitiesPosition[spawnerIndex], axis=1)
@@ -111,7 +112,9 @@ class PropagatingVisionAi(Artificial):
             spawnerRequiredCounts[spawnerIndex] = int(self.spawners[spawnerIndex].remainingSinguitiesToClaim(currentPlayerId) * 1.5)
 
             if self.getSpawnerSelfSinguityPresence(currentPlayerId, list(singuitiesArray[spawnerClosestSinguityIndices[spawnerIndex]])) < 0\
-                    or self.spawners[spawnerIndex].remainingSinguitiesToClaim(currentPlayerId) > len([s for s in singuitiesArray[spawnerClosestSinguityIndices[spawnerIndex]] if s.playerId == currentPlayerId]):
+                    or self.spawners[spawnerIndex].remainingSinguitiesToClaim(currentPlayerId) > len(
+                [s for s in singuitiesArray[spawnerClosestSinguityIndices[spawnerIndex]] if s.playerId == currentPlayerId]
+                ):
 
                 distances = np.linalg.norm(spawnerPositions - self.spawners[spawnerIndex].position, axis=1)
 
@@ -119,14 +122,20 @@ class PropagatingVisionAi(Artificial):
                 for potentialNeighbourSpawnerIndex in np.argsort(distances)[1::]:
 
                     neighbourSinguities: List[Singuity] = singuitiesArray[spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex]]
-                    ownUsableNeighbourSinguities = arrays.soft_accessor([(singuityIndex, singuity) for singuityIndex, singuity in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if singuity.playerId == currentPlayerId], spawnerRequiredCounts[potentialNeighbourSpawnerIndex])
+                    ownUsableNeighbourSinguities = arrays.soft_accessor(
+                        [(singuityIndex, singuity) for singuityIndex, singuity in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if
+                         singuity.playerId == currentPlayerId], spawnerRequiredCounts[potentialNeighbourSpawnerIndex]
+                        )
 
                     if self.getSpawnerSelfSinguityPresence(currentPlayerId, neighbourSinguities) > 0 and len(ownUsableNeighbourSinguities) > 0:
 
                         enemyNeighbourSinguities = [(singuityIndex, singuity) for singuityIndex, singuity in
                                                     zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if singuity.playerId != currentPlayerId]
 
-                        ownUnusableNeighbourSinguities = arrays.soft_accessor([(singuityIndex, singuity) for singuityIndex, singuity in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if singuity.playerId == currentPlayerId], 0, spawnerRequiredCounts[potentialNeighbourSpawnerIndex])
+                        ownUnusableNeighbourSinguities = arrays.soft_accessor(
+                            [(singuityIndex, singuity) for singuityIndex, singuity in zip(spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex], neighbourSinguities) if
+                             singuity.playerId == currentPlayerId], 0, spawnerRequiredCounts[potentialNeighbourSpawnerIndex]
+                            )
 
                         spawnerClosestSinguityIndices[spawnerIndex].extend([index for index, _ in ownUsableNeighbourSinguities])
                         spawnerClosestSinguityIndices[potentialNeighbourSpawnerIndex] = [index for index, _ in enemyNeighbourSinguities + ownUnusableNeighbourSinguities]
@@ -169,7 +178,8 @@ class PropagatingVisionAi(Artificial):
 
                 else:
                     movingCommands.append(
-                        ("moveToPosition", ownAssignedSinguities, self.getClosestOwnSpawner(np.mean([s.position for s in ownAssignedSinguities], axis=0), propagatedPresence).position)
+                        ("moveToPosition", ownAssignedSinguities,
+                         self.getClosestOwnSpawner(np.mean([s.position for s in ownAssignedSinguities], axis=0), propagatedPresence).position)
                     )
 
             else:
@@ -181,7 +191,8 @@ class PropagatingVisionAi(Artificial):
 
                 else:
                     movingCommands.append(
-                        ("moveToPosition", ownAssignedSinguities, self.getClosestOwnSpawner(np.mean([s.position for s in ownAssignedSinguities], axis=0), propagatedPresence).position)
+                        ("moveToPosition", ownAssignedSinguities,
+                         self.getClosestOwnSpawner(np.mean([s.position for s in ownAssignedSinguities], axis=0), propagatedPresence).position)
                     )
 
         return movingCommands

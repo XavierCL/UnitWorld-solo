@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import List, Optional
 
 import numpy as np
@@ -22,3 +23,7 @@ class Move:
             return Move(False, singuityIds, spawner.id, spawner.position)
         else:
             return Move(True, singuityIds, spawner.id, spawner.position)
+
+    @staticmethod
+    def fromNothing():
+        return Move(True, [], None, np.array([0, 0]))

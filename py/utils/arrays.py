@@ -38,6 +38,9 @@ def assignInline(arr, indices, values):
     arr[indices] = values
     return arr
 
+def flatten(arr: Iterable[Iterable[Nested]]) -> List[Nested]:
+    return [inner for middle in arr for inner in middle]
+
 def first(arr: Iterable[Nested], predicate: Callable[[Nested], bool]) -> Nested:
     for value in arr:
         if predicate(value):
@@ -95,6 +98,11 @@ def mad(arr: Iterable, median: Optional[float] = None, axis: Optional[int] = Non
 
 # O(max(arr) + shape(arr))
 def toNaturals(arr: np.ndarray, returnMapping=False) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
+    if len(arr) == 0:
+        if returnMapping:
+            return arr, np.empty(0, dtype=arr.dtype)
+        return arr
+
     uniques = np.unique(arr)
     reverseUniques = assign(np.empty(np.max(uniques) + 1, dtype=arr.dtype), uniques, np.arange(len(uniques)))
 

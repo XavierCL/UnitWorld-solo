@@ -1,22 +1,22 @@
 from typing import List
 
 from clientAis.ais.shortMachine.gameInterface.Move import Move
+from clientAis.ais.shortMachine.long.plan import Plan
 from clientAis.ais.shortMachine.machines.ShortMachineProperties import ShortMachineProperties
-from clientAis.ais.shortMachine.machines.states.Regroup import Regroup
-from clientAis.games.GameState import GameState
+from clientAis.ais.shortMachine.machines.states.InitialState import InitialState
+from clientAis.games.GameState import GameState, Singuity
 
 class ShortMachine:
-    def __init__(self, gameState: GameState, currentPlayerId: str, singuityIds: List[str]):
-        self.currentPlayerId = currentPlayerId
-        self.singuityIds = singuityIds
-        self.properties = ShortMachineProperties(len(singuityIds))
-        self.currentState = Regroup(currentPlayerId).nextState(gameState, self.properties)
+    def __init__(self, clusterId: str, playerId: str, singuities: List[Singuity]):
+        self.playerId = playerId
+        self.singuities = singuities
+        self.currentState = InitialState(ShortMachineProperties.fromSinguities(clusterId, playerId, singuities))
 
-    def updateSinguities(self, singuityIds: List[str]):
-        self.singuityIds = singuityIds
-        self.properties = ShortMachineProperties(len(singuityIds))
+    def updateSinguities(self, singuities: List[Singuity]):
+        self.singuities = singuities
+        self.currentState = self.currentState.updateProperties(singuities)
         return self
 
-    def nextState(self, gameState: GameState) -> Move:
-        self.currentState = self.currentState.nextState(gameState, self.properties)
-        return self.currentState.getMove(gameState, self.singuityIds)
+    def nextState(self, gameState: GameState, plan: Plan, clusterProperties: List[ShortMachineProperties]) -> Move:
+        self.currentState = self.currentState.nextState(gameState, plan, clusterProperties)
+        return self.currentState.getMove(gameState, [s.id for s in self.singuities])

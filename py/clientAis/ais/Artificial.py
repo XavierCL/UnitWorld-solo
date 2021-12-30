@@ -1,5 +1,5 @@
-from clientAis.games.GameState import GameState
 from clientAis.communications.ServerCommander import ServerCommander
+from clientAis.games.GameState import GameState
 
 SECOND_BETWEEN_AI_FRAME = 0.5
 

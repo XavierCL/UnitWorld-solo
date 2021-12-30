@@ -6,10 +6,10 @@ from typing import List, Optional
 
 import numpy as np
 
-from clientAis.ais.discreteV1.scores.DiscreteGameScorer import DiscreteGameScorer
 from clientAis.ais.discreteV1.models.DiscreteGameState import DiscreteGameState
 from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
 from clientAis.ais.discreteV1.Plans.DiscreteMoveGenerator import DiscreteMoveGenerator
+from clientAis.ais.discreteV1.scores.DiscreteGameScorer import DiscreteGameScorer
 from clientAis.ais.discreteV1.searches.StateScore import StateScore
 
 class DiscreteGameNode:

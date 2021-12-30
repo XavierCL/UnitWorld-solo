@@ -7,9 +7,9 @@ from sklearn.neighbors import KDTree
 
 from clientAis.ais.discreteV1.models.DiscretePlayer import DiscretePlayer
 from clientAis.ais.discreteV1.models.DiscreteSpawner import DiscreteSpawner
-from clientAis.ais.discreteV1.Plans.Move import Move
 from clientAis.ais.discreteV1.physics.PhysicsEstimator import PhysicsEstimator
 from clientAis.ais.discreteV1.Plans.DiscreteMove import DiscreteMove
+from clientAis.ais.discreteV1.Plans.Move import Move
 from clientAis.games.GameState import GameState
 from utils import arrays
 
@@ -150,7 +150,7 @@ class DiscreteGameState:
             # Spawn singuities during interaction
             assignNewSpawnees(spawnersAfterMovement, self.frameCount + movementDuration, self.frameCount + movementDuration + interactionDuration)
 
-            spawners =[getLastSpawnerVersion(spawner.id) for spawner in self.spawners]
+            spawners = [getLastSpawnerVersion(spawner.id) for spawner in self.spawners]
 
             return DiscreteGameState(
                 self.currentPlayerId,
