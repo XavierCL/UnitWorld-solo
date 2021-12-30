@@ -7,10 +7,10 @@ from clientAis.ais.shortMachine.machines.states.InitialState import InitialState
 from clientAis.games.GameState import GameState, Singuity
 
 class ShortMachine:
-    def __init__(self, clusterId: str, playerId: str, singuities: List[Singuity]):
+    def __init__(self, playerId: str, singuities: List[Singuity]):
         self.playerId = playerId
         self.singuities = singuities
-        self.currentState = InitialState(ShortMachineProperties.fromSinguities(clusterId, playerId, singuities))
+        self.currentState = InitialState(ShortMachineProperties.fromSinguities(playerId, singuities))
 
     def updateSinguities(self, singuities: List[Singuity]):
         self.singuities = singuities

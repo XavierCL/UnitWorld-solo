@@ -16,9 +16,10 @@ class ShortMachineManager:
         self.clustererByPlayerId: Dict[str, Clusterer] = {}
         self.planProvider = PlanProvider()
 
-    # todo one unit at a time gets bumped to another cluster?? Probably last unit because of a lingering -1??
-    # todo make default movement go to closest claimed spawner
     # todo still attack should also use enemy clusters with a different threshold
+    # todo make default movement go to closest claimed spawner
+    # todo cluster based on position + speed for less discrepancies in clusters
+    # todo defense
     def fromGameState(self, gameState: GameState, currentPlayerId: str) -> List[Move]:
         self.updateClusters(gameState)
         plan = self.planProvider.getPlan(gameState, currentPlayerId)
@@ -51,11 +52,12 @@ class ShortMachineManager:
                 singuities = playerSinguities[singuityClusters == newClusterId].tolist()
 
                 if newClusterId not in newClusterIdToOldClusterIds:
-                    return ShortMachine(str(uuid4()), player.id, singuities)
+                    return ShortMachine(player.id, singuities)
 
                 oldClusters = [self.clustersByPlayerId[player.id][oldClusterId] for oldClusterId in newClusterIdToOldClusterIds[newClusterId]]
 
                 mostPopulousOldClusterIndex = np.argmax([oldCluster.currentState.properties.singuityCount for oldCluster in oldClusters])
+
                 return oldClusters[mostPopulousOldClusterIndex].updateSinguities(singuities)
 
             self.clustersByPlayerId[player.id] = [getShortMachine(newClusterId) for newClusterId in np.unique(singuityClusters) if newClusterId != -1]

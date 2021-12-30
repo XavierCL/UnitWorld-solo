@@ -68,4 +68,4 @@ class AttackSpawner(ShortState):
         return self.getDefaultState(gameState, plan, properties)
 
     def getMove(self, gameState: GameState, singuityIds: List[str]) -> Move:
-        return Move.fromSpawner(singuityIds, self.spawner, self.properties.playerId)
+        return Move.fromPosition(singuityIds, self.spawner.position)
