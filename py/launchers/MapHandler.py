@@ -15,6 +15,11 @@ class MapHandler:
 
         self.generatedMap = None
 
+    def archiveGenerateAndSaveMap(self):
+        self.archiveLastMap()
+        self.generateRandomMap()
+        self.saveMapToFile()
+
     def archiveLastMap(self):
         if len([True for file in os.listdir(self.lastGamePath) if file == "config.json"]) == 1:
             archivedGameIds = [
@@ -74,6 +79,9 @@ class MapHandler:
         homeSpawnerConfig = symmetryFunction(
             arrays.assign(np.zeros((discreteMapSize, discreteMapSize), dtype=bool).reshape(-1), homeSquareIndex, True).reshape(discreteMapSize, -1)
         )
+
+        # Removing neutral spawner from home location
+        symmetricSpawnerConfig[homeSpawnerConfig] = False
 
         # Generating final spawner array
         viewPointInGameUnit = mapSizeInGameUnits - mapBordersInGameUnit

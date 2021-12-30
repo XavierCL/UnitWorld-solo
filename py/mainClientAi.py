@@ -2,15 +2,13 @@ import sys
 import time
 from typing import Callable, Dict
 
-import numpy as np
-from sklearn.cluster import AgglomerativeClustering, DBSCAN
-from sklearn.neighbors import KDTree
-
 from clientAis.ais.Artificial import Artificial
+from clientAis.ais.discreteV1.DiscreteV1Ai import DiscreteV1Ai
 from clientAis.ais.packing.PackingAi import PackingAi
 from clientAis.ais.packingAhead.PackingAheadAi import PackingAheadAi
 from clientAis.ais.packingBehind.PackingBehindAi import PackingBehindAi
 from clientAis.ais.quickAttack.QuickAttackAi import QuickAttackAi
+from clientAis.ais.shortMachine.ShortMachineAi import ShortMachineAi
 from clientAis.ais.SingleMindClosest.SingleMindClosestAi import SingleMindClosestAi
 from clientAis.ais.Voider.VoiderAi import VoiderAi
 from clientAis.ais.PropagatingVision.PropagatingVisionAi import PropagatingVisionAi
@@ -26,8 +24,7 @@ commandLineOptions = {key: value for key, value in zip(arrays.soft_accessor(sys.
 
 DEFAULT_SERVER_IP = "127.0.0.1"
 DEFAULT_SERVER_PORT = 52124
-DEFAULT_AI_NAME = "packing"
-SECOND_BETWEEN_AI_FRAME = 0.5
+DEFAULT_AI_NAME = "shortMachine"
 
 serverIp = commandLineOptions.get("serverIp") or DEFAULT_SERVER_IP
 serverPort = int(commandLineOptions.get("serverPort") or DEFAULT_SERVER_PORT)
@@ -41,6 +38,8 @@ ais: Dict[str, Callable[[ServerCommander], Artificial]] = {
     "quickAttack": lambda serverCommander: QuickAttackAi(serverCommander),
     "packingAhead": lambda serverCommander: PackingAheadAi(serverCommander),
     "packingBehind": lambda serverCommander: PackingBehindAi(serverCommander),
+    "discreteV1": lambda serverCommander: DiscreteV1Ai(serverCommander),
+    "shortMachine": lambda serverCommander: ShortMachineAi(serverCommander)
 }
 
 def clientConnectorCallBack(communicationHandler: CommunicationHandler):
@@ -65,19 +64,29 @@ def clientConnectorCallBack(communicationHandler: CommunicationHandler):
         while not communicationHandler.closed:
             timeBeforeFrame = time.time()
 
-            if gameManager.gameState is not None and gameManager.gameState.frameCount > lastAiGameStateVersion:
+            hasNewFrame = gameManager.gameState is not None and gameManager.gameState.frameCount > lastAiGameStateVersion
+
+            if hasNewFrame:
                 lastAiGameStateVersion = gameManager.gameState.frameCount
-                artificial.frame(gameManager.gameState, gameManager.currentPlayerId)
+
+                if not artificial.frameIsIgnored(gameManager.gameState, gameManager.currentPlayerId):
+                    artificial.frame(gameManager.gameState, gameManager.currentPlayerId)
 
             timeAfterFrame = time.time()
 
             frameTimeInSecond = timeAfterFrame - timeBeforeFrame
 
-            if frameTimeInSecond < SECOND_BETWEEN_AI_FRAME:
-                print(f"Frame {0 if gameManager.gameState is None else gameManager.gameState.frameCount} took {frameTimeInSecond:.3f}s. Sleeping {SECOND_BETWEEN_AI_FRAME - frameTimeInSecond:.3f}s.")
-                time.sleep(SECOND_BETWEEN_AI_FRAME - frameTimeInSecond)
+            allottedFrameTime = artificial.frameTimeSecond()
+
+            if not hasNewFrame:
+                print(f"No new frame. Sleeping {allottedFrameTime:.3f}s.")
+                time.sleep(allottedFrameTime)
+            elif frameTimeInSecond < allottedFrameTime:
+                print(f"Frame {0 if gameManager.gameState is None else gameManager.gameState.frameCount} took {frameTimeInSecond:.3f}s. Sleeping {allottedFrameTime - frameTimeInSecond:.3f}s.")
+                time.sleep(allottedFrameTime - frameTimeInSecond)
             else:
                 print(f"Frame {0 if gameManager.gameState is None else gameManager.gameState.frameCount} took {frameTimeInSecond:.3f}s. Not sleeping")
+                time.sleep(0.001)
     except:
         raise
     finally:

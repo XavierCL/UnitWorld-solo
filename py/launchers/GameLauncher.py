@@ -40,13 +40,11 @@ class GameLauncher:
         self.cleanupStack.append(lambda: aiProcess.wait())
         self.cleanupStack.append(lambda: aiProcess.kill())
 
-    def runCppClientGuiPlayerBlocking(self):
-        subprocess.call(os.path.normpath(os.path.join(self.lastGamePath, 'UnitWorld_client_gui.exe')), cwd=os.path.normpath(self.lastGamePath))
-
-    def runCppClientGuiObserverBlocking(self):
-        sleepTimeInSeconds = 10
-        print(f"Waiting {sleepTimeInSeconds} seconds for called ais to startup before starting observer...")
-        time.sleep(sleepTimeInSeconds)
+    def runCppClientGuiBlocking(self, mode="observer"):
+        if mode == "observer":
+            sleepTimeInSeconds = 10
+            print(f"Waiting {sleepTimeInSeconds} seconds for called ais to startup before starting observer...")
+            time.sleep(sleepTimeInSeconds)
 
         subprocess.call(os.path.normpath(os.path.join(self.lastGamePath, 'UnitWorld_client_gui.exe')), cwd=os.path.normpath(self.lastGamePath))
 

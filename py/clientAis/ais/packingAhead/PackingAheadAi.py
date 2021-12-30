@@ -5,7 +5,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.neighbors import KDTree
 
 from clientAis.ais.Artificial import Artificial
-from clientAis.communications.GameState import GameState, Spawner
+from clientAis.games.GameState import GameState, Spawner
 
 class PackingAheadAi(Artificial):
     def frame(self, gameState: GameState, currentPlayerId: str):
@@ -55,7 +55,9 @@ class PackingAheadAi(Artificial):
         ownSpawnersPosition = [s.position for s in ownSpawners]
         ownSpawnerKdtree = KDTree(np.array(ownSpawnersPosition))
         closestOwnSpawnerIndex = ownSpawnerKdtree.query(target.position.reshape(1, -1), return_distance=False)[0].item()
-        rally = self.getPositionCloseToTargetToward(target.position, ownSpawners[closestOwnSpawnerIndex].position, np.linalg.norm(target.position - ownSpawners[closestOwnSpawnerIndex].position) / 2)
+        rally = self.getPositionCloseToTargetToward(
+            target.position, ownSpawners[closestOwnSpawnerIndex].position, np.linalg.norm(target.position - ownSpawners[closestOwnSpawnerIndex].position) / 2
+            )
 
         clusterer = DBSCAN(eps=100, min_samples=target.remainingSinguitiesToClaim(currentPlayerId))
         clusters = clusterer.fit_predict(ownSinguitiesPosition)

@@ -1,6 +1,6 @@
 from typing import Union
 
-from clientAis.communications.GameState import GameState
+from clientAis.games.GameState import GameState
 
 class GameManager:
     def __init__(self):

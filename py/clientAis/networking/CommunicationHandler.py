@@ -10,13 +10,12 @@ class CommunicationHandler:
 
     def send(self, communication: str):
         if self.closed:
-            raise Exception("Cannot send data through a disconnected socket.")
+            return
 
         try:
             return self.sock.send(communication.encode("ascii"))
         except:
             self.closed = True
-            raise
 
     def receive(self) -> str:
         if self.closed:

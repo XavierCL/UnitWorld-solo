@@ -5,7 +5,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.neighbors import KDTree
 
 from clientAis.ais.Artificial import Artificial
-from clientAis.communications.GameState import GameState, Spawner
+from clientAis.games.GameState import GameState, Spawner
 
 class PackingBehindAi(Artificial):
     def frame(self, gameState: GameState, currentPlayerId: str):
@@ -57,7 +57,8 @@ class PackingBehindAi(Artificial):
             enemySinguitiesPosition = np.array([s.position for s in enemySinguities])
             centerOfEnemy = np.median(enemySinguitiesPosition, axis=0)
         else:
-            notOwnSpawners = [s for s in gameState.spawners if s.allegence is None or not s.allegence.isClaimed or (s.allegence.isClaimed and s.allegence.playerId != currentPlayerId)]
+            notOwnSpawners = [s for s in gameState.spawners if
+                              s.allegence is None or not s.allegence.isClaimed or (s.allegence.isClaimed and s.allegence.playerId != currentPlayerId)]
             notOwnSpawnersPosition = [s.position for s in notOwnSpawners]
             centerOfEnemy = np.median(notOwnSpawnersPosition, axis=0)
 
