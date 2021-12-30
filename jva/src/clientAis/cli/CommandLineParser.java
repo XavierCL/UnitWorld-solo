@@ -1,10 +1,8 @@
 package clientAis.cli;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class CommandLineParser {
 
@@ -27,12 +25,12 @@ public class CommandLineParser {
     public List<String> findArguments(String commandName, int numberOfArguments) {
         final List<String> arguments = new ArrayList<>();
 
-        Arrays.asList(args).stream()
+        args.stream()
                 .filter(s -> s.equals(commandName))
                 .findFirst()
                 .ifPresent(cmdStr -> {
                     final int commandIndex = args.indexOf(cmdStr);
-                    IntStream.range(0, numberOfArguments).forEach(i -> {
+                    IntStream.range(1, numberOfArguments+1).forEach(i -> {
                         final String argument = args.get(commandIndex+i);
                         arguments.add(argument);
                     });

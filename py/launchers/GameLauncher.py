@@ -26,9 +26,10 @@ class GameLauncher:
         self.cleanupStack.append(lambda: aiProcess.wait())
         self.cleanupStack.append(lambda: aiProcess.kill())
 
-    def runJavaAiBackground(self):
+    def runJavaAiBackground(self, aiName=None):
+        arguments = "" if aiName is None else f"aiName {aiName}"
         aiProcess = subprocess.Popen(
-            f'"C:\\Program Files (x86)\\Java\\jdk-14.0.2\\bin\\java.exe" "-javaagent:C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2020.1.4\\lib\\idea_rt.jar=49386:C:\\Program Files\\JetBrains\\IntelliJ IDEA Community Edition 2020.1.4\\bin" -Dfile.encoding=UTF-8 -classpath "D:\\Program Files\\GitHub\\UnitWorld-solo\\jva\\out\\production\\jva;C:\\Users\\John\\.m2\\repository\\com\\jayway\\jsonpath\\json-path\\2.6.0\\json-path-2.6.0.jar;C:\\Users\\John\\.m2\\repository\\net\\minidev\\json-smart\\2.4.7\\json-smart-2.4.7.jar;C:\\Users\\John\\.m2\\repository\\net\\minidev\\accessors-smart\\2.4.7\\accessors-smart-2.4.7.jar;C:\\Users\\John\\.m2\\repository\\org\\ow2\\asm\\asm\\9.1\\asm-9.1.jar;C:\\Users\\John\\.m2\\repository\\org\\slf4j\\slf4j-api\\1.7.30\\slf4j-api-1.7.30.jar" clientAis.MainClientAi',
+            f'java -jar out\\artifacts\\jva_jar\\jva.jar' + arguments,
             cwd=self.javaAiFolder
         )
         self.cleanupStack.append(lambda: aiProcess.wait())

@@ -5,8 +5,8 @@ import java.util.Objects;
 
 public class Vector2Int implements Serializable {
 
-    private final int x;
-    private final int y;
+    public final int x;
+    public final int y;
 
     public Vector2Int(int x, int y) {
         this.x = x;

@@ -9,7 +9,7 @@ lastGamePath = "./launchers/games/latest/"
 gameExecutablesPath = "../cpp/x64/Release/"
 
 pythonExecutablePath = "mainClientAi.py"
-javaAiFolder = "../jva/out/production/jva/clientAis/"
+javaAiFolder = "../jva"
 
 mapHandler = MapHandler(lastGamePath, archivedGamesPath)
 # mapHandler.archiveGenerateAndSaveMap()
@@ -23,4 +23,5 @@ for gameFileName in gameFileNames:
 gameLauncher = GameLauncher(lastGamePath, pythonExecutablePath, javaAiFolder)
 gameLauncher.runServerBackground()
 gameLauncher.runCppAiBackground()
+gameLauncher.runJavaAiBackground()
 gameLauncher.runCppClientGuiBlocking(mode="observer")

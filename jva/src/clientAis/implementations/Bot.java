@@ -1,10 +1,9 @@
 package clientAis.implementations;
 
 import clientAis.communications.ServerCommander;
-import clientAis.communications.game_data.GameState;
-import utils.data_structure.tupple.Tuple2;
+import clientAis.dynamic_data.DataPacket;
 import utils.state_machine.Behaviour;
 
 import java.util.function.Consumer;
 
-public interface Bot extends Behaviour<Tuple2<GameState, String>, Consumer<ServerCommander>> {}
+public interface Bot extends Behaviour<DataPacket, Consumer<ServerCommander>> {}

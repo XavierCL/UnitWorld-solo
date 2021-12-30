@@ -9,9 +9,9 @@ from clientAis.ais.packingAhead.PackingAheadAi import PackingAheadAi
 from clientAis.ais.packingBehind.PackingBehindAi import PackingBehindAi
 from clientAis.ais.quickAttack.QuickAttackAi import QuickAttackAi
 from clientAis.ais.shortMachine.ShortMachineAi import ShortMachineAi
-from clientAis.ais.singleMindClosest.SingleMindClosestAi import SingleMindClosestAi
+from clientAis.ais.SingleMindClosest.SingleMindClosestAi import SingleMindClosestAi
 from clientAis.ais.Voider.VoiderAi import VoiderAi
-from clientAis.ais.propagatingVision.PropagatingVisionAi import PropagatingVisionAi
+from clientAis.ais.PropagatingVision.PropagatingVisionAi import PropagatingVisionAi
 from clientAis.networking.ClientConnector import ClientConnector
 from clientAis.communications.MessageSerializer import MessageSerializer
 from clientAis.games.GameManager import GameManager

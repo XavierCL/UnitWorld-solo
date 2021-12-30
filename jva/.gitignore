@@ -1,3 +1,5 @@
 *.iml
 out/
 .idea/
+../py/launchAis.cmd
+!out/artifacts/jva_jar/jva.jar

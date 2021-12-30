@@ -14,8 +14,8 @@ public class CommunicationHandler implements Closeable {
     private final Socket socket;
     private final ConnectionCredentials serverCredentials;
     private final char[] bufferData;
-    private final BufferedReader reader;
-    final PrintWriter writer;
+    private BufferedReader reader;
+    private final PrintWriter writer;
 
     public CommunicationHandler(Socket socket, ConnectionCredentials serverCredentials) {
         this.socket = socket;
@@ -56,9 +56,18 @@ public class CommunicationHandler implements Closeable {
         catch (IOException ioException) {
             ioException.printStackTrace();
             close();
-            throw new RuntimeException("Remote socket has been shutdown while receiving from it");
+            if(socket.isClosed()) {
+                throw new RuntimeException("Remote socket has been shutdown while receiving from it");
+            }
+            try {
+                reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            }
+            catch (IOException ioException2) {
+                ioException2.printStackTrace();
+                throw new RuntimeException("Remote socket has been shutdown while receiving from it");
+            }
+            return receive();
         }
-
     }
 
     private void raiseExceptionIfDisconnectedFromServer(String nameOfAction) {
