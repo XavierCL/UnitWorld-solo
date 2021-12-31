@@ -22,6 +22,6 @@ for gameFileName in gameFileNames:
 
 gameLauncher = GameLauncher(lastGamePath, pythonExecutablePath, javaAiFolder)
 gameLauncher.runServerBackground()
-gameLauncher.runCppAiBackground()
-gameLauncher.runJavaAiBackground()
+gameLauncher.runJavaAiBackground("clientAis.implementations.basic_minion_wielder.BasicMinionWielder")
+# gameLauncher.runPythonAiBackground("shortMachine")
 gameLauncher.runCppClientGuiBlocking(mode="observer")

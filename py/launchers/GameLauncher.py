@@ -29,7 +29,7 @@ class GameLauncher:
     def runJavaAiBackground(self, aiName=None):
         arguments = "" if aiName is None else f"aiName {aiName}"
         aiProcess = subprocess.Popen(
-            f'java -jar out\\artifacts\\jva_jar\\jva.jar' + arguments,
+            f'java -jar out\\artifacts\\jva_jar\\jva.jar ' + arguments,
             cwd=self.javaAiFolder
         )
         self.cleanupStack.append(lambda: aiProcess.wait())

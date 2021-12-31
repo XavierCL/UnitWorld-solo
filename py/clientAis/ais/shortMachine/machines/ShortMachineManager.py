@@ -16,9 +16,12 @@ class ShortMachineManager:
         self.clustererByPlayerId: Dict[str, Clusterer] = {}
         self.planProvider = PlanProvider()
 
+    # todo compute new units count per distance
     # todo still attack should also use enemy clusters with a different threshold
     # todo make default movement go to closest claimed spawner
     # todo cluster based on position + speed for less discrepancies in clusters
+    # todo sometimes attack larger than 4x units defended enemy spawner, or does it?☻
+    # todo merge two clusters
     # todo defense
     def fromGameState(self, gameState: GameState, currentPlayerId: str) -> List[Move]:
         self.updateClusters(gameState)
@@ -52,12 +55,12 @@ class ShortMachineManager:
                 singuities = playerSinguities[singuityClusters == newClusterId].tolist()
 
                 if newClusterId not in newClusterIdToOldClusterIds:
-                    return ShortMachine(player.id, singuities)
+                    return ShortMachine(player.id, singuities, gameState.frameCount)
 
                 oldClusters = [self.clustersByPlayerId[player.id][oldClusterId] for oldClusterId in newClusterIdToOldClusterIds[newClusterId]]
 
                 mostPopulousOldClusterIndex = np.argmax([oldCluster.currentState.properties.singuityCount for oldCluster in oldClusters])
 
-                return oldClusters[mostPopulousOldClusterIndex].updateSinguities(singuities)
+                return oldClusters[mostPopulousOldClusterIndex].updateSinguities(singuities, gameState.frameCount)
 
             self.clustersByPlayerId[player.id] = [getShortMachine(newClusterId) for newClusterId in np.unique(singuityClusters) if newClusterId != -1]
