@@ -20,10 +20,7 @@ import clientAis.implementations.threat_level_defender.ThreatLevelDefender;
 import clientAis.networking.ClientConnector;
 import utils.timer.LambdaTimerTaskHelper;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Timer;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -31,7 +28,7 @@ public class MainClientAi {
 
     public static final String DEFAULT_SERVER_IP = "127.0.0.1";
     public static final String DEFAULT_SERVER_PORT = "52124";
-    public static final String DEFAULT_AI_NAME = ThreatLevelDefender.class.getName();
+    public static final String DEFAULT_AI_NAME = BasicMinionWielder.class.getName();
     public static final double SECOND_BETWEEN_AI_FRAME = 0.1;
     public static final long REFRESH_PERIOD_MS = (int)(SECOND_BETWEEN_AI_FRAME*1000);
 
@@ -101,7 +98,11 @@ public class MainClientAi {
         });
     }
 
-    private static void runBot(Bot bot, String currentPlayerId, GameState gameState, ServerCommander serverCommander) {
+    private static void runBot(
+            final Bot bot,
+            final String currentPlayerId,
+            final GameState gameState,
+            final ServerCommander serverCommander) {
         final DataPacket input = new DataPacket(gameState, currentPlayerId, previousInputOpt);
         final Consumer<ServerCommander> consumer = bot.exec(input);
         previousInputOpt = Optional.of(input);

@@ -5,7 +5,7 @@ import java.util.Set;
 
 public interface MemoryResource<PointerType> {
     Set<PointerType> alloc(int amount);
-    Set<PointerType> alloc(int amount,  Function<String, Double> scoreFunction);
+    Set<PointerType> alloc(int amount,  Function<PointerType, Double> scoreFunction);
     void free(Set<PointerType> ptrSet);
 
     void actualize(Set<PointerType> ptrSet);
