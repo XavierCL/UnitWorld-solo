@@ -33,14 +33,14 @@ class AttackSpawner(ShortState):
 
     @staticmethod
     def attackIfWorthIt(clusterProperties: ShortMachineProperties, spawner: Spawner, properties: List[ShortMachineProperties]) -> Union[AttackSpawner, None]:
-        if AttackSpawner.isWorthAttacking(clusterProperties, spawner, properties, 1.9, 100):
+        if AttackSpawner.isWorthAttacking(clusterProperties, spawner, properties, 3.5, 1.0):
             return AttackSpawner(clusterProperties, spawner)
 
         # Not enough units to attack, don't attack
         return None
 
     def canStillAttack(self, allProperties: List[ShortMachineProperties]) -> bool:
-        return AttackSpawner.isWorthAttacking(self.properties, self.spawner, allProperties, 1.1, 50)
+        return AttackSpawner.isWorthAttacking(self.properties, self.spawner, allProperties, 2.5, 0.7)
 
     @staticmethod
     def isWorthAttacking(
@@ -75,7 +75,11 @@ class AttackSpawner(ShortState):
                 totalEnemiesAtLocation += enemyClusters[closestEnemyClusterIndex].singuityCount
 
         # current cluster is more numerous than enemy defender, attack indeed.
-        if totalEnemiesAtLocation * singuityRatio + spawnerInfluence * spawner.allegence.healthPoints / Spawner.MAX_HEALTH_POINTS < clusterProperties.singuityCount:
+        spawnerDiesFirst = totalEnemiesAtLocation + spawnerInfluence * spawner.allegence.healthPoints / Singuity.MAX_HEALTH_POINT
+        defendersDieFirst = totalEnemiesAtLocation * singuityRatio
+        enemyDefense = min(spawnerDiesFirst, defendersDieFirst)
+
+        if enemyDefense < clusterProperties.singuityCount:
             return True
 
         # Not enough units to attack, don't attack

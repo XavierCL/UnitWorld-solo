@@ -16,12 +16,12 @@ class ShortMachineManager:
         self.clustererByPlayerId: Dict[str, Clusterer] = {}
         self.planProvider = PlanProvider()
 
-    # todo compute new units count per distance
-    # todo still attack should also use enemy clusters with a different threshold
+    # todo Missing tweaks to the spawner attack worth.
+    # todo merge two clusters, probably by checking affinities in goal, and if a goal is achievable together lets do it. There might be an issue with cluster std
     # todo make default movement go to closest claimed spawner
     # todo cluster based on position + speed for less discrepancies in clusters
-    # todo sometimes attack larger than 4x units defended enemy spawner, or does it?☻
-    # todo merge two clusters
+    # todo sometimes attack larger than 4x units defended enemy spawner, or does it?
+    # todo micro interrupts
     # todo defense
     def fromGameState(self, gameState: GameState, currentPlayerId: str) -> List[Move]:
         self.updateClusters(gameState)
