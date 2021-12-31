@@ -13,8 +13,8 @@ class ShortState:
     def __init__(self, properties: ShortMachineProperties):
         self.properties = properties
 
-    def updateProperties(self, singuities: List[Singuity]) -> ShortState:
-        self.properties = self.properties.updateSinguities(singuities)
+    def updateProperties(self, singuities: List[Singuity], frameCount: int) -> ShortState:
+        self.properties = self.properties.updateSinguities(singuities, frameCount)
         return self
 
     def nextState(self, gameState: GameState, plan: Plan, properties: List[ShortMachineProperties]) -> ShortState:

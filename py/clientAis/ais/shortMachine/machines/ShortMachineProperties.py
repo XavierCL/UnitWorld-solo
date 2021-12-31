@@ -7,14 +7,15 @@ import numpy as np
 from clientAis.games.GameState import Singuity
 
 class ShortMachineProperties:
-    def __init__(self, playerId: str, singuityCount: int, singuityMeanPosition: np.ndarray):
+    def __init__(self, playerId: str, singuityCount: int, singuityMeanPosition: np.ndarray, frameCount: int):
         self.playerId = playerId
         self.singuityCount = singuityCount
         self.singuityMeanPosition = singuityMeanPosition
+        self.frameCount = frameCount
 
     @staticmethod
-    def fromSinguities(playerId: str, singuities: List[Singuity]) -> ShortMachineProperties:
-        return ShortMachineProperties(playerId, len(singuities), np.mean([s.position for s in singuities], axis=0))
+    def fromSinguities(playerId: str, singuities: List[Singuity], frameCount: int) -> ShortMachineProperties:
+        return ShortMachineProperties(playerId, len(singuities), np.mean([s.position for s in singuities], axis=0), frameCount)
 
-    def updateSinguities(self, singuities: List[Singuity]) -> ShortMachineProperties:
-        return ShortMachineProperties.fromSinguities(self.playerId, singuities)
+    def updateSinguities(self, singuities: List[Singuity], frameCount: int) -> ShortMachineProperties:
+        return ShortMachineProperties.fromSinguities(self.playerId, singuities, frameCount)
