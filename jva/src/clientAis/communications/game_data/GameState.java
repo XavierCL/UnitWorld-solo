@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 public class GameState {
 
+    public static final double GAME_PHYSICS_REFRESH_RATE = 30.0;
+
     public final List<Player> players;
     public final List<Singuity> singuities;
     public final List<Spawner> spawners;

@@ -1,11 +1,14 @@
 package clientAis.communications.game_data;
 
+import clientAis.MainClientAi;
 import net.minidev.json.JSONObject;
 import utils.math.vector.Vector2;
 
 import java.util.Optional;
 
 public class Spawner {
+
+    public static final double SINGUITY_SPAWNING_RATE = 1.0/MainClientAi.SECOND_BETWEEN_AI_FRAME;
 
     public final String id;
     public final Vector2 position;

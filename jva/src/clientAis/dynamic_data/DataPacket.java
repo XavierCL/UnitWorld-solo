@@ -6,8 +6,7 @@ import clientAis.communications.game_data.Spawner;
 import utils.data_structure.cluster.DataCluster;
 import utils.data_structure.cluster.DensityBasedScan;
 import utils.unit_world.game_data_resources.MemoryResource;
-import utils.unit_world.game_data_resources.singuity.SinguityResourceHandler;
-import utils.unit_world.game_data_resources.spawner.OwnedSpawnerResourceHandler;
+import utils.unit_world.game_data_resources.ResourceHandler;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,8 +15,8 @@ public class DataPacket {
 
     public static final double DENSITY_SCAN_RADIUS = 20;
 
-    public static final MemoryResource<String> singuityResourceHandler = new SinguityResourceHandler();
-    public static final MemoryResource<String> ownedSpawnerResourceHandler = new OwnedSpawnerResourceHandler();
+    public static final MemoryResource<String> singuityResourceHandler = new ResourceHandler<>();
+    public static final MemoryResource<String> ownedSpawnerResourceHandler = new ResourceHandler<>();
 
     public final GameState gameState;
     public final String playerId;
@@ -107,17 +106,13 @@ public class DataPacket {
         DataPacket.ownedSpawnerResourceHandler.actualize(ownedSpawners);
 
         // setup clusters
-        final DensityBasedScan<Singuity, String> ownedSinguityDensityScanner = new DensityBasedScan<>(ownedSinguities.stream()
-                .map(singuityIdMap::get)
-                .collect(Collectors.toList()),
-                singuity -> singuity.position,
-                singuity -> singuity.id);
+        final DensityBasedScan<String> ownedSinguityDensityScanner = new DensityBasedScan<>(
+                new ArrayList<>(ownedSinguities),
+                id -> singuityIdMap.get(id).position);
         this.ownedClusters = ownedSinguityDensityScanner.query(DENSITY_SCAN_RADIUS);
-        final DensityBasedScan<Singuity, String> adverseSinguityDensityScanner = new DensityBasedScan<>(adverseSinguities.stream()
-                .map(singuityIdMap::get)
-                .collect(Collectors.toList()),
-                singuity -> singuity.position,
-                singuity -> singuity.id);
+        final DensityBasedScan<String> adverseSinguityDensityScanner = new DensityBasedScan<>(
+                new ArrayList<>(adverseSinguities),
+                id -> singuityIdMap.get(id).position);
         this.adverseClusters = adverseSinguityDensityScanner.query(DENSITY_SCAN_RADIUS);
         this.allClusters = new HashSet<>(ownedClusters);
         allClusters.addAll(adverseClusters);

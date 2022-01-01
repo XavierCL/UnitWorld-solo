@@ -16,14 +16,12 @@ import clientAis.implementations.closest_spawner.ClosestSpawner;
 import clientAis.implementations.dummy.Dummy;
 import clientAis.implementations.go_middle.GoMiddle;
 import clientAis.implementations.mindless_chase.MindlessChase;
+import clientAis.implementations.relentless_attacker.RelentlessAttacker;
 import clientAis.implementations.threat_level_defender.ThreatLevelDefender;
 import clientAis.networking.ClientConnector;
 import utils.timer.LambdaTimerTaskHelper;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Timer;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -31,7 +29,7 @@ public class MainClientAi {
 
     public static final String DEFAULT_SERVER_IP = "127.0.0.1";
     public static final String DEFAULT_SERVER_PORT = "52124";
-    public static final String DEFAULT_AI_NAME = ThreatLevelDefender.class.getName();
+    public static final String DEFAULT_AI_NAME = RelentlessAttacker.class.getName();
     public static final double SECOND_BETWEEN_AI_FRAME = 0.1;
     public static final long REFRESH_PERIOD_MS = (int)(SECOND_BETWEEN_AI_FRAME*1000);
 
@@ -45,6 +43,7 @@ public class MainClientAi {
         addBotImplementation(new BasicSingleMind());
         addBotImplementation(new BasicMinionWielder());
         addBotImplementation(new ThreatLevelDefender());
+        addBotImplementation(new RelentlessAttacker());
     }
 
     private static Optional<DataPacket> previousInputOpt = Optional.empty();
@@ -91,17 +90,21 @@ public class MainClientAi {
                     if(gameState.frameCount > lastAiGameStateVersion.get()) {
                         lastAiGameStateVersion.set(gameManager.gameState.get().frameCount);
                     }
-                    final long timeBeforeRunningBot = System.currentTimeMillis();
+                    final double timeBeforeRunningBot = System.nanoTime()/1000000.0;
                     runBot(bot, currentPlayerId, gameState, serverCommander);
-                    final long timeAfterRunningBot = System.currentTimeMillis();
-                    final long deltaTime = timeAfterRunningBot - timeBeforeRunningBot;
-                    System.out.println("FrameId: " + gameState.frameCount + "\tExecution time: " + deltaTime + " ms");
+                    final double timeAfterRunningBot = System.nanoTime()/1000000.0;
+                    final double deltaTime = timeAfterRunningBot - timeBeforeRunningBot;
+                    System.out.println("Frame " + gameState.frameCount + " took " + String.format("%,.3f", deltaTime) + "ms. CPU " + (int)(100*deltaTime/REFRESH_PERIOD_MS) + "%.");
                 }));
             }), 0, REFRESH_PERIOD_MS);
         });
     }
 
-    private static void runBot(Bot bot, String currentPlayerId, GameState gameState, ServerCommander serverCommander) {
+    private static void runBot(
+            final Bot bot,
+            final String currentPlayerId,
+            final GameState gameState,
+            final ServerCommander serverCommander) {
         final DataPacket input = new DataPacket(gameState, currentPlayerId, previousInputOpt);
         final Consumer<ServerCommander> consumer = bot.exec(input);
         previousInputOpt = Optional.of(input);

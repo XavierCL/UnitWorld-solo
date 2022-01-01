@@ -7,6 +7,9 @@ import java.util.Optional;
 
 public class Singuity {
 
+    public static final double SINGUITY_MAX_SPEED = 4;
+    public static final double SINGUITY_MAX_ACCELERATION = 0.08;
+
     public final String id;
     public final String playerId;
     public final Vector2 position;

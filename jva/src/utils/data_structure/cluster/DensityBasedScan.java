@@ -8,26 +8,24 @@ import utils.shape.Circle;
 import java.util.*;
 import java.util.function.Function;
 
-public class DensityBasedScan<T, ID> implements Queryable<Double, Set<DataCluster<ID>>> {
+public class DensityBasedScan<T> implements Queryable<Double, Set<DataCluster<T>>> {
 
     private final BAHQueryRemoval<T> bahQueryRemoval;
     private final List<T> elements;
     private final Function<T, Vector2> elementPositionMapper;
-    private final Function<T, ID> elementIdMapper;
 
     private double scanRadiusSize;
 
-    public DensityBasedScan(final List<T> elements, Function<T, Vector2> elementPositionMapper, Function<T, ID> elementIdMapper) {
+    public DensityBasedScan(final List<T> elements, Function<T, Vector2> elementPositionMapper) {
         bahQueryRemoval = new BAHQueryRemoval<>(elements, elementPositionMapper);
         this.elements = elements;
         this.elementPositionMapper = elementPositionMapper;
-        this.elementIdMapper = elementIdMapper;
     }
 
     @Override
-    public Set<DataCluster<ID>> query(final Double radiusSize) {
+    public Set<DataCluster<T>> query(final Double radiusSize) {
         this.scanRadiusSize = radiusSize;
-        final List<DataCluster<ID>> dataClusters = new ArrayList<>();
+        final List<DataCluster<T>> dataClusters = new ArrayList<>();
         final Set<T> remainingSinguities = new LinkedHashSet<>(elements);
 
         while(!remainingSinguities.isEmpty()) {
@@ -35,7 +33,7 @@ public class DensityBasedScan<T, ID> implements Queryable<Double, Set<DataCluste
                     .findFirst()
                     .get();
             dataClusters.add(new DataCluster<>(new HashSet<>()));
-            final DataCluster<ID> lastCluster = dataClusters.get(dataClusters.size()-1);
+            final DataCluster<T> lastCluster = dataClusters.get(dataClusters.size()-1);
 
             fillCluster(lastCluster, firstValid, remainingSinguities);
         }
@@ -43,13 +41,13 @@ public class DensityBasedScan<T, ID> implements Queryable<Double, Set<DataCluste
         return new HashSet<>(dataClusters);
     }
 
-    private void fillCluster(final DataCluster<ID> cluster, final T elementToAdd, final Set<T> remainingElements) {
+    private void fillCluster(final DataCluster<T> cluster, final T elementToAdd, final Set<T> remainingElements) {
         final Set<T> remainingElementsToAddInCluster = new LinkedHashSet<>();
         remainingElementsToAddInCluster.add(elementToAdd);
 
         while(!remainingElementsToAddInCluster.isEmpty()) {
             final T firstElement = remainingElementsToAddInCluster.stream().findFirst().get();
-            cluster.elements.add(elementIdMapper.apply(firstElement));
+            cluster.elements.add(firstElement);
             final List<T> nearEnoughSinguities = bahQueryRemoval.query(new Circle(elementPositionMapper.apply(firstElement), scanRadiusSize));
             nearEnoughSinguities.stream()
                     .filter(remainingElements::contains)
@@ -59,16 +57,4 @@ public class DensityBasedScan<T, ID> implements Queryable<Double, Set<DataCluste
             remainingElementsToAddInCluster.remove(firstElement);
         }
     }
-
-    /*
-    private void fillCluster(final DataCluster<ID> cluster, final T elementToAdd, final Set<T> remainingElements, final Map<T, List<T>> elementScanMap) {
-        cluster.elements.add(elementIdMapper.apply(elementToAdd));
-        remainingElements.remove(elementToAdd);
-        elementScanMap.get(elementToAdd).forEach(element -> {
-            if(remainingElements.contains(element)) {
-                fillCluster(cluster, element, remainingElements, elementScanMap);
-            }
-        });
-    }
-    */
 }
