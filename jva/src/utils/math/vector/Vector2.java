@@ -61,6 +61,10 @@ public class Vector2 implements Serializable {
         return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
     }
 
+    public double distanceSquared(Vector2 other) {
+        return minus(other).magnitudeSquared();
+    }
+
     /**
      * This is the length of the vector.
      */

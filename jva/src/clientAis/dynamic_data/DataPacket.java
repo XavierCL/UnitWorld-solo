@@ -27,8 +27,12 @@ public class DataPacket {
     public final Set<String> ownedSinguities;
     public final Set<String> adverseSinguities;
     public final Set<String> allSinguities;
+    public final Set<String> newOwnedSinguities;
+    public final Set<String> deadOwnedSinguities;
 
     public final Set<String> ownedSpawners;
+    public final Set<String> newOwnedSpawners;
+    public final Set<String> deadOwnedSpawners;
     public final Set<String> adverseSpawners;
     public final Set<String> allSpawners;
     public final Set<String> freeSpawners;
@@ -50,7 +54,6 @@ public class DataPacket {
             previousInput.previousInput = Optional.empty();
         });
 
-
         // setup id maps
         this.singuityIdMap = new HashMap<>();
         gameState.singuities
@@ -60,16 +63,27 @@ public class DataPacket {
         this.spawnerIdMap = new HashMap<>();
         gameState.spawners.forEach(spawner -> spawnerIdMap.put(spawner.id, spawner));
 
+
         // setup singuities
+        // all
+        this.allSinguities = gameState.singuities.stream()
+                .filter(Objects::nonNull)
+                .map(singuity -> singuity.id)
+                .collect(Collectors.toSet());
+        // owned
         this.ownedSinguities = gameState.singuities.stream()
                 .filter(Objects::nonNull)
                 .filter(singuity -> singuity.playerId.equals(currentPlayerId))
                 .map(singuity -> singuity.id)
                 .collect(Collectors.toSet());
-        this.allSinguities = gameState.singuities.stream()
-                .filter(Objects::nonNull)
-                .map(singuity -> singuity.id)
-                .collect(Collectors.toSet());
+        // new owned
+        this.newOwnedSinguities = new HashSet<>(ownedSinguities);
+        previousInputOpt.ifPresent(dataPacket -> this.newOwnedSinguities.removeAll(dataPacket.ownedSinguities));
+        // dead owned
+        this.deadOwnedSinguities = new HashSet<>(previousInputOpt.map(dataPacket -> dataPacket.ownedSinguities)
+                .orElse(new HashSet<>()));
+        previousInputOpt.ifPresent(dataPacket -> this.deadOwnedSinguities.removeAll(ownedSinguities));
+        // adverse
         this.adverseSinguities = allSinguities.stream()
                 .filter(Objects::nonNull)
                 .filter(singuity -> !ownedSinguities.contains(singuity))
@@ -79,28 +93,39 @@ public class DataPacket {
         DataPacket.singuityResourceHandler.actualize(ownedSinguities);
 
         // setup spawners
+        // all
+        this.allSpawners = gameState.spawners.stream()
+                .map(spawner -> spawner.id)
+                .collect(Collectors.toSet());
+        // owned
         this.ownedSpawners = gameState.spawners.stream()
                 .filter(spawner -> spawner.allegence.map(spawnerAllegence ->
                 spawnerAllegence.isClaimed && spawnerAllegence.playerId.equals(currentPlayerId))
                         .orElse(false))
                 .map(spawner -> spawner.id)
                 .collect(Collectors.toSet());
-        this.allSpawners = gameState.spawners.stream()
-                .map(spawner -> spawner.id)
-                .collect(Collectors.toSet());
+        // new owned
+        this.newOwnedSpawners = new HashSet<>(ownedSpawners);
+        previousInputOpt.ifPresent(dataPacket -> this.ownedSpawners.removeAll(dataPacket.ownedSpawners));
+        // dead owned
+        this.deadOwnedSpawners = new HashSet<>(previousInputOpt.map(dataPacket -> dataPacket.ownedSpawners).orElse(new HashSet<>()));
+        previousInputOpt.ifPresent(dataPacket -> this.deadOwnedSpawners.removeAll(dataPacket.ownedSpawners));
+        // adverse
         this.adverseSpawners = gameState.spawners.stream()
                 .filter(spawner -> spawner.allegence.map(spawnerAllegence ->
                         spawnerAllegence.isClaimed && !spawnerAllegence.playerId.equals(currentPlayerId))
                         .orElse(false))
                 .map(spawner -> spawner.id)
                 .collect(Collectors.toSet());
+        // free
         this.freeSpawners = allSpawners.stream()
                 .filter(spawner -> !ownedSpawners.contains(spawner)
                         && !adverseSpawners.contains(spawner))
                 .collect(Collectors.toSet());
+        // attackable
         this.attackableSpawners = new HashSet<>();
-        attackableSpawners.addAll(adverseSpawners);
-        attackableSpawners.addAll(freeSpawners);
+        this.attackableSpawners.addAll(adverseSpawners);
+        this.attackableSpawners.addAll(freeSpawners);
 
         // owned spawner resource handler
         DataPacket.ownedSpawnerResourceHandler.actualize(ownedSpawners);

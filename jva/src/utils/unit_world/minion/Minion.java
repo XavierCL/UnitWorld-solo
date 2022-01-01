@@ -14,8 +14,8 @@ import java.util.stream.IntStream;
 
 public class Minion implements Behaviour<DataPacket, Consumer<ServerCommander>> {
 
-    public final Set<String> singuities;
     private final StateMachine<Tuple2<DataPacket, Minion>, Consumer<ServerCommander>> stateMachine;
+    public final Set<String> singuities;
 
     public Minion(MinionState initialState) {
         this.singuities = new HashSet<>();

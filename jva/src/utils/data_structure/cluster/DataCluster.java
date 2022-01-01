@@ -7,7 +7,7 @@ public class DataCluster<T> {
     public final Set<T> elements;
     public String id;
 
-    public DataCluster(Set<T> elements, final String id) {
+    public DataCluster(Set<T> elements) {
         this.elements = elements;
     }
 }

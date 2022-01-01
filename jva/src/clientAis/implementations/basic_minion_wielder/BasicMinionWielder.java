@@ -1,18 +1,14 @@
 package clientAis.implementations.basic_minion_wielder;
 
 import clientAis.communications.ServerCommander;
-import clientAis.communications.game_data.Singuity;
-import clientAis.communications.game_data.Spawner;
 import clientAis.dynamic_data.DataPacket;
 import clientAis.implementations.Bot;
 import clientAis.implementations.basic_minion_wielder.states.DefendClosestSpawner;
-import utils.data_structure.cluster.DataCluster;
-import utils.math.vector.Vector2;
 import utils.unit_world.minion.Minion;
 import utils.unit_world.minion.MinionWielder;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -72,26 +68,5 @@ public class BasicMinionWielder implements Bot, MinionWielder {
     @Override
     public Set<Minion> getMinions() {
         return minions;
-    }
-
-
-    // TODO: instead of using distances to evaluate threat level, we should predict where every enemy cluster is going,
-    //       and towards which spawners they are most likely headed
-    private Map<String, Double> evaluateThreatLevels(final Set<Spawner> ownedSpawners, final Set<DataCluster<Singuity>> adverseClusters) {
-        final Map<String, Double> threatLevelMap = new HashMap<>();
-
-        ownedSpawners.forEach(spawner -> {
-            final AtomicReference<Double> threat = new AtomicReference<>(0d);
-            adverseClusters.forEach(adverseCluster -> {
-                final Optional<Vector2> centerOfMassOpt = Vector2.centerOfMass(adverseCluster.elements, singuity -> singuity.position);
-                centerOfMassOpt.ifPresent(centerOfMass -> {
-                    final Double clusterThreat = adverseCluster.elements.size() / spawner.position.minus(centerOfMass).magnitudeSquared();
-                    threat.set(threat.get() + clusterThreat);
-                });
-            });
-            threatLevelMap.put(spawner.id, threat.get());
-        });
-
-        return threatLevelMap;
     }
 }

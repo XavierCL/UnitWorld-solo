@@ -16,12 +16,16 @@ import clientAis.implementations.closest_spawner.ClosestSpawner;
 import clientAis.implementations.dummy.Dummy;
 import clientAis.implementations.go_middle.GoMiddle;
 import clientAis.implementations.mindless_chase.MindlessChase;
+import clientAis.implementations.multidefense.MultiDefense;
 import clientAis.implementations.relentless_attacker.RelentlessAttacker;
 import clientAis.implementations.threat_level_defender.ThreatLevelDefender;
 import clientAis.networking.ClientConnector;
 import utils.timer.LambdaTimerTaskHelper;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Timer;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -43,7 +47,9 @@ public class MainClientAi {
         addBotImplementation(new BasicSingleMind());
         addBotImplementation(new BasicMinionWielder());
         addBotImplementation(new ThreatLevelDefender());
+
         addBotImplementation(new RelentlessAttacker());
+        addBotImplementation(new MultiDefense());
     }
 
     private static Optional<DataPacket> previousInputOpt = Optional.empty();
