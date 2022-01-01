@@ -12,8 +12,8 @@ class GoToOwnSpawner(ShortState):
         super().__init__(properties)
         self.spawnerId = spawnerId
 
-    def nextState(self, gameState: GameState, plan: Plan, properties: List[ShortMachineProperties]) -> ShortState:
-        return self.getDefaultState(gameState, plan, properties)
+    def nextState(self, gameState: GameState, plan: Plan) -> ShortState:
+        return self.getDefaultState(gameState, plan)
 
     def getMove(self, gameState: GameState, singuityIds: List[str]) -> Move:
         spawnerPosition = first(gameState.spawners, lambda spawner: spawner.id == self.spawnerId).position

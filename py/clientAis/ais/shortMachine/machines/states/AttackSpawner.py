@@ -17,36 +17,36 @@ class AttackSpawner(ShortState):
         super().__init__(properties)
         self.spawner = spawner
 
-    def nextState(self, gameState: GameState, plan: Plan, properties: List[ShortMachineProperties]) -> ShortState:
+    def nextState(self, gameState: GameState, plan: Plan) -> ShortState:
         self.spawner = firstOrNone(gameState.spawners, lambda spawner: spawner.id == self.spawner.id)
 
         if self.spawner is None:
-            return self.getDefaultState(gameState, plan, properties)
+            return self.getDefaultState(gameState, plan)
 
-        if self.canStillAttack(properties):
+        if self.canStillAttack(gameState):
             return self
 
-        return self.getDefaultState(gameState, plan, properties)
+        return self.getDefaultState(gameState, plan)
 
     def getMove(self, gameState: GameState, singuityIds: List[str]) -> Move:
         return Move.fromPosition(singuityIds, self.spawner.position)
 
     @staticmethod
-    def attackIfWorthIt(clusterProperties: ShortMachineProperties, spawner: Spawner, properties: List[ShortMachineProperties]) -> Union[AttackSpawner, None]:
-        if AttackSpawner.isWorthAttacking(clusterProperties, spawner, properties, 3.5, 1.0):
+    def attackIfWorthIt(clusterProperties: ShortMachineProperties, spawner: Spawner, gameState: GameState) -> Union[AttackSpawner, None]:
+        if AttackSpawner.isWorthAttacking(clusterProperties, spawner, gameState, 3.5, 1.0):
             return AttackSpawner(clusterProperties, spawner)
 
         # Not enough units to attack, don't attack
         return None
 
-    def canStillAttack(self, allProperties: List[ShortMachineProperties]) -> bool:
-        return AttackSpawner.isWorthAttacking(self.properties, self.spawner, allProperties, 2.5, 0.7)
+    def canStillAttack(self, gameState: GameState) -> bool:
+        return AttackSpawner.isWorthAttacking(self.properties, self.spawner, gameState, 3.1, 0.9)
 
     @staticmethod
     def isWorthAttacking(
         clusterProperties: ShortMachineProperties,
         spawner: Spawner,
-        properties: List[ShortMachineProperties],
+        gameState: GameState,
         singuityRatio: float,
         spawnerInfluence: float
     ) -> bool:
@@ -62,17 +62,9 @@ class AttackSpawner(ShortState):
             activeSpawningFrames = max(frameUntilArrival - remainingGestationFrame, 0)
             enemyCountFromDistance = activeSpawningFrames / Spawner.SPAWN_FRAME_LAG
 
-        enemyClusters = [p for p in properties if p.playerId != clusterProperties.playerId]
-        totalEnemiesAtLocation = enemyCountFromDistance
-
-        # No enemies, attack indeed
-        if len(enemyClusters) > 0:
-            enemyClusterDistances = distance2(np.array([p.singuityMeanPosition for p in enemyClusters]), spawner.position)
-            closestEnemyClusterIndex = np.argmin(enemyClusterDistances)
-
-            # Closest enemy is too far, ignore it
-            if enemyClusterDistances[closestEnemyClusterIndex] < 400 ** 2:
-                totalEnemiesAtLocation += enemyClusters[closestEnemyClusterIndex].singuityCount
+        enemySinguityPositions = [s.position for s in gameState.singuities if s.playerId != clusterProperties.playerId]
+        closeEnemyCount = 0 if len(enemySinguityPositions) == 0 else np.count_nonzero(distance2(np.array(enemySinguityPositions), spawner.position) < 500 ** 2)
+        totalEnemiesAtLocation = enemyCountFromDistance + closeEnemyCount
 
         # current cluster is more numerous than enemy defender, attack indeed.
         spawnerDiesFirst = totalEnemiesAtLocation + spawnerInfluence * spawner.allegence.healthPoints / Singuity.MAX_HEALTH_POINT

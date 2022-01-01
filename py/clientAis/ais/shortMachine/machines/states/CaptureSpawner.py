@@ -32,16 +32,16 @@ class CaptureSpawner(ShortState):
         # Not enough units to capture, don't even try
         return None
 
-    def nextState(self, gameState: GameState, plan: Plan, properties: List[ShortMachineProperties]) -> ShortState:
+    def nextState(self, gameState: GameState, plan: Plan) -> ShortState:
         self.spawner = firstOrNone(gameState.spawners, lambda spawner: spawner.id == self.spawner.id)
 
         if self.spawner is None:
-            return self.getDefaultState(gameState, plan, properties)
+            return self.getDefaultState(gameState, plan)
 
         if self.captureIfPossible(self.properties, self.spawner) is not None:
             return self
 
-        return self.getDefaultState(gameState, plan, properties)
+        return self.getDefaultState(gameState, plan)
 
     def getMove(self, gameState: GameState, singuityIds: List[str]) -> Move:
         return Move.fromSpawner(singuityIds, self.spawner, self.properties.playerId)
