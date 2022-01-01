@@ -101,6 +101,7 @@ public class MainClientAi {
                     final double timeAfterRunningBot = System.nanoTime()/1000000.0;
                     final double deltaTime = timeAfterRunningBot - timeBeforeRunningBot;
                     System.out.println("Frame " + gameState.frameCount + " took " + String.format("%,.3f", deltaTime) + "ms. CPU " + (int)(100*deltaTime/REFRESH_PERIOD_MS) + "%.");
+
                 }));
             }), 0, REFRESH_PERIOD_MS);
         });

@@ -143,30 +143,4 @@ public class DataPacket {
         allClusters.addAll(adverseClusters);
         //previousInput.ifPresent(this::computeClusterIds);
     }
-
-    /*
-    private void computeClusterIds(DataPacket previousInput) {
-        Map<DataCluster<String>, DataCluster<String>> potentialClusterBijections = new HashMap<>();
-        Map<String, DataCluster<String>> singuityIdToClusterMap = new HashMap<>();
-        Map<String, DataCluster<String>> singuityIdToPreviousClusterMap = new HashMap<>();
-
-        // current map
-        allSinguities.forEach(id -> allClusters.stream()
-                .filter(cluster -> cluster.elements.contains(id))
-                .forEach(cluster -> singuityIdToClusterMap.put(id, cluster)));
-
-        // previous map
-        previousInput.allSinguities.forEach(id -> previousInput.allClusters.stream()
-                .filter(cluster -> cluster.elements.contains(id))
-                .forEach(cluster -> singuityIdToPreviousClusterMap.put(id, cluster)));
-
-        // map between clusters
-        singuityIdToClusterMap.keySet().forEach(currentId -> {
-            final DataCluster<String> currentCluster = singuityIdToClusterMap.get(currentId);
-            final DataCluster<String> previousCluster = singuityIdToPreviousClusterMap.get(currentId);
-            if(previousCluster != null) {
-                potentialClusterBijections.put(currentCluster, previousCluster);
-            }
-        });
-    }*/
 }

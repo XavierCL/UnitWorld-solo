@@ -1,4 +1,8 @@
 *.iml
 out/
 .idea/
+<<<<<<< HEAD
+=======
+../py/launchAis.cmd
+>>>>>>> 19101f9136b73b804437fba37f94121be9c0ed92
 !out/artifacts/jva_jar/jva.jar
