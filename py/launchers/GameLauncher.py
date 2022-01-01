@@ -1,15 +1,32 @@
 import os
+import shutil
 import subprocess
 import time
 from typing import Any, Callable, List
 
+from launchers.MapHandler import MapHandler
+
 class GameLauncher:
-    def __init__(self, lastGamePath: str, pythonExecutablePath: str, javaAiFolder: str):
-        self.lastGamePath = lastGamePath
-        self.pythonExecutablePath = pythonExecutablePath
-        self.javaAiFolder = javaAiFolder
+    def __init__(self, generateNewMap: bool):
+        self.lastGamePath = "./launchers/games/latest/"
+        self.pythonExecutablePath = "mainClientAi.py"
+        self.javaAiFolder = "../jva"
 
         self.cleanupStack: List[Callable[[], Any]] = []
+
+        gameExecutablesPath = "../cpp/x64/Release/"
+
+        # Copying game from release
+        gameFileNames = ["openal32.dll", "sfml-audio-2.dll", "sfml-graphics-2.dll", "sfml-network-2.dll", "sfml-system-2.dll", "sfml-window-2.dll", "UnitWorld_client_ais.exe",
+                         "UnitWorld_client_gui.exe", "UnitWorld_server.exe"]
+        for gameFileName in gameFileNames:
+            shutil.copy(os.path.join(gameExecutablesPath, gameFileName), os.path.join(self.lastGamePath, gameFileName))
+
+        archivedGamesPath = "./launchers/games/archived/"
+
+        if generateNewMap:
+            mapHandler = MapHandler(self.lastGamePath, archivedGamesPath)
+            mapHandler.archiveGenerateAndSaveMap()
 
     def runServerBackground(self):
         serverProcess = subprocess.Popen(os.path.normpath(os.path.join(self.lastGamePath, 'UnitWorld_server.exe')), cwd=os.path.normpath(self.lastGamePath))
