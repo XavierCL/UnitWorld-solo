@@ -18,10 +18,6 @@ public class BasicMinionWielder implements Bot, MinionWielder {
     private final Set<Minion> minionsToAdd;
     private final Set<Minion> minionsToRemove;
 
-    // TODO: Check whether an enemy cluster is moving or not. If it's moving, check where it's most likely headed to (probably a spawner. Which one?)
-    //       If it's not moving, and it's on an enemy spawner, it's probably defending. If it's not moving, and on an ally spawner, then it's probably attacking.
-    //       If it's not moving, and it's in the middle of nowhere, then it's probably wasting its time? Bait? Forming a strong cluster? Gathering more singuities before attack?
-
     public BasicMinionWielder() {
         this.minions = new HashSet<>();
         this.minionsToAdd = new HashSet<>();

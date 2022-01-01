@@ -5,6 +5,7 @@ import clientAis.communications.game_data.Singuity;
 import clientAis.communications.game_data.Spawner;
 import utils.data_structure.cluster.DataCluster;
 import utils.data_structure.cluster.DensityBasedScan;
+import utils.data_structure.tupple.Tuple3;
 import utils.unit_world.game_data_resources.MemoryResource;
 import utils.unit_world.game_data_resources.ResourceHandler;
 
@@ -38,6 +39,8 @@ public class DataPacket {
     public final Set<String> freeSpawners;
     public final Set<String> attackableSpawners;
 
+    public final Map<String, DataCluster<String>> clusterIdMap;
+
     public final Set<DataCluster<String>> ownedClusters;
     public final Set<DataCluster<String>> adverseClusters;
     public final Set<DataCluster<String>> allClusters;
@@ -56,8 +59,7 @@ public class DataPacket {
 
         // setup id maps
         this.singuityIdMap = new HashMap<>();
-        gameState.singuities
-                .stream()
+        gameState.singuities.stream()
                 .filter(Objects::nonNull)
                 .forEach(singuity -> singuityIdMap.put(singuity.id, singuity));
         this.spawnerIdMap = new HashMap<>();
@@ -77,12 +79,15 @@ public class DataPacket {
                 .map(singuity -> singuity.id)
                 .collect(Collectors.toSet());
         // new owned
-        this.newOwnedSinguities = new HashSet<>(ownedSinguities);
-        previousInputOpt.ifPresent(dataPacket -> this.newOwnedSinguities.removeAll(dataPacket.ownedSinguities));
+        this.newOwnedSinguities = ownedSinguities.stream()
+                .filter(ownedSinguity -> previousInputOpt.isPresent())
+                .filter(ownedSinguity -> !previousInputOpt.get().ownedSinguities.contains(ownedSinguity))
+                .collect(Collectors.toSet());
         // dead owned
-        this.deadOwnedSinguities = new HashSet<>(previousInputOpt.map(dataPacket -> dataPacket.ownedSinguities)
-                .orElse(new HashSet<>()));
-        previousInputOpt.ifPresent(dataPacket -> this.deadOwnedSinguities.removeAll(ownedSinguities));
+        this.deadOwnedSinguities = new HashSet<>();
+        previousInputOpt.ifPresent(previousInput -> previousInput.ownedSinguities.stream()
+                .filter(previousOwnedSinguities -> !ownedSinguities.contains(previousOwnedSinguities))
+                .forEach(deadOwnedSinguities::add));
         // adverse
         this.adverseSinguities = allSinguities.stream()
                 .filter(Objects::nonNull)
@@ -105,11 +110,15 @@ public class DataPacket {
                 .map(spawner -> spawner.id)
                 .collect(Collectors.toSet());
         // new owned
-        this.newOwnedSpawners = new HashSet<>(ownedSpawners);
-        previousInputOpt.ifPresent(dataPacket -> this.ownedSpawners.removeAll(dataPacket.ownedSpawners));
+        this.newOwnedSpawners = ownedSpawners.stream()
+                .filter(ownedSpawner -> previousInputOpt.isPresent())
+                .filter(ownedSpawner -> !previousInputOpt.get().ownedSpawners.contains(ownedSpawner))
+                .collect(Collectors.toSet());
         // dead owned
-        this.deadOwnedSpawners = new HashSet<>(previousInputOpt.map(dataPacket -> dataPacket.ownedSpawners).orElse(new HashSet<>()));
-        previousInputOpt.ifPresent(dataPacket -> this.deadOwnedSpawners.removeAll(dataPacket.ownedSpawners));
+        this.deadOwnedSpawners = new HashSet<>();
+        previousInputOpt.ifPresent(previousInput -> previousInput.ownedSpawners.stream()
+                .filter(previousOwnedSpawner -> !ownedSpawners.contains(previousOwnedSpawner))
+                .forEach(deadOwnedSpawners::add));
         // adverse
         this.adverseSpawners = gameState.spawners.stream()
                 .filter(spawner -> spawner.allegence.map(spawnerAllegence ->
@@ -141,6 +150,63 @@ public class DataPacket {
         this.adverseClusters = adverseSinguityDensityScanner.query(DENSITY_SCAN_RADIUS);
         this.allClusters = new HashSet<>(ownedClusters);
         allClusters.addAll(adverseClusters);
-        //previousInput.ifPresent(this::computeClusterIds);
+        previousInput.ifPresentOrElse(previousInput -> updateClusterIds(allClusters, previousInput.allClusters), () -> initClusterIds(allClusters));
+
+        this.clusterIdMap = new HashMap<>();
+        allClusters.forEach(cluster -> clusterIdMap.put(cluster.id, cluster));
+    }
+
+    private void initClusterIds(final Set<DataCluster<String>> singuityClusters) {
+        singuityClusters.forEach(singuityCluster -> singuityCluster.id = UUID.randomUUID().toString());
+    }
+
+    private void updateClusterIds(final Set<DataCluster<String>> singuityClusters, final Set<DataCluster<String>> previousSinguityClusters) {
+        final Set<String> availableClusterIds = previousSinguityClusters.stream()
+                .map(cluster -> cluster.id)
+                .collect(Collectors.toSet());
+        var referenceCounterObjects = generateClustersReferenceCount(previousSinguityClusters).stream()
+                .sorted(Comparator.comparingInt(clusterReferenceCount -> clusterReferenceCount.value3))
+                .collect(Collectors.toList());
+        Collections.reverse(referenceCounterObjects);
+        referenceCounterObjects.forEach(referenceCounterObject -> {
+            if(availableClusterIds.contains(referenceCounterObject.value2)) {   // if the reference hasn't been taken yet
+                referenceCounterObject.value1.id = referenceCounterObject.value2;   // set the id of the cluster
+                availableClusterIds.remove(referenceCounterObject.value2);          // "take" the reference so we can't use it twice
+            }
+        });
+
+        // generate new uuids for the somewhat "new" clusters that have no ids yet
+        singuityClusters.stream()
+                .filter(singuityCluster -> singuityCluster.id.equals(""))
+                .forEach(singuityCluster -> singuityCluster.id = UUID.randomUUID().toString());
+    }
+
+    private Set<Tuple3<DataCluster<String>, String, Integer>> generateClustersReferenceCount(
+            final Set<DataCluster<String>> previousSinguityClusters) {
+        // <cluster that needs its id to be set, one such possible id, amount of times this possible id was referenced>
+        final Set<Tuple3<DataCluster<String>, String, Integer>> clustersReferenceCount = new HashSet<>();
+
+        allSinguities.forEach(singuity -> {
+            previousSinguityClusters.forEach(previousCluster -> {
+                if(previousCluster.elements.contains(singuity)) {
+                    final Optional<Tuple3<DataCluster<String>, String, Integer>> clusterReferenceCountOpt = clustersReferenceCount.stream()
+                            .filter(clusterReferenceCount -> clusterReferenceCount.value2.equals(previousCluster.id))
+                            .findFirst();
+                    clusterReferenceCountOpt.ifPresentOrElse(clusterReferenceCount -> clusterReferenceCount.value3++,
+                            () -> clustersReferenceCount.add(new Tuple3<>(
+                                    findClusterInWhichSinguityBelongs(singuity),
+                                    previousCluster.id,
+                                    1)));
+                }
+            });
+        });
+
+        return clustersReferenceCount;
+    }
+
+    private DataCluster<String> findClusterInWhichSinguityBelongs(final String singuity) {
+        return allClusters.stream()
+                .filter(cluster -> cluster.elements.contains(singuity))
+                .findFirst().get();
     }
 }

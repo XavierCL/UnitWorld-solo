@@ -9,5 +9,6 @@ public class DataCluster<T> {
 
     public DataCluster(Set<T> elements) {
         this.elements = elements;
+        this.id = "";
     }
 }
