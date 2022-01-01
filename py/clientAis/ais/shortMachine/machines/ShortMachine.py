@@ -17,6 +17,6 @@ class ShortMachine:
         self.currentState = self.currentState.updateProperties(singuities, frameCount)
         return self
 
-    def nextState(self, gameState: GameState, plan: Plan, clusterProperties: List[ShortMachineProperties]) -> Move:
-        self.currentState = self.currentState.nextState(gameState, plan, clusterProperties)
+    def nextState(self, gameState: GameState, plan: Plan) -> Move:
+        self.currentState = self.currentState.nextState(gameState, plan)
         return self.currentState.getMove(gameState, [s.id for s in self.singuities])

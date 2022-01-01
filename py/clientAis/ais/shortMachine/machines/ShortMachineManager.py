@@ -1,5 +1,4 @@
 from typing import Dict, List
-from uuid import uuid4
 
 import numpy as np
 
@@ -8,7 +7,6 @@ from clientAis.ais.shortMachine.gameInterface.Move import Move
 from clientAis.ais.shortMachine.long.planProvider import PlanProvider
 from clientAis.ais.shortMachine.machines.ShortMachine import ShortMachine
 from clientAis.games.GameState import GameState
-from utils.arrays import flatten
 
 class ShortMachineManager:
     def __init__(self):
@@ -20,18 +18,16 @@ class ShortMachineManager:
     # todo merge two clusters, probably by checking affinities in goal, and if a goal is achievable together lets do it. There might be an issue with cluster std
     # todo make default movement go to closest claimed spawner
     # todo cluster based on position + speed for less discrepancies in clusters
-    # todo sometimes attack larger than 4x units defended enemy spawner, or does it?
     # todo micro interrupts
     # todo defense
     def fromGameState(self, gameState: GameState, currentPlayerId: str) -> List[Move]:
         self.updateClusters(gameState)
         plan = self.planProvider.getPlan(gameState, currentPlayerId)
-        clusterProperties = [c.currentState.properties for c in flatten([clusters for clusters in self.clustersByPlayerId.values()])]
 
         moves = []
 
         for cluster in self.clustersByPlayerId.get(currentPlayerId, []):
-            moves.append(cluster.nextState(gameState, plan, clusterProperties))
+            moves.append(cluster.nextState(gameState, plan))
 
         return moves
 

@@ -17,13 +17,13 @@ class ShortState:
         self.properties = self.properties.updateSinguities(singuities, frameCount)
         return self
 
-    def nextState(self, gameState: GameState, plan: Plan, properties: List[ShortMachineProperties]) -> ShortState:
+    def nextState(self, gameState: GameState, plan: Plan) -> ShortState:
         raise NotImplementedError
 
     def getMove(self, gameState: GameState, singuityIds: List[str]) -> Move:
         raise NotImplementedError
 
-    def getDefaultState(self, gameState: GameState, plan: Plan, properties: List[ShortMachineProperties]) -> ShortState:
+    def getDefaultState(self, gameState: GameState, plan: Plan) -> ShortState:
         from clientAis.ais.shortMachine.machines.states.CaptureSpawner import CaptureSpawner
         from clientAis.ais.shortMachine.machines.states.AttackSpawner import AttackSpawner
 
@@ -32,7 +32,7 @@ class ShortState:
         for spawnerId in plan.offensiveSpawnerIds:
             spawnerStateGenerator = [
                 lambda: CaptureSpawner.captureIfPossible(self.properties, spawnerById[spawnerId]),
-                lambda: AttackSpawner.attackIfWorthIt(self.properties, spawnerById[spawnerId], properties)
+                lambda: AttackSpawner.attackIfWorthIt(self.properties, spawnerById[spawnerId], gameState)
             ]
 
             for stateGenerator in spawnerStateGenerator:
