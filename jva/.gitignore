@@ -1,5 +1,4 @@
 *.iml
 out/
 .idea/
-launchAis.cmd
 !out/artifacts/jva_jar/jva.jar
