@@ -79,10 +79,10 @@ public class DataPacket {
                 .map(singuity -> singuity.id)
                 .collect(Collectors.toSet());
         // new owned
-        this.newOwnedSinguities = ownedSinguities.stream()
-                .filter(ownedSinguity -> previousInputOpt.isPresent())
-                .filter(ownedSinguity -> !previousInputOpt.get().ownedSinguities.contains(ownedSinguity))
-                .collect(Collectors.toSet());
+        this.newOwnedSinguities = new HashSet<>();
+        previousInputOpt.ifPresentOrElse(previousInput -> ownedSinguities.stream()
+                .filter(ownedSinguity -> !previousInput.ownedSpawners.contains(ownedSinguity))
+                .forEach(newOwnedSinguities::add), () -> newOwnedSinguities.addAll(ownedSinguities));
         // dead owned
         this.deadOwnedSinguities = new HashSet<>();
         previousInputOpt.ifPresent(previousInput -> previousInput.ownedSinguities.stream()
@@ -110,10 +110,10 @@ public class DataPacket {
                 .map(spawner -> spawner.id)
                 .collect(Collectors.toSet());
         // new owned
-        this.newOwnedSpawners = ownedSpawners.stream()
-                .filter(ownedSpawner -> previousInputOpt.isPresent())
-                .filter(ownedSpawner -> !previousInputOpt.get().ownedSpawners.contains(ownedSpawner))
-                .collect(Collectors.toSet());
+        this.newOwnedSpawners = new HashSet<>();
+        previousInputOpt.ifPresentOrElse(previousInput -> ownedSpawners.stream()
+                .filter(ownedSpawner -> !previousInput.ownedSpawners.contains(ownedSpawner))
+                .forEach(newOwnedSpawners::add), () -> newOwnedSpawners.addAll(ownedSpawners));
         // dead owned
         this.deadOwnedSpawners = new HashSet<>();
         previousInputOpt.ifPresent(previousInput -> previousInput.ownedSpawners.stream()

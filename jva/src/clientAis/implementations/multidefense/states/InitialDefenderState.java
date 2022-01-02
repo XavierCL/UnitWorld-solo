@@ -5,13 +5,15 @@ import clientAis.dynamic_data.DataPacket;
 import utils.state_machine.State;
 import utils.unit_world.singuity_state_machine.SinguityStateMachine;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class InitialDefenderState implements State<DataPacket, Consumer<ServerCommander>> {
 
+    private Optional<SinguityStateMachine> singuityStateMachineOpt = Optional.empty();
 
     public void linkSinguityMachine(SinguityStateMachine singuityStateMachine) {
-        // TODO: implement private variable
+        singuityStateMachineOpt = Optional.of(singuityStateMachine);
     }
 
     @Override
@@ -26,6 +28,14 @@ public class InitialDefenderState implements State<DataPacket, Consumer<ServerCo
 
     @Override
     public Consumer<ServerCommander> exec(DataPacket input) {
+        if(singuityStateMachineOpt.isPresent()) {
+            if(singuityStateMachineOpt.get().spawnerOpt.isPresent()) {
+                return serverCommander -> serverCommander.moveUnitsToPosition(
+                        singuityStateMachineOpt.get().singuities,
+                        input.spawnerIdMap.get(singuityStateMachineOpt.get().spawnerOpt.get()).position);
+            }
+        }
+
         return serverCommander -> {};
     }
 

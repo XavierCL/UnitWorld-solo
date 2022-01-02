@@ -26,8 +26,10 @@ public class MultiDefense implements Bot {
 
     @Override
     public Consumer<ServerCommander> exec(DataPacket input) {
-        makeSureEveryOwnedSpawnerIsHandledWithAStateMachine(input);
-        assingNewSinguitiesToTheRightSpawners(input);
+        updateInitialSpawnerStates(input);
+        updateSinguitiesForTheStateMachine(input);
+
+        singuityStateMachines.forEach(singuityStateMachine -> System.out.println(singuityStateMachine.singuities.size()));
 
         return serverCommander -> singuityStateMachines.stream()
                 .map(singuityStateMachine -> singuityStateMachine.stateMachine)
@@ -35,9 +37,42 @@ public class MultiDefense implements Bot {
                 .forEach(serverCommanderConsumer -> serverCommanderConsumer.accept(serverCommander));
     }
 
-    private void makeSureEveryOwnedSpawnerIsHandledWithAStateMachine(final DataPacket input) {
+    private void updateInitialSpawnerStates(final DataPacket input) {
         input.newOwnedSpawners.forEach(this::addDefenderStateMachine);
         input.deadOwnedSpawners.forEach(this::removeDefenderStateMachine);
+    }
+
+    private void addDefenderStateMachine(final String spawner) {
+        final Optional<SinguityStateMachine> singuityStateMachineOpt = singuityStateMachines.stream()
+                .filter(singuityStateMachine -> singuityStateMachine.spawnerOpt.isPresent())
+                .filter(singuityStateMachine -> singuityStateMachine.spawnerOpt.get().equals(spawner))
+                .findFirst();
+        if(singuityStateMachineOpt.isEmpty()) {
+            // "complicated stuff" to have a double-sided reference between the state and its state machine
+            final InitialDefenderState initialDefenderState = new InitialDefenderState();
+            final SinguityStateMachine singuityStateMachine = new SinguityStateMachine(
+                    new StateMachine<>(initialDefenderState),
+                    new HashSet<>(),
+                    spawner);
+            // that's where the "double-sided reference" is updated for the state
+            initialDefenderState.linkSinguityMachine(singuityStateMachine);
+            singuityStateMachines.add(singuityStateMachine);
+        }
+    }
+
+    private void removeDefenderStateMachine(final String spawner) {
+        // Using a set here is indeed redundant, but we handle the general case by doing so instead of
+        // assuming that the uuids just work as intended.
+        final Set<SinguityStateMachine> singuityStateMachineSet = singuityStateMachines.stream()
+                .filter(singuityStateMachine -> singuityStateMachine.spawnerOpt.isPresent())
+                .filter(singuityStateMachine -> singuityStateMachine.spawnerOpt.get().equals(spawner))
+                .collect(Collectors.toSet());
+        singuityStateMachineSet.forEach(singuityStateMachines::remove);
+    }
+
+    private void updateSinguitiesForTheStateMachine(DataPacket input) {
+        assingNewSinguitiesToTheRightSpawners(input);
+        removeDeadSinguities(input);
     }
 
     private void assingNewSinguitiesToTheRightSpawners(final DataPacket input) {
@@ -67,31 +102,7 @@ public class MultiDefense implements Bot {
         };
     }
 
-    private void addDefenderStateMachine(final String spawner) {
-        final Optional<SinguityStateMachine> singuityStateMachineOpt = singuityStateMachines.stream()
-                .filter(singuityStateMachine -> singuityStateMachine.spawnerOpt.isPresent())
-                .filter(singuityStateMachine -> singuityStateMachine.spawnerOpt.get().equals(spawner))
-                .findFirst();
-        if(singuityStateMachineOpt.isEmpty()) {
-            // "complicated stuff" to have a double-sided reference between the state and its state machine
-            final InitialDefenderState initialDefenderState = new InitialDefenderState();
-            final SinguityStateMachine singuityStateMachine = new SinguityStateMachine(
-                    new StateMachine<>(initialDefenderState),
-                    new HashSet<>(),
-                    spawner);
-            // that's where the "double-sided reference" is updated for the state
-            initialDefenderState.linkSinguityMachine(singuityStateMachine);
-            singuityStateMachines.add(singuityStateMachine);
-        }
-    }
-
-    private void removeDefenderStateMachine(final String spawner) {
-        // Using a set here is indeed redundant, but we handle the general case by doing so instead of
-        // assuming that the uuids just work as intended.
-        final Set<SinguityStateMachine> singuityStateMachineSet = singuityStateMachines.stream()
-                .filter(singuityStateMachine -> singuityStateMachine.spawnerOpt.isPresent())
-                .filter(singuityStateMachine -> singuityStateMachine.spawnerOpt.get().equals(spawner))
-                .collect(Collectors.toSet());
-        singuityStateMachineSet.forEach(singuityStateMachines::remove);
+    private void removeDeadSinguities(DataPacket input) {
+        singuityStateMachines.forEach(singuityStateMachine -> singuityStateMachine.singuities.removeAll(input.deadOwnedSinguities));
     }
 }

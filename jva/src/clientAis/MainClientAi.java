@@ -33,7 +33,7 @@ public class MainClientAi {
 
     public static final String DEFAULT_SERVER_IP = "127.0.0.1";
     public static final String DEFAULT_SERVER_PORT = "52124";
-    public static final String DEFAULT_AI_NAME = BasicMinionWielder.class.getName();
+    public static final String DEFAULT_AI_NAME = MultiDefense.class.getName();
     public static final double SECOND_BETWEEN_AI_FRAME = 0.1;
     public static final long REFRESH_PERIOD_MS = (int)(SECOND_BETWEEN_AI_FRAME*1000);
 
