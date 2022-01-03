@@ -9,6 +9,7 @@ import java.util.Optional;
 public class Spawner {
 
     public static final double SINGUITY_SPAWNING_RATE = 1.0/MainClientAi.SECOND_BETWEEN_AI_FRAME;
+    public static final int AMOUNT_OF_SINGUITIES_NEEDED_TO_CONQUER = 100;
 
     public final String id;
     public final Vector2 position;

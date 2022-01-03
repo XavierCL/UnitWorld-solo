@@ -81,7 +81,7 @@ public class DataPacket {
         // new owned
         this.newOwnedSinguities = new HashSet<>();
         previousInputOpt.ifPresentOrElse(previousInput -> ownedSinguities.stream()
-                .filter(ownedSinguity -> !previousInput.ownedSpawners.contains(ownedSinguity))
+                .filter(ownedSinguity -> !previousInput.ownedSinguities.contains(ownedSinguity))
                 .forEach(newOwnedSinguities::add), () -> newOwnedSinguities.addAll(ownedSinguities));
         // dead owned
         this.deadOwnedSinguities = new HashSet<>();

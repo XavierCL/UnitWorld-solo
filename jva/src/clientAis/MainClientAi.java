@@ -112,7 +112,10 @@ public class MainClientAi {
             final String currentPlayerId,
             final GameState gameState,
             final ServerCommander serverCommander) {
+        long x1 = System.currentTimeMillis();
         final DataPacket input = new DataPacket(gameState, currentPlayerId, previousInputOpt);
+        long x2 = System.currentTimeMillis();
+        System.out.println(x2-x1);
         final Consumer<ServerCommander> consumer = bot.exec(input);
         previousInputOpt = Optional.of(input);
         consumer.accept(serverCommander);

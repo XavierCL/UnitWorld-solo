@@ -5,10 +5,14 @@ import clientAis.communications.game_data.Singuity;
 import clientAis.communications.game_data.Spawner;
 import clientAis.dynamic_data.DataPacket;
 import clientAis.implementations.Bot;
+import clientAis.implementations.multidefense.states.CaptureSpawnerState;
 import clientAis.implementations.multidefense.states.InitialDefenderState;
+import utils.data_structure.collection.Discriminator;
+import utils.math.vector.Vector2;
 import utils.state_machine.StateMachine;
 import utils.unit_world.singuity_state_machine.SinguityStateMachine;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -19,22 +23,23 @@ import java.util.stream.Collectors;
 public class MultiDefense implements Bot {
 
     public final Set<SinguityStateMachine> singuityStateMachines;
+    public final Set<SinguityStateMachine> singuityStateMachinesToRemove;
 
     public MultiDefense() {
         this.singuityStateMachines = new HashSet<>();
+        this.singuityStateMachinesToRemove = new HashSet<>();
     }
 
     @Override
-    public Consumer<ServerCommander> exec(DataPacket input) {
+    public Consumer<ServerCommander> exec(final DataPacket input) {
+        singuityStateMachines.removeAll(singuityStateMachinesToRemove);
+        singuityStateMachinesToRemove.clear();
+
         updateInitialSpawnerStates(input);
-        updateSinguitiesForTheStateMachine(input);
+        updateSinguitiesForTheRunningStates(input);
+        updateNonDefendingStates(input);
 
-        singuityStateMachines.forEach(singuityStateMachine -> System.out.println(singuityStateMachine.singuities.size()));
-
-        return serverCommander -> singuityStateMachines.stream()
-                .map(singuityStateMachine -> singuityStateMachine.stateMachine)
-                .map(stateMachine -> stateMachine.exec(input))
-                .forEach(serverCommanderConsumer -> serverCommanderConsumer.accept(serverCommander));
+        return executeBotMachines(input);
     }
 
     private void updateInitialSpawnerStates(final DataPacket input) {
@@ -70,13 +75,13 @@ public class MultiDefense implements Bot {
         singuityStateMachineSet.forEach(singuityStateMachines::remove);
     }
 
-    private void updateSinguitiesForTheStateMachine(DataPacket input) {
-        assingNewSinguitiesToTheRightSpawners(input);
-        removeDeadSinguities(input);
+    private void updateSinguitiesForTheRunningStates(final DataPacket input) {
+        assingNewSinguitiesToTheRightSpawners(input.newOwnedSinguities, input);
+        removeSinguitiesFromRunningStates(input.deadOwnedSinguities);
     }
 
-    private void assingNewSinguitiesToTheRightSpawners(final DataPacket input) {
-        input.newOwnedSinguities.forEach(singuityId -> {
+    public void assingNewSinguitiesToTheRightSpawners(final Set<String> singuitiesToAdd, final DataPacket input) {
+        singuitiesToAdd.forEach(singuityId -> {
             final Singuity singuity = input.singuityIdMap.get(singuityId);
             final Optional<SinguityStateMachine> singuityStateMachineOpt = singuityStateMachines.stream()
                     .filter(singuityStateMachine -> singuityStateMachine.spawnerOpt.isPresent())
@@ -102,7 +107,66 @@ public class MultiDefense implements Bot {
         };
     }
 
-    private void removeDeadSinguities(DataPacket input) {
-        singuityStateMachines.forEach(singuityStateMachine -> singuityStateMachine.singuities.removeAll(input.deadOwnedSinguities));
+    private void removeSinguitiesFromRunningStates(final Set<String> singuitiesToRemove) {
+        singuityStateMachines.forEach(singuityStateMachine -> singuityStateMachine.singuities.removeAll(singuitiesToRemove));
+    }
+
+    private void updateNonDefendingStates(final DataPacket input) {
+        final Optional<Set<String>> defendingSinguitiesOpt = getDefendingSinguitiesOpt();
+        defendingSinguitiesOpt.ifPresent(defendingSinguities -> {
+            // TODO: put the if in a separate function!
+            if(defendingSinguities.size() >= Spawner.AMOUNT_OF_SINGUITIES_NEEDED_TO_CONQUER) {
+                final Vector2 centerOfMassOfOwnedSpawners = Vector2.centerOfMass(input.ownedSpawners.stream()
+                        .map(input.spawnerIdMap::get)
+                        .map(spawner -> spawner.position)
+                        .collect(Collectors.toSet())).get();
+                final Collection<String> closestFreeSpawnerInACollection = new Discriminator<>(input.freeSpawners)
+                        .discriminate(1, spawnerId -> {
+                    final Vector2 spawnerPosition = input.spawnerIdMap.get(spawnerId).position;
+                    final double distanceSquared = centerOfMassOfOwnedSpawners.distanceSquared(spawnerPosition);
+                    return -distanceSquared;
+                });
+                closestFreeSpawnerInACollection.stream().findFirst().ifPresent(spawnerId -> {
+                    final Collection<String> singuitiesToTakeFreeSpawner = new Discriminator<>(defendingSinguities)
+                            .discriminate(Spawner.AMOUNT_OF_SINGUITIES_NEEDED_TO_CONQUER, singuityId -> {
+                                final Vector2 spawnerPosition = input.spawnerIdMap.get(spawnerId).position;
+                                final Vector2 singuityPosition = input.singuityIdMap.get(singuityId).position;
+                                final double distanceSquared = spawnerPosition.distanceSquared(singuityPosition);
+                                return -distanceSquared;
+                            });
+                    // updating singuities when creating the new state
+                    singuityStateMachines.forEach(singuityStateMachine -> singuityStateMachine.singuities.removeAll(singuitiesToTakeFreeSpawner));
+                    final CaptureSpawnerState state = new CaptureSpawnerState(spawnerId);
+                    final SinguityStateMachine singuityStateMachine = new SinguityStateMachine(
+                            new StateMachine<>(state),
+                            new HashSet<>(singuitiesToTakeFreeSpawner));
+                    state.linkSinguityMachine(singuityStateMachine);
+                    state.linkMultiDefenseBot(this);
+                    singuityStateMachines.add(singuityStateMachine);
+                });
+            }
+        });
+    }
+
+    private Optional<Set<String>> getDefendingSinguitiesOpt() {
+        return singuityStateMachines.stream()
+                .filter(singuityStateMachine -> singuityStateMachine.spawnerOpt.isPresent())
+                .map(singuityStateMachine -> singuityStateMachine.singuities)
+                .reduce((singuities1, singuities2) -> {
+                    final Set<String> combined = new HashSet<>(singuities1);
+                    combined.addAll(singuities2);
+                    return combined;
+                });
+    }
+
+    private Consumer<ServerCommander> executeBotMachines(final DataPacket input) {
+        return serverCommander -> singuityStateMachines.stream()
+                .map(singuityStateMachine -> singuityStateMachine.stateMachine)
+                .map(stateMachine -> stateMachine.exec(input))
+                .forEach(serverCommanderConsumer -> serverCommanderConsumer.accept(serverCommander));
+    }
+
+    public void removeStateMachine(final SinguityStateMachine singuityStateMachine) {
+        singuityStateMachinesToRemove.add(singuityStateMachine);
     }
 }
