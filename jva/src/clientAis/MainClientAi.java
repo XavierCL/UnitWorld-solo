@@ -15,6 +15,8 @@ import clientAis.implementations.challenge_defense.ChallengeDefense;
 import clientAis.implementations.closest_spawner.ClosestSpawner;
 import clientAis.implementations.dummy.Dummy;
 import clientAis.implementations.go_middle.GoMiddle;
+import clientAis.implementations.keep_n_singuities_on_initial_spawner.KeepNSinguitiesOnInitialSpawner;
+import clientAis.implementations.attack_first_enemy_spawner_with_n_singuities.AttackFirstEnemySpawnerWithNSinguities;
 import clientAis.implementations.mindless_chase.MindlessChase;
 import clientAis.implementations.multidefense.MultiDefense;
 import clientAis.implementations.relentless_attacker.RelentlessAttacker;
@@ -33,8 +35,8 @@ public class MainClientAi {
 
     public static final String DEFAULT_SERVER_IP = "127.0.0.1";
     public static final String DEFAULT_SERVER_PORT = "52124";
-    public static final String DEFAULT_AI_NAME = MultiDefense.class.getName();
-    public static final double SECOND_BETWEEN_AI_FRAME = 0.1;
+    public static final String DEFAULT_AI_NAME = KeepNSinguitiesOnInitialSpawner.class.getName();
+    public static final double SECOND_BETWEEN_AI_FRAME = 0.3;
     public static final long REFRESH_PERIOD_MS = (int)(SECOND_BETWEEN_AI_FRAME*1000);
 
     private static final Map<String, Bot> BOT_IMPLEMENTATIONS = new HashMap<>();
@@ -50,6 +52,9 @@ public class MainClientAi {
 
         addBotImplementation(new RelentlessAttacker());
         addBotImplementation(new MultiDefense());
+
+        addBotImplementation(new KeepNSinguitiesOnInitialSpawner());
+        addBotImplementation(new AttackFirstEnemySpawnerWithNSinguities());
     }
 
     private static Optional<DataPacket> previousInputOpt = Optional.empty();
@@ -115,7 +120,6 @@ public class MainClientAi {
         long x1 = System.currentTimeMillis();
         final DataPacket input = new DataPacket(gameState, currentPlayerId, previousInputOpt);
         long x2 = System.currentTimeMillis();
-        System.out.println(x2-x1);
         final Consumer<ServerCommander> consumer = bot.exec(input);
         previousInputOpt = Optional.of(input);
         consumer.accept(serverCommander);

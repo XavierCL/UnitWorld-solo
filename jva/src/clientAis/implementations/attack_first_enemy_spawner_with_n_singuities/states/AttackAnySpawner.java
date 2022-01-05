@@ -1,30 +1,24 @@
-package clientAis.implementations.multidefense.states;
+package clientAis.implementations.attack_first_enemy_spawner_with_n_singuities.states;
 
 import clientAis.communications.ServerCommander;
 import clientAis.dynamic_data.DataPacket;
-import clientAis.implementations.multidefense.MultiDefense;
 import utils.state_machine.State;
 import utils.unit_world.singuity_state_machine.SinguityStateMachine;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class CaptureSpawnerState implements State<DataPacket, Consumer<ServerCommander>> {
+public class AttackAnySpawner implements State<DataPacket, Consumer<ServerCommander>> {
 
     private Optional<SinguityStateMachine> singuityStateMachineOpt = Optional.empty();
-    private Optional<MultiDefense> multiDefenseOpt = Optional.empty();
     private final String idOfSpawnerToCapture;
 
-    public CaptureSpawnerState(final String idOfSpawnerToCapture) {
+    public AttackAnySpawner(final String idOfSpawnerToCapture) {
         this.idOfSpawnerToCapture = idOfSpawnerToCapture;
     }
 
     public void linkSinguityMachine(SinguityStateMachine singuityStateMachine) {
         singuityStateMachineOpt = Optional.of(singuityStateMachine);
-    }
-
-    public void linkMultiDefenseBot(final MultiDefense multiDefense) {
-        multiDefenseOpt = Optional.of(multiDefense);
     }
 
     @Override
@@ -40,18 +34,13 @@ public class CaptureSpawnerState implements State<DataPacket, Consumer<ServerCom
     @Override
     public Consumer<ServerCommander> exec(DataPacket input) {
         return singuityStateMachineOpt.<Consumer<ServerCommander>>map(singuityStateMachine ->
-                        serverCommander -> serverCommander.moveUnitsToSpawner(singuityStateMachine.singuities, idOfSpawnerToCapture))
+                        serverCommander -> serverCommander.moveUnitsToPosition(singuityStateMachine.singuities, input.spawnerIdMap.get(idOfSpawnerToCapture).position))
                 .orElseGet(() -> serverCommander -> {});
+
     }
 
     @Override
     public State<DataPacket, Consumer<ServerCommander>> next(DataPacket input) {
-        if(!input.freeSpawners.contains(idOfSpawnerToCapture)) {
-            multiDefenseOpt.ifPresent(multiDefense -> singuityStateMachineOpt.ifPresent(singuityStateMachine -> {
-                multiDefense.assingNewSinguitiesToTheRightSpawners(singuityStateMachine.singuities, input);
-                multiDefense.removeStateMachine(singuityStateMachine);
-            }));
-        }
         return this;
     }
 
